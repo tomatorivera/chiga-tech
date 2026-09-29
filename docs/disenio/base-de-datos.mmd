@@ -1,0 +1,280 @@
+erDiagram
+    usuario ||--o{ usuario_rol : "posee"
+    rol ||--o{ usuario_rol : "es_asignado_en"
+    rol ||--o{ rol_permiso : "otorga"
+    permiso ||--o{ rol_permiso : "es_otorgado_en"
+    categoria ||--o{ categoria : "es_familia_de"
+    categoria ||--o{ producto : "clasifica"
+    ubicacion |o--o{ producto : "almacena"
+    producto ||--|{ codigo_barra : "se_identifica_con"
+    producto ||--o{ movimiento_stock : "registra"
+    proveedor |o--o{ movimiento_stock : "provee_en"
+    usuario ||--o{ movimiento_stock : "carga"
+    venta |o--o{ movimiento_stock : "descuenta"
+    nota |o--o{ movimiento_stock : "reingresa"
+    cliente ||--o| cuenta_corriente : "posee"
+    cliente ||--o{ venta : "realiza"
+    usuario ||--o{ venta : "vende"
+    venta ||--|{ item_venta : "contiene"
+    producto ||--o{ item_venta : "es_vendido_en"
+    venta ||--o{ autorizacion : "requiere"
+    comprobante |o--o{ autorizacion : "requiere"
+    usuario ||--o{ autorizacion : "solicita"
+    usuario |o--o{ autorizacion : "autoriza"
+    cliente ||--o{ comprobante : "recibe"
+    usuario ||--o{ comprobante : "emite"
+    comprobante ||--o| factura : "se_especializa_en"
+    comprobante ||--o| nota : "se_especializa_en"
+    comprobante ||--o| recibo : "se_especializa_en"
+    venta ||--o| factura : "genera"
+    factura ||--o{ nota : "da_origen_a"
+    nota ||--o{ item_nota : "contiene"
+    producto ||--o{ item_nota : "es_devuelto_en"
+    cuenta_corriente ||--o{ movimiento_cuenta_corriente : "acumula"
+    comprobante |o--o| movimiento_cuenta_corriente : "impacta_en"
+    usuario ||--o{ movimiento_cuenta_corriente : "registra"
+    movimiento_cuenta_corriente ||--o{ imputacion : "acredita"
+    movimiento_cuenta_corriente ||--o{ imputacion : "es_cancelado_por"
+    usuario ||--o{ auditoria : "genera"
+
+    usuario {
+        int id_usuario PK
+        varchar_50 nombre_usuario UK "UNIQUE"
+        varchar_60 nombre
+        varchar_60 apellido
+        varchar_120 correo "NULLABLE"
+        varchar_255 contrasena "HASH"
+        varchar_64 codigo_autorizacion UK "NULLABLE, UNIQUE, HMAC (Supervisor o superior)"
+        boolean estado "DEFAULT true"
+    }
+
+    rol {
+        int id_rol PK
+        varchar_50 rol UK "UNIQUE"
+        varchar_250 descripcion "NULLABLE"
+    }
+
+    usuario_rol {
+        int id_usuario PK, FK
+        int id_rol PK, FK
+    }
+
+    permiso {
+        int id_permiso PK
+        varchar_40 modulo UK "UNIQUE, formato modulo.accion"
+        varchar_250 descripcion "NULLABLE"
+    }
+
+    rol_permiso {
+        int id_rol PK, FK
+        int id_permiso PK, FK
+    }
+
+    categoria {
+        int id_categoria PK
+        varchar_100 nombre UK "UNIQUE"
+        varchar_500 descripcion "NULLABLE"
+        int id_familia FK "NULLABLE, max 2 niveles"
+        boolean estado "DEFAULT true"
+    }
+
+    producto {
+        int id_producto PK
+        varchar_150 nombre
+        varchar_1000 descripcion "NULLABLE"
+        int id_categoria FK
+        int id_ubicacion FK "NULLABLE"
+        decimal_12_2 costo_unitario
+        decimal_12_2 precio_unitario "neto sin IVA"
+        int stock_minimo "DEFAULT 0"
+        int stock_actual "DEFAULT 0"
+        varchar_255 imagen "NULLABLE"
+        boolean estado "DEFAULT true"
+        varchar_500 motivo_baja "NULLABLE"
+        varchar_500 observacion "NULLABLE"
+    }
+
+    ubicacion {
+        int id_ubicacion PK
+        varchar_20 sector UK "UNIQUE(sector, estante)"
+        varchar_20 estante UK "UNIQUE(sector, estante)"
+    }
+
+    codigo_barra {
+        int id_codigo_barra PK
+        varchar_50 codigo UK "UNIQUE"
+        int id_producto FK
+    }
+
+    proveedor {
+        int id_proveedor PK
+        varchar_150 razon_social
+        char_11 cuit "NULLABLE, UNIQUE"
+        varchar_30 telefono "NULLABLE"
+        varchar_120 correo "NULLABLE"
+        varchar_250 direccion "NULLABLE"
+    }
+
+    movimiento_stock {
+        int id_movimiento_stock PK
+        int id_producto FK
+        int id_usuario FK "quien carga y responde"
+        int id_proveedor FK "NULLABLE"
+        int id_venta FK "NULLABLE, tipo VENTA"
+        int id_nota FK "NULLABLE, tipo DEVOLUCION"
+        varchar_20 tipo "INGRESO, AJUSTE, VENTA, DEVOLUCION"
+        int cantidad
+        varchar_500 motivo "NULLABLE, obligatorio en AJUSTE"
+        timestamp fecha_carga "DEFAULT CURRENT_TIMESTAMP"
+    }
+
+    cliente {
+        int id_cliente PK
+        varchar_10 tipo_persona
+        varchar_180 nombre_razon_social
+        varchar_15 tipo_documento
+        varchar_20 nro_documento
+        varchar_40 condicion_iva
+        varchar_250 domicilio_facturacion "NULLABLE"
+        varchar_30 telefono "NULLABLE"
+        varchar_120 correo "NULLABLE"
+        boolean es_sistema "DEFAULT false, Consumidor Final"
+        boolean estado "DEFAULT true"
+        varchar_500 motivo_baja "NULLABLE"
+        varchar_500 observacion "NULLABLE"
+    }
+
+    cuenta_corriente {
+        int id_cuenta_corriente PK
+        int id_cliente FK, UK "UNIQUE"
+        decimal_12_2 limite_credito "obligatorio"
+    }
+
+    venta {
+        int id_venta PK
+        int id_cliente FK
+        int id_vendedor FK
+        varchar_20 condicion_pago "CONTADO, CUENTA_CORRIENTE"
+        varchar_20 medio_pago "NULLABLE, obligatorio si CONTADO"
+        varchar_25 estado "PENDIENTE_AUTORIZACION, CONFIRMADA, RECHAZADA"
+        decimal_5_2 porcentaje_descuento "DEFAULT 0"
+        decimal_14_2 total "DEFAULT 0"
+        varchar_500 observaciones "NULLABLE"
+        timestamp fecha_hora "DEFAULT CURRENT_TIMESTAMP"
+        timestamp fecha_confirmacion "NULLABLE"
+    }
+
+    item_venta {
+        int id_venta PK, FK
+        int id_producto PK, FK
+        int cantidad
+        decimal_12_2 precio_unitario "neto, congelado"
+        decimal_12_2 costo_unitario "congelado"
+        decimal_5_2 alicuota_iva "congelada"
+        decimal_14_2 subtotal
+    }
+
+    autorizacion {
+        int id_autorizacion PK
+        varchar_30 tipo "CREDITO_EXCEDIDO, PRODUCTO_INACTIVO, CLIENTE_INACTIVO, DESCUENTO, DEVOLUCION"
+        varchar_15 estado "PENDIENTE, APROBADA, RECHAZADA"
+        int id_venta FK "NULLABLE"
+        int id_comprobante FK "NULLABLE, nota de devolucion"
+        int id_solicitante FK
+        int id_autorizador FK "NULLABLE mientras PENDIENTE"
+        jsonb datos "NULLABLE, saldo proyectado, limite, etc."
+        varchar_500 motivo "NULLABLE"
+        timestamp fecha_solicitud "DEFAULT CURRENT_TIMESTAMP"
+        timestamp fecha_resolucion "NULLABLE"
+    }
+
+    comprobante {
+        int id_comprobante PK
+        int id_cliente FK
+        int id_usuario FK "quien emite"
+        varchar_20 tipo_comprobante UK "UNIQUE(tipo, modo, punto_venta, numero)"
+        varchar_10 modo_emision UK "DEFAULT INTERNO"
+        int punto_venta UK "DEFAULT 1"
+        bigint numero UK
+        timestamp fecha_emision "DEFAULT CURRENT_TIMESTAMP"
+        decimal_14_2 importe_total
+        varchar_20 cae "NULLABLE, uso futuro fiscal"
+        date cae_vencimiento "NULLABLE, uso futuro fiscal"
+    }
+
+    factura {
+        int id_comprobante PK, FK
+        int id_venta FK "UNIQUE"
+    }
+
+    nota {
+        int id_comprobante PK, FK
+        int id_factura_origen FK "factura que corrige"
+        varchar_10 tipo_nota "CREDITO, DEBITO"
+        varchar_20 motivo_tipo "DEVOLUCION, MORA"
+        varchar_500 motivo
+        varchar_20 medio_pago "NULLABLE, reembolso de venta CONTADO"
+    }
+
+    item_nota {
+        int id_comprobante PK, FK
+        int id_producto PK, FK
+        int cantidad
+        decimal_12_2 precio_unitario "de la venta original"
+        decimal_5_2 alicuota_iva "de la venta original"
+        boolean reingresa_stock
+    }
+
+    recibo {
+        int id_comprobante PK, FK
+        varchar_20 medio_pago
+        varchar_500 observacion "NULLABLE"
+    }
+
+    movimiento_cuenta_corriente {
+        int id_movimiento_cc PK
+        int id_cuenta_corriente FK
+        int id_comprobante FK "NULLABLE, UNIQUE"
+        int id_usuario FK
+        varchar_20 tipo_movimiento "SALDO_INICIAL, FACTURA, NOTA_CREDITO, NOTA_DEBITO, RECIBO, AJUSTE"
+        varchar_7 sentido "DEBITO, CREDITO"
+        decimal_14_2 importe "positivo"
+        timestamp fecha_hora "DEFAULT CURRENT_TIMESTAMP"
+        date fecha_vencimiento "NULLABLE, solo debitos"
+        varchar_500 observacion "NULLABLE, obligatorio en AJUSTE"
+    }
+
+    imputacion {
+        int id_imputacion PK
+        int id_movimiento_credito FK
+        int id_movimiento_debito FK
+        decimal_14_2 importe_imputado
+        timestamp fecha_imputacion "DEFAULT CURRENT_TIMESTAMP"
+    }
+
+    auditoria {
+        bigint id_auditoria PK
+        int id_usuario FK
+        varchar_40 accion
+        varchar_50 entidad
+        varchar_50 id_entidad
+        timestamp fecha_hora "DEFAULT CURRENT_TIMESTAMP"
+        jsonb valores_anteriores "NULLABLE"
+        jsonb valores_posteriores "NULLABLE"
+        varchar_500 motivo "NULLABLE"
+    }
+
+    configuracion {
+        int id_configuracion PK "DEFAULT 1"
+        varchar_10 modo_comprobante "DEFAULT INTERNO"
+        decimal_5_2 alicuota_iva "DEFAULT 21"
+        decimal_5_2 descuento_max_vendedor "DEFAULT 10"
+        int dias_vencimiento "DEFAULT 30"
+        decimal_7_4 tasa_mora "NULLABLE, diaria"
+        varchar_10 tipo_regla_precio "DEFAULT RECARGO, pendiente docente"
+        decimal_5_2 porcentaje_regla_precio "DEFAULT 0, pendiente docente"
+        int tamano_max_archivo "NULLABLE"
+        int cantidad_max_archivo "NULLABLE"
+        int punto_venta_fiscal "NULLABLE, uso futuro fiscal"
+        varchar_20 ambiente_fiscal "NULLABLE, uso futuro fiscal"
+    }
