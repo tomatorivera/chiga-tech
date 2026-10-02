@@ -1,0 +1,10 @@
+dist
+build
+.claude
+.agents
+node_modules
+package-lock.json
+*.tsbuildinfo
+*.min.js
+*.min.ts
+*.min.css
