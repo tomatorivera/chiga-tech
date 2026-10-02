@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Chiga.Api/Chiga.Api.csproj" />
+  <Project Path="Chiga.Tests/Chiga.Tests.csproj" />
+</Solution>
