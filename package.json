@@ -3,7 +3,12 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "prepare": "husky"
+    "prepare": "husky",
+    "test": "npm run test:unit && npm run test:integration",
+    "test:unit": "npm run test:unit:backend && npm run test:unit:frontend",
+    "test:unit:backend": "dotnet test backend/Chiga.UnitTests",
+    "test:unit:frontend": "npm --prefix frontend test",
+    "test:integration": "dotnet test backend/Chiga.IntegrationTests"
   },
   "devDependencies": {
     "@commitlint/cli": "^21.2.3",

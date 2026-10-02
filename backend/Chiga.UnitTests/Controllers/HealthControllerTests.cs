@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Controllers;
 
-namespace Chiga.Tests.Controllers;
+namespace Chiga.UnitTests.Controllers;
 
 public class HealthControllerTests
 {
