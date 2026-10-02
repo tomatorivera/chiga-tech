@@ -22,7 +22,7 @@ function App() {
     <main className="login-shell min-h-screen w-full lg:grid lg:grid-cols-[1.08fr_0.92fr]">
       <a className="skip-link" href="#login-form">Saltar al inicio de sesión</a>
 
-      <section className="brand-panel relative flex min-h-[340px] flex-col overflow-hidden px-7 py-7 text-white sm:px-10 sm:py-9 lg:min-h-screen lg:px-14 lg:py-12 xl:px-20">
+      <section className="brand-panel relative flex min-h-85 flex-col overflow-hidden px-7 py-7 text-white sm:px-10 sm:py-9 lg:min-h-screen lg:px-14 lg:py-12 xl:px-20">
         <div className="brand-grain" aria-hidden="true" />
         <header className="relative z-10 flex items-center gap-3">
           <div className="brand-mark grid size-11 place-items-center rounded-xl text-[#173d33]" aria-hidden="true">
@@ -88,8 +88,8 @@ function App() {
         <div className="brand-orbit brand-orbit-two" aria-hidden="true" />
       </section>
 
-      <section className="form-panel flex min-h-[560px] flex-col items-center justify-center px-6 py-12 sm:px-10 lg:min-h-screen lg:px-12">
-        <div className="w-full max-w-[420px] animate-enter">
+      <section className="form-panel flex min-h-140 flex-col items-center justify-center px-6 py-12 sm:px-10 lg:min-h-screen lg:px-12">
+        <div className="w-full max-w-105 animate-enter">
           <div className="mb-9 flex items-center gap-2 text-xs font-medium text-[#617168]">
             <span className="size-2 rounded-full bg-[#8cb46a]" />
             Acceso al sistema
@@ -134,7 +134,7 @@ function App() {
                   className="login-input w-full rounded-lg border bg-white py-3.5 pl-11 pr-12 text-sm text-[#26372f] outline-none transition"
                 />
                 <button
-                  className="password-toggle absolute inset-y-0 right-0 grid w-11 place-items-center rounded-r-lg text-[#86928b] transition hover:text-[#345849] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-[#527863]"
+                  className="password-toggle absolute inset-y-0 right-0 grid w-11 place-items-center rounded-r-lg text-[#86928b] transition hover:text-[#345849] focus-visible:outline focus-visible:-outline-offset-4 focus-visible:outline-[#527863]"
                   type="button"
                   onClick={() => setShowPassword((visible) => !visible)}
                   aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
@@ -150,7 +150,7 @@ function App() {
               Mantener mi sesión iniciada
             </label>
 
-            <button className="submit-button group flex w-full items-center justify-center gap-2 rounded-lg px-5 py-3.5 text-sm font-semibold text-white transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#315d4a]" type="submit">
+            <button className="submit-button group flex w-full items-center justify-center gap-2 rounded-lg px-5 py-3.5 text-sm font-semibold text-white transition focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#315d4a]" type="submit">
               Iniciar sesión
               <ArrowRight className="transition-transform group-hover:translate-x-1" size={17} aria-hidden="true" />
             </button>
@@ -172,7 +172,7 @@ function App() {
             </p>
           </div>
         </div>
-        <p className="mt-auto w-full max-w-[420px] pt-12 text-center text-[10px] tracking-[0.02em] text-[#a0aaa3] lg:absolute lg:bottom-7">
+        <p className="mt-auto w-full max-w-105 pt-12 text-center text-[10px] tracking-[0.02em] text-[#a0aaa3] lg:absolute lg:bottom-7">
           Proyecto académico · Facultad de Ciencias Exactas · UNT
         </p>
       </section>
