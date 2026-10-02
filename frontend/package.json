@@ -46,6 +46,9 @@
     ],
     "src/**/*.{css,json,md}": [
       "prettier --write"
+    ],
+    "./*.{ts,mjs,json,html,md}": [
+      "prettier --write"
     ]
   }
 }

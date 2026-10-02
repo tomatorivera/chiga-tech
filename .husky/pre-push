@@ -1,0 +1,31 @@
+# Corre los tests unitarios solo de la carpeta que cambió respecto al upstream
+# (o a origin/dev si la rama es nueva). Si no se puede comparar, corre ambos.
+# Ojo: husky ejecuta esto con `sh -e`, así que ningún comando puede fallar en vano
+# (por eso no se usa `grep -c`, que sale con 1 cuando no hay coincidencias).
+base=$(git rev-parse --abbrev-ref --symbolic-full-name '@{u}' 2>/dev/null || echo origin/dev)
+
+backend=0
+frontend=0
+
+if changed=$(git diff --name-only "$base"...HEAD 2>/dev/null); then
+  case "$changed" in
+    backend/* | *"
+backend/"*) backend=1 ;;
+  esac
+  case "$changed" in
+    frontend/* | *"
+frontend/"*) frontend=1 ;;
+  esac
+else
+  backend=1
+  frontend=1
+fi
+
+if [ "$backend" = 1 ]; then
+  npm run test:unit:backend
+fi
+
+if [ "$frontend" = 1 ]; then
+  npm --prefix frontend run typecheck
+  npm run test:unit:frontend
+fi

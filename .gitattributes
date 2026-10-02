@@ -1,1 +1,2 @@
-* text=auto
+# Los hooks son scripts de shell: con CRLF fallan en Windows.
+.husky/* text eol=lf
