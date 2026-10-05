@@ -6,7 +6,7 @@ Cómo un cambio llega desde una issue hasta `dev`.
 
 | Rama | Qué es |
 |---|---|
-| `main` | Producción. Solo recibe PRs desde `dev` |
+| `main` | Producción. Solo recibe PRs desde `dev`. Cada merge es una iteración y se replica en [Bitbucket](#iteraciones-y-bitbucket) |
 | `dev` | Integración y rama por defecto. Recibe PRs de las ramas de trabajo |
 | `tipo/descripcion` | Tu rama de trabajo, una por tarea |
 
@@ -106,6 +106,15 @@ Si algo falla, la acción se cancela y te muestra el error. Corregilo y repetí.
 | `git commit` | Formato del mensaje. Si tocaste el frontend, lint y formato de esos archivos (corrige lo que puede) |
 | `git push` | Tests unitarios de la parte que tocaste |
 | PR ([CI](../.github/workflows/ci.yml)) | `commitlint`: commits · `backend`: build y tests · `database`: migraciones y seeds desde cero ([si falla](../db/casos-de-uso.md#10-falla-el-job-database-del-ci-en-mi-pr)) · `frontend`: lint, formato, tipos, tests y build · `origen`: que las PRs a `main` vengan de `dev` |
+| Push a `main` ([espejo](../.github/workflows/bitbucket.yml)) | No valida: replica `main` en Bitbucket (ver [Iteraciones](#iteraciones-y-bitbucket)) |
+
+## Iteraciones y Bitbucket
+
+Cada merge de `dev` a `main` es una nueva iteración del sistema. La cátedra sigue el avance en [Bitbucket](https://bitbucket.org/EstebanSaborido/2026-grupo6), que es un espejo de `main`: con cada push a `main`, GitHub Actions lo replica solo. No se pushea a Bitbucket a mano.
+
+- Solo se replica `main`; `dev` y las ramas de trabajo quedan en GitHub.
+- El push pisa lo que haya en Bitbucket: cualquier cambio hecho allá se pierde.
+- Usa el token de Bitbucket guardado en el secret `BITBUCKET_API_KEY` del repo de GitHub. Si vence o se revoca, el workflow falla en la pestaña **Actions**: generá uno nuevo con permiso de escritura en repositorios, actualizá el secret y tocá **Re-run jobs**.
 
 ## Otros casos
 
