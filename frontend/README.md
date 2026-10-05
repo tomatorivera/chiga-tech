@@ -44,6 +44,7 @@ Para agregar una página: creala en su feature y registrala en `routes.tsx`. Est
 
 ## Convenciones
 
+- **Código en general:** en `../AGENTS.md`
 - **Tipos de la API:** replican a mano los DTOs del backend, con su nulabilidad (`string?` → `string | null`). Si cambia un DTO, se actualiza en el mismo cambio ([ADR técnico 0001](../docs/adr/tecnico/0001-typescript-en-el-frontend.md)).
 - **`any`:** solo como último recurso; el lint lo marca como advertencia.
 - **Tests:** junto al archivo que prueban, como `*.test.ts(x)` (Vitest).

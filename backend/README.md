@@ -20,9 +20,10 @@ La API queda en http://localhost:5098, que redirige a **Swagger** para ver y pro
 
 ## Convenciones
 
+- **Código en general:** en `../AGENTS.md`
 - **Controllers:** en `Chiga.Api/Controllers/`, uno por recurso, `ControllerBase` + `[ApiController]`.
 - **Tests:** misma ruta que el archivo probado (`Controllers/HealthController.cs` → `Chiga.UnitTests/Controllers/HealthControllerTests.cs`); nombre `Metodo_Resultado`.
-- **Dinero:** `decimal`, en centavos; los cálculos se hacen acá, no en el frontend.
+- **Dinero:** `decimal`; los cálculos se hacen acá, no en el frontend.
 - **Enums:** se serializan como texto.
 - **DTOs:** si cambiás uno, actualizá su tipo en el frontend en el mismo cambio ([ADR técnico 0001](../docs/adr/tecnico/0001-typescript-en-el-frontend.md)).
 - **Esquema de BD:** no se toca desde acá (no hay migraciones de EF Core); va en [`db/migrations`](../db/README.md#migraciones).
