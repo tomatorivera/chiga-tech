@@ -56,6 +56,8 @@ No hace falta crear un `.env` para los datos de la BD: los valores por defecto f
 - Los commits siguen [Conventional Commits](https://www.conventionalcommits.org/es/) (`feat:`, `fix:`, `docs:`, `chore:`, `refactor:`, etc.); commitlint rechaza el commit si no cumple el formato.
 - La rama `main` es producción, y solo recibe PRs desde `dev`.
 
+El paso a paso con comandos está en [docs/GIT.md](docs/GIT.md).
+
 ### Validaciones automáticas
 
 El repo trabaja con herramientas que validan automáticamente posibles problemas, si ocurre alguno, detienen lo que estás haciendo y te informan:
@@ -101,6 +103,10 @@ El repo trabaja con herramientas que validan automáticamente posibles problemas
 - [Especificación de Requisitos de Software (ERS)](docs/ERS.md)
 - [Glosario del dominio (CONTEXT)](docs/CONTEXT.md)
 - [Diagrama de la base de datos](docs/disenio/base-de-datos.mmd) (Mermaid)
+
+### Flujo de trabajo
+
+- [Flujo de trabajo en Git y Github](docs/GIT.md)
 
 ### Base de datos
 
