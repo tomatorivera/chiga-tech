@@ -1,0 +1,84 @@
+# BD local para desarrollo. Ver db/README.md para el uso diario.
+# Los valores por defecto funcionan sin .env; para cambiarlos, copiar .env.example a .env.
+name: chiga
+
+services:
+  db:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-chiga}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-chiga}
+      POSTGRES_DB: ${POSTGRES_DB:-chiga}
+      # Para que `psql` dentro del contenedor no pida usuario ni base.
+      PGUSER: ${POSTGRES_USER:-chiga}
+      PGDATABASE: ${POSTGRES_DB:-chiga}
+      TZ: America/Argentina/Buenos_Aires
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - db-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  # Aplica las migraciones pendientes de db/migrations y termina.
+  flyway:
+    image: flyway/flyway:13
+    command: migrate
+    environment:
+      FLYWAY_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-chiga}
+      FLYWAY_USER: ${POSTGRES_USER:-chiga}
+      FLYWAY_PASSWORD: ${POSTGRES_PASSWORD:-chiga}
+      FLYWAY_LOCATIONS: filesystem:/flyway/sql
+      FLYWAY_CONNECT_RETRIES: 10
+      FLYWAY_VALIDATE_MIGRATION_NAMING: "true"
+    volumes:
+      - ./db/migrations:/flyway/sql:ro
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # Carga db/seeds/*.sql en orden alfabético. Solo corre con `docker compose run --rm seed`.
+  seed:
+    image: postgres:18-alpine
+    profiles: [seed]
+    environment:
+      PGHOST: db
+      PGUSER: ${POSTGRES_USER:-chiga}
+      PGPASSWORD: ${POSTGRES_PASSWORD:-chiga}
+      PGDATABASE: ${POSTGRES_DB:-chiga}
+    volumes:
+      - ./db/seeds:/seeds:ro
+    entrypoint: ["sh", "-c"]
+    command:
+      - |
+        for f in /seeds/*.sql; do
+          echo "-> $$f"
+          psql -q -v ON_ERROR_STOP=1 -f "$$f" || exit 1
+        done
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # Interfaz web para explorar la BD en http://localhost:5050
+  pgadmin:
+    image: dpage/pgadmin4:9
+    environment:
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
+      PGADMIN_DEFAULT_EMAIL: pgadmin4@pgadmin.org
+      PGADMIN_DEFAULT_PASSWORD: pgadmin
+    ports:
+      - "${PGADMIN_PORT:-5050}:80"
+    volumes:
+      - ./db/pgadmin-servers.json:/pgadmin4/servers.json:ro
+      - pgadmin-data:/var/lib/pgadmin
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  db-data:
+  pgadmin-data:

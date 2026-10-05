@@ -12,6 +12,9 @@ erDiagram
     usuario ||--o{ movimiento_stock : "carga"
     venta |o--o{ movimiento_stock : "descuenta"
     nota |o--o{ movimiento_stock : "reingresa"
+    tipo_persona ||--o{ cliente : "clasifica"
+    tipo_documento ||--o{ cliente : "identifica"
+    condicion_iva ||--o{ cliente : "encuadra"
     cliente ||--o| cuenta_corriente : "posee"
     cliente ||--o{ venta : "realiza"
     usuario ||--o{ venta : "vende"
@@ -125,16 +128,33 @@ erDiagram
         varchar_20 tipo "INGRESO, AJUSTE, VENTA, DEVOLUCION"
         int cantidad
         varchar_500 motivo "NULLABLE, obligatorio en AJUSTE"
-        timestamp fecha_carga "DEFAULT CURRENT_TIMESTAMP"
+        timestamptz fecha_carga "DEFAULT CURRENT_TIMESTAMP"
+    }
+
+    tipo_persona {
+        int id_tipo_persona PK
+        varchar_20 nombre UK "UNIQUE"
+    }
+
+    tipo_documento {
+        int id_tipo_documento PK
+        varchar_20 nombre UK "UNIQUE"
+        smallint codigo_arca UK "UNIQUE, uso futuro fiscal"
+    }
+
+    condicion_iva {
+        int id_condicion_iva PK
+        varchar_60 nombre UK "UNIQUE"
+        smallint codigo_arca UK "UNIQUE, uso futuro fiscal"
     }
 
     cliente {
         int id_cliente PK
-        varchar_10 tipo_persona
+        int id_tipo_persona FK
         varchar_180 nombre_razon_social
-        varchar_15 tipo_documento
+        int id_tipo_documento FK
         varchar_20 nro_documento
-        varchar_40 condicion_iva
+        int id_condicion_iva FK
         varchar_250 domicilio_facturacion "NULLABLE"
         varchar_30 telefono "NULLABLE"
         varchar_120 correo "NULLABLE"
@@ -160,8 +180,8 @@ erDiagram
         decimal_5_2 porcentaje_descuento "DEFAULT 0"
         decimal_14_2 total "DEFAULT 0"
         varchar_500 observaciones "NULLABLE"
-        timestamp fecha_hora "DEFAULT CURRENT_TIMESTAMP"
-        timestamp fecha_confirmacion "NULLABLE"
+        timestamptz fecha_hora "DEFAULT CURRENT_TIMESTAMP"
+        timestamptz fecha_confirmacion "NULLABLE"
     }
 
     item_venta {
@@ -184,8 +204,8 @@ erDiagram
         int id_autorizador FK "NULLABLE mientras PENDIENTE"
         jsonb datos "NULLABLE, saldo proyectado, limite, etc."
         varchar_500 motivo "NULLABLE"
-        timestamp fecha_solicitud "DEFAULT CURRENT_TIMESTAMP"
-        timestamp fecha_resolucion "NULLABLE"
+        timestamptz fecha_solicitud "DEFAULT CURRENT_TIMESTAMP"
+        timestamptz fecha_resolucion "NULLABLE"
     }
 
     comprobante {
@@ -196,7 +216,7 @@ erDiagram
         varchar_10 modo_emision UK "DEFAULT INTERNO"
         int punto_venta UK "DEFAULT 1"
         bigint numero UK
-        timestamp fecha_emision "DEFAULT CURRENT_TIMESTAMP"
+        timestamptz fecha_emision "DEFAULT CURRENT_TIMESTAMP"
         decimal_14_2 importe_total
         varchar_20 cae "NULLABLE, uso futuro fiscal"
         date cae_vencimiento "NULLABLE, uso futuro fiscal"
@@ -239,7 +259,7 @@ erDiagram
         varchar_20 tipo_movimiento "SALDO_INICIAL, FACTURA, NOTA_CREDITO, NOTA_DEBITO, RECIBO, AJUSTE"
         varchar_7 sentido "DEBITO, CREDITO"
         decimal_14_2 importe "positivo"
-        timestamp fecha_hora "DEFAULT CURRENT_TIMESTAMP"
+        timestamptz fecha_hora "DEFAULT CURRENT_TIMESTAMP"
         date fecha_vencimiento "NULLABLE, solo debitos"
         varchar_500 observacion "NULLABLE, obligatorio en AJUSTE"
     }
@@ -249,7 +269,7 @@ erDiagram
         int id_movimiento_credito FK
         int id_movimiento_debito FK
         decimal_14_2 importe_imputado
-        timestamp fecha_imputacion "DEFAULT CURRENT_TIMESTAMP"
+        timestamptz fecha_imputacion "DEFAULT CURRENT_TIMESTAMP"
     }
 
     auditoria {
@@ -258,7 +278,7 @@ erDiagram
         varchar_40 accion
         varchar_50 entidad
         varchar_50 id_entidad
-        timestamp fecha_hora "DEFAULT CURRENT_TIMESTAMP"
+        timestamptz fecha_hora "DEFAULT CURRENT_TIMESTAMP"
         jsonb valores_anteriores "NULLABLE"
         jsonb valores_posteriores "NULLABLE"
         varchar_500 motivo "NULLABLE"

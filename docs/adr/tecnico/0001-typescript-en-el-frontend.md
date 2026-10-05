@@ -1,5 +1,5 @@
 ---
-status: proposed
+status: accepted
 ---
 
 # El frontend usa TypeScript con los tipos de la API escritos a mano

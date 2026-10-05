@@ -4,11 +4,21 @@
   "type": "module",
   "scripts": {
     "prepare": "husky",
+
     "test": "npm run test:unit && npm run test:integration",
     "test:unit": "npm run test:unit:backend && npm run test:unit:frontend",
     "test:unit:backend": "dotnet test backend/Chiga.UnitTests",
     "test:unit:frontend": "npm --prefix frontend test",
-    "test:integration": "dotnet test backend/Chiga.IntegrationTests"
+    "test:integration": "dotnet test backend/Chiga.IntegrationTests",
+
+    "db:up": "docker compose up -d db && docker compose run --rm flyway",
+    "db:down": "docker compose down",
+    "db:migrate": "docker compose run --rm flyway",
+    "db:info": "docker compose run --rm flyway info",
+    "db:seed": "docker compose run --rm seed",
+    "db:reset": "docker compose down -v db && npm run db:up && npm run db:seed",
+    "db:psql": "docker compose exec db psql",
+    "db:gui": "docker compose up -d pgadmin"
   },
   "devDependencies": {
     "@commitlint/cli": "^21.2.3",
