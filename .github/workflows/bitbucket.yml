@@ -1,0 +1,22 @@
+name: Espejo Bitbucket
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: espejo-bitbucket
+  cancel-in-progress: false
+
+jobs:
+  espejo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - env:
+          BITBUCKET_API_KEY: ${{ secrets.BITBUCKET_API_KEY }}
+        run: git push --force "https://x-bitbucket-api-token-auth:${BITBUCKET_API_KEY}@bitbucket.org/EstebanSaborido/2026-grupo6.git" HEAD:refs/heads/main
