@@ -9,6 +9,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Verifica el formato de los commits
   commitlint:
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -23,6 +24,7 @@ jobs:
       - run: npm ci --ignore-scripts
       - run: npx commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }}
 
+  # Verifica que pasen los tests del backend
   backend:
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -35,6 +37,21 @@ jobs:
       - run: dotnet test backend/Chiga.UnitTests --no-build
       - run: dotnet test backend/Chiga.IntegrationTests --no-build
 
+  # Verifica que no haya errores en las migraciones de la BD
+  database:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker compose up -d --wait db
+      - run: docker compose run --rm flyway migrate
+      - run: docker compose run --rm flyway validate
+      - run: docker compose run --rm seed
+      - name: Logs de la BD
+        if: failure()
+        run: docker compose logs db
+
+  # Verifica que pasen los tests del frontend
   frontend:
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -55,9 +72,9 @@ jobs:
       - run: npm test
       - run: npm run build
 
+# Activar cuando exista frontend/e2e (Playwright): levantar backend y
+# frontend en el runner y correr `npm run test:e2e`.
   # e2e:
   #   needs: [backend, frontend]
   #   runs-on: ubuntu-latest
   #   timeout-minutes: 15
-  #   # Activar cuando exista frontend/e2e (Playwright): levantar backend y
-  #   # frontend en el runner y correr `npm run test:e2e`.
