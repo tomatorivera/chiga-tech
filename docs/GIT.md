@@ -21,6 +21,33 @@ docs/flujo-de-git
 chore/actualizar-dependencias
 ```
 
+## Mensajes de commit
+
+Seguimos [Conventional Commits](https://www.conventionalcommits.org/es/):
+
+```
+tipo(alcance opcional): descripción en minúscula y en infinitivo
+```
+
+| Tipo | Cuándo |
+|---|---|
+| `feat` | Funcionalidad nueva |
+| `fix` | Corrección de un error |
+| `docs` | Solo documentación |
+| `refactor` | Cambio de código que no agrega funcionalidad ni corrige errores |
+| `test` | Agregar o corregir tests |
+| `chore` | Configuración, dependencias, scripts, CI |
+| `style` | Formato (espacios, comas) sin cambiar la lógica |
+
+El alcance indica la parte del repo: `frontend`, `backend` o `db`. Ejemplos:
+
+```
+feat(backend): agregar endpoint de alta de clientes
+fix(frontend): mostrar error cuando falla el login
+chore(db): agregar migración de la tabla de proveedores
+docs: agregar flujo de trabajo de git
+```
+
 ## Ciclo de una tarea
 
 ### 1. Partir de `dev` actualizado
@@ -107,34 +134,9 @@ git pull
 git branch -d feat/alta-de-clientes
 ```
 
-## Mensajes de commit
+## Otros casos fuera del ciclo de trabajo
 
-Seguimos [Conventional Commits](https://www.conventionalcommits.org/es/):
-
-```
-tipo(alcance opcional): descripción en minúscula y en infinitivo
-```
-
-| Tipo | Cuándo |
-|---|---|
-| `feat` | Funcionalidad nueva |
-| `fix` | Corrección de un error |
-| `docs` | Solo documentación |
-| `refactor` | Cambio de código que no agrega funcionalidad ni corrige errores |
-| `test` | Agregar o corregir tests |
-| `chore` | Configuración, dependencias, scripts, CI |
-| `style` | Formato (espacios, comas) sin cambiar la lógica |
-
-El alcance indica la parte del repo: `frontend`, `backend` o `db`. Ejemplos:
-
-```
-feat(backend): agregar endpoint de alta de clientes
-fix(frontend): mostrar error cuando falla el login
-chore(db): agregar migración de la tabla de proveedores
-docs: agregar flujo de trabajo de git
-```
-
-## Traer los cambios nuevos de `dev` a tu rama
+### Traer cambios que necesitas de `dev` a tu rama
 
 Si mientras trabajabas se mergearon otras PRs a `dev`, traé esos cambios a tu rama si los necesitas (sobre todo si abriste la PR y viste que hay conflictos):
 
@@ -166,9 +168,14 @@ Si te perdiste en el medio, `git merge --abort` deja todo como estaba antes del 
 
 Un caso particular son dos migraciones con el mismo número: ver el [caso de uso 05 de la BD](../db/casos-de-uso.md#05-solucionar-migraciones-con-el-mismo-número-al-hacer-pr).
 
-## Pasar `dev` a producción (`main`)
+### Encontrar un bug
 
-Cuando `dev` tiene un conjunto de cambios probados para publicar, se abre una PR de `dev` hacia `main`. Se revisa y se mergea igual que cualquier otra PR. No se mergean ramas de trabajo directo a `main`.
+Si encontras un bug tenes algunas opciones según el contexto:
+
+1. Es un bug muy chico (1 archivo, algunas pocas líneas, no se propaga) -> lo resolvés en un commit y seguís
+3. Si es un bug que requiere tocar 2 o más archivos:
+   3.1 Si necesitas resolverlo para seguir en lo que estabas -> lo resolvés en algunos commits y seguís
+   3.2 Si no tiene que ver ni interfiere con lo que estabas haciendo -> lo dejas explicado en una issue y en otro momento te encargas
 
 ## Comandos útiles
 
