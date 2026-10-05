@@ -80,7 +80,7 @@ En GitHub, botón **Compare & pull request** (verificá que la base sea `dev`). 
 
 ### 5. CI y revisión
 
-Los checks corren con cada push. Si uno falla, abrí **Details**, corregí y pusheá. Otra persona revisa; los cambios pedidos van como commits nuevos en la misma rama.
+Los checks corren con cada push. Si uno falla, abrí **Details**, corregí y pusheá. Otra persona revisa y aprueba (se necesita al menos una aprobación); los cambios pedidos van como commits nuevos en la misma rama. Un push nuevo anula la aprobación anterior.
 
 ```bash
 gh pr checks       # estado de los checks
@@ -89,7 +89,7 @@ gh pr view --web   # abrir la PR en el navegador
 
 ### 6. Mergear
 
-Con checks en verde y revisión aprobada: **Merge pull request** y **Delete branch**. Después:
+Con checks en verde y revisión aprobada: si GitHub muestra **Update branch** (entraron cambios a la base después de abrir la PR), tocalo y esperá que el CI vuelva a pasar. Después, **Merge pull request** y **Delete branch**. Después:
 
 ```bash
 git switch dev
@@ -105,7 +105,7 @@ Si algo falla, la acción se cancela y te muestra el error. Corregilo y repetí.
 |---|---|
 | `git commit` | Formato del mensaje. Si tocaste el frontend, lint y formato de esos archivos (corrige lo que puede) |
 | `git push` | Tests unitarios de la parte que tocaste |
-| PR ([CI](../.github/workflows/ci.yml)) | `commitlint`: commits · `backend`: build y tests · `database`: migraciones y seeds desde cero ([si falla](../db/casos-de-uso.md#10-falla-el-job-database-del-ci-en-mi-pr)) · `frontend`: lint, formato, tipos, tests y build |
+| PR ([CI](../.github/workflows/ci.yml)) | `commitlint`: commits · `backend`: build y tests · `database`: migraciones y seeds desde cero ([si falla](../db/casos-de-uso.md#10-falla-el-job-database-del-ci-en-mi-pr)) · `frontend`: lint, formato, tipos, tests y build · `origen`: que las PRs a `main` vengan de `dev` |
 
 ## Otros casos
 

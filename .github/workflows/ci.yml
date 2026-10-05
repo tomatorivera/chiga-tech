@@ -9,6 +9,17 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # main solo recibe PRs desde dev
+  origen:
+    if: github.base_ref == 'main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+      - if: github.head_ref != 'dev'
+        run: |
+          echo "::error::main solo recibe PRs desde dev (esta viene de ${{ github.head_ref }})"
+          exit 1
+
   # Verifica el formato de los commits
   commitlint:
     runs-on: ubuntu-latest
