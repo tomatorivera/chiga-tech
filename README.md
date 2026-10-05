@@ -1,114 +1,83 @@
 # Chiga Tech
 
-Proyecto final de Programador Universitario y Licenciatura Informática. _Chiga Tech_ es un sistema tipo punto de venta para una casa de computación.
+Proyecto final de Programador Universitario y Licenciatura Informática: sistema de punto de venta para una casa de computación.
 
-**Stack:** backend en ASP.NET Core (.NET 10), frontend en React + TypeScript (Vite, Tailwind) y base de datos PostgreSQL con migraciones de Flyway, todo en un monorepo.
+**Stack:** ASP.NET Core (.NET 10) · React + TypeScript (Vite, Tailwind) · PostgreSQL + Flyway. Monorepo.
 
-## Onboarding
+## Recorrido
 
-### Requisitos
+Leé en este orden; cada documento enlaza al siguiente.
+
+1. **Este README**: instalar y levantar el proyecto.
+2. [Base de datos](db/README.md): migraciones, seeds y [casos de uso](db/casos-de-uso.md).
+3. [Backend](backend/README.md)
+4. [Frontend](frontend/README.md)
+5. [Flujo de trabajo](docs/GIT.md): ramas, commits, issues y PRs.
+
+## Requisitos
 
 - [Git](https://git-scm.com/)
-- [Node.js 24](https://nodejs.org/) (con npm)
+- [Node.js 24](https://nodejs.org/)
 - [.NET SDK 10](https://dotnet.microsoft.com/download)
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/) instalado y corriendo
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/), corriendo
 
-### Primera vez en el repositorio
+## Onboarding del repositorio
 
-Desde la raíz del repo:
+La primera vez que lo clones (o que recibas estos cambios), desde la raíz:
 
 ```bash
-# 1. Dependencias de la raíz
-npm install
-
-# 2. Dependencias del frontend
-npm --prefix frontend install
-
-# 3. Base de datos: levanta Postgres, aplica las migraciones y carga los datos de prueba
-npm run db:up
-npm run db:seed
+npm install                    # dependencias de la raíz y git hooks
+npm --prefix frontend install  # dependencias del frontend
+npm run db:up                  # BD + migraciones
+npm run db:seed                # datos de prueba
 ```
 
-No hace falta crear un `.env` para los datos de la BD: los valores por defecto funcionan. Solo si necesitás cambiar algo (por ejemplo, el puerto de Postgres) copiá `.env.example` a `.env`. Más detalle en [db/README.md](db/README.md#conexión).
+No hace falta `.env`: los valores por defecto funcionan ([cómo cambiarlos](db/README.md#conexión)).
 
 ### Levantar el proyecto
 
-| Qué | Comando | URL |
-|---|---|---|
-| Base de datos | `npm run db:up` | `localhost:5432` |
-| Backend | `cd backend/Chiga.Api & dotnet watch` | http://localhost:5098 (Swagger en `/swagger`) |
-| Frontend | `cd frontend & npm run dev` | http://localhost:5173 |
-| pgAdmin (opcional) | `npm run db:gui` | http://localhost:5050 |
+| Qué | Comando | Desde | URL |
+|---|---|---|---|
+| BD | `npm run db:up` | raíz | `localhost:5432` |
+| Backend | `dotnet watch` | `backend/Chiga.Api` | http://localhost:5098 |
+| Frontend | `npm run dev` | `frontend` | http://localhost:5173 |
 
 ### Tests
 
+Desde la raíz:
+
 | Comando | Qué corre |
 |---|---|
-| `npm test` | Todos los tests (unitarios + integración) |
-| `npm run test:unit` | Unitarios del backend y del frontend |
-| `npm run test:unit:backend` | Unitarios del backend (`Chiga.UnitTests`) |
-| `npm run test:unit:frontend` | Unitarios del frontend (Vitest) |
-| `npm run test:integration` | Integración del backend (`Chiga.IntegrationTests`) |
+| `npm test` | Todo |
+| `npm run test:unit` | Unitarios de backend y frontend |
+| `npm run test:unit:backend` / `test:unit:frontend` | Unitarios de una parte |
+| `npm run test:integration` | Integración del backend |
 
-### Flujo de trabajo
-
-- Se trabaja en ramas que salen de `dev` y se integran mediante PRs hacia `dev`.
-- Los commits siguen [Conventional Commits](https://www.conventionalcommits.org/es/) (`feat:`, `fix:`, `docs:`, `chore:`, `refactor:`, etc.); commitlint rechaza el commit si no cumple el formato.
-- La rama `main` es producción, y solo recibe PRs desde `dev`.
-
-El paso a paso con comandos está en [docs/GIT.md](docs/GIT.md).
-
-### Validaciones automáticas
-
-El repo trabaja con herramientas que validan automáticamente posibles problemas, si ocurre alguno, detienen lo que estás haciendo y te informan:
-
-1. **Husky**:
-  - Al hacer commit, si trabajaste en el frontend valida el código que escribiste ahí
-  - Al hacer commit, en el front o en el back, valida el formato del mensaje del commit
-  - Al hacer push, corre los tests unitarios del frontend y/o backend según en qué trabajaste
-2. **Github Actions**:
-  - Al abrir una PR, el [CI](.github/workflows/ci.yml) verifica los commits, compila y testea el backend, aplica y valida las migraciones con los seeds, y corre lint, formato, tipos, tests y build del frontend. Si algo falla, te lo informa en la PR.
-
-## Carpetas en este repositorio
+### Carpetas
 
 ```
 .
-├── .github/workflows/   # CI de GitHub Actions
-├── .husky/              # Git hooks (commit-msg, pre-commit, pre-push)
-├── backend/
-│   ├── Chiga.Api/               # API web (ASP.NET Core)
-│   ├── Chiga.UnitTests/         # Tests unitarios
-│   ├── Chiga.IntegrationTests/  # Tests de integración
-│   └── Chiga.slnx               # Solución .NET
-├── db/
-│   ├── migrations/      # Esquema de la BD versionado por Flyway
-│   ├── seeds/           # Datos de prueba
-│   ├── README.md        # Documentación sobre la BD y su manejo
-│   └── casos-de-uso.md  # Acciones y problemas particulares sobre la BD
-├── docs/
-│   ├── adr/             # Registros de decisiones (negocio y técnicas)
-│   ├── disenio/         # Diagramas de diseño
-│   ├── CONTEXT.md       # Glosario del dominio
-│   └── ERS.md           # Documento de requisitos
-├── frontend/
-│   └── src/features/    # Código del frontend organizado por funcionalidad
-├── docker-compose.yml   # Configuración de docker: Postgres, Flyway, seeds y pgAdmin
-└── package.json         # Scripts del repositorio (BD, tests) y hooks
+├── .github/          # CI y plantillas de issues y PRs
+├── .husky/           # Git hooks
+├── backend/          # API (.NET) y sus tests
+├── db/               # Migraciones y seeds
+├── docs/             # Requisitos, glosario, ADR, diseño y flujo de trabajo
+├── frontend/         # App web (React)
+├── docker-compose.yml
+└── package.json      # Scripts de BD y tests
 ```
 
-## Índice de documentación
+## Referencia
 
-### Requisitos y dominio
+Se consultan cuando hacen falta, no son parte del recorrido.
 
-- [Especificación de Requisitos de Software (ERS)](docs/ERS.md)
-- [Glosario del dominio (CONTEXT)](docs/CONTEXT.md)
-- [Diagrama de la base de datos](docs/disenio/base-de-datos.mmd) (Mermaid)
+- [ERS](docs/ERS.md): requisitos del sistema.
+- [CONTEXT](docs/CONTEXT.md): glosario del dominio. Usá estos términos en código, issues y PRs.
+- [ADR de negocio](docs/adr/negocio/) y [técnicos](docs/adr/tecnico/): decisiones tomadas y por qué.
+- [Diagrama de la BD](docs/disenio/base-de-datos.mmd) (Mermaid).
 
-### Flujo de trabajo
 
-- [Flujo de trabajo en Git y Github](docs/GIT.md)
 
-### Base de datos
+---
 
-- [Base de datos local](db/README.md): comandos, conexión, migraciones y seeds.
-- [Casos de uso de la BD](db/casos-de-uso.md): setup, resetear la BD, conflictos de migraciones, errores comunes.
+[**Siguiente ->**](db/README.md) (base de datos)

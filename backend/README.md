@@ -1,37 +1,32 @@
 # Backend
 
-API web de Chiga Tech en ASP.NET Core (.NET 10), con controllers y tests en xUnit.
+API en ASP.NET Core (.NET 10), tests con xUnit. Abrí `Chiga.slnx` en Visual Studio o Rider.
 
-Para el setup general del repo (requisitos, BD, flujo de trabajo) ver el [README de la raíz](../README.md).
-
-## Proyectos
-
-| Proyecto | Qué contiene |
+| Proyecto | Contiene |
 |---|---|
-| `Chiga.Api/` | La API: controllers, configuración (`appsettings*.json`) y arranque (`Program.cs`) |
-| `Chiga.UnitTests/` | Tests unitarios: prueban clases aisladas, sin levantar la API ni la BD |
-| `Chiga.IntegrationTests/` | Tests de integración: levantan la API en memoria y le hacen requests |
-| `Chiga.slnx` | Solución que agrupa los tres proyectos (abrir este archivo en Visual Studio / Rider) |
+| `Chiga.Api/` | La API: controllers, `appsettings*.json` y `Program.cs` |
+| `Chiga.UnitTests/` | Tests de clases aisladas, sin API ni BD |
+| `Chiga.IntegrationTests/` | Tests que levantan la API en memoria y le hacen requests |
 
 ## Comandos
 
 | Comando | Desde | Qué hace |
 |---|---|---|
-| `dotnet watch` | `backend/Chiga.Api` | Levanta la API y la reinicia al guardar cambios |
-| `dotnet run` | `backend/Chiga.Api` | Levanta la API sin recarga automática |
-| `dotnet build Chiga.slnx` | `backend/` | Compila todos los proyectos |
-| `dotnet test` | Chiga.UnitTests | Corre los tests unitarios |
-| `dotnet test` | Chiga.IntegrationTests | Corre los tests de integración |
+| `dotnet watch` | `Chiga.Api` | Levanta la API y la reinicia al guardar |
+| `dotnet build Chiga.slnx` | `backend` | Compila todo |
+| `dotnet test` | `Chiga.UnitTests` o `Chiga.IntegrationTests` | Corre esos tests |
 
-La API queda en http://localhost:5098. En desarrollo, abrir esa URL redirige a **Swagger** (`/swagger`), donde se pueden ver y probar todos los endpoints. Para verificar que esté andando: `GET http://localhost:5098/ping` devuelve `pong`.
-
-También se pueden probar requests desde el editor con [`Chiga.Api/api.http`](Chiga.Api/api.http) (soportado por Visual Studio con la extensión REST Client de VS Code).
+La API queda en http://localhost:5098, que redirige a **Swagger** para ver y probar endpoints. `GET /ping` → `pong` confirma que anda. También podés usar [`api.http`](Chiga.Api/api.http) desde Visual Studio, Rider o VS Code (extensión REST Client).
 
 ## Convenciones
 
-- **Controllers:** van en `Chiga.Api/Controllers/`, uno por recurso, heredando de `ControllerBase` con `[ApiController]`.
-- **Tests:** replican la ruta del archivo que prueban (`Controllers/HealthController.cs` → `Chiga.UnitTests/Controllers/HealthControllerTests.cs`) y se nombran `Metodo_Resultado` (p. ej. `Ping_ReturnsOkWithPong`).
-- **Importes:** se manejan como `decimal` y los cálculos con dinero se hacen acá, no en el frontend. Todos los importes están en centavos para evitar errores de redondeo.
-- **Enums:** se serializan como texto, no como números, para que el frontend los reciba con nombre.
-- **DTOs:** si cambiás uno, actualizá su tipo en el frontend en el mismo cambio. Ver el [ADR técnico 0001](../docs/adr/tecnico/0001-typescript-en-el-frontend.md).
-- **Base de datos:** el esquema **no** se maneja desde el backend (no hay migraciones de EF Core); se cambia con scripts SQL en `db/migrations`. Ver [db/README.md](../db/README.md).
+- **Controllers:** en `Chiga.Api/Controllers/`, uno por recurso, `ControllerBase` + `[ApiController]`.
+- **Tests:** misma ruta que el archivo probado (`Controllers/HealthController.cs` → `Chiga.UnitTests/Controllers/HealthControllerTests.cs`); nombre `Metodo_Resultado`.
+- **Dinero:** `decimal`, en centavos; los cálculos se hacen acá, no en el frontend.
+- **Enums:** se serializan como texto.
+- **DTOs:** si cambiás uno, actualizá su tipo en el frontend en el mismo cambio ([ADR técnico 0001](../docs/adr/tecnico/0001-typescript-en-el-frontend.md)).
+- **Esquema de BD:** no se toca desde acá (no hay migraciones de EF Core); va en [`db/migrations`](../db/README.md#migraciones).
+
+---
+
+[**<- Anterior**](../db/README.md) (base de datos) -- [**Siguiente ->**](../frontend/README.md) (frontend)
