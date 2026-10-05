@@ -51,3 +51,18 @@ Un cambio está terminado cuando pasan:
 - BD: `npm run db:reset`.
 
 Si el cambio afecta algo documentado en un README o en `docs/GIT.md`, actualizalo en el mismo cambio.
+
+## Agent skills
+
+### Issue tracker
+
+Issues y specs en GitHub Issues, vía `gh`. Ver `docs/agents/issue-tracker.md`.
+
+### Domain docs
+
+Contexto único: `docs/CONTEXT.md` y ADR en `docs/adr/negocio/` y `docs/adr/tecnico/`. Ver `docs/agents/domain.md`.
+
+### Prioridad entre skills
+
+- Los tests siguen siempre las convenciones de este archivo (xUnit y Vitest, en las rutas indicadas), aunque una skill proponga otro formato.
+- En tareas de UI (diseño, estilos, layout, interacción) manda `impeccable`. `ponytail` aplica solo a la lógica: backend, BD, hooks, servicios y estado del frontend.

@@ -1,2 +1,5 @@
 # Los hooks son scripts de shell: con CRLF fallan en Windows.
 .husky/* text eol=lf
+
+# Launcher de la skill impeccable: también es un script de shell.
+.claude/skills/impeccable/scripts/impeccable text eol=lf
