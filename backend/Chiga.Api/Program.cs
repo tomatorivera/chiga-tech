@@ -1,8 +1,11 @@
+using System.Text.Json.Serialization;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+// Enums como texto: el frontend los tipa como uniones de strings (ADR técnico 0001).
+builder.Services.AddControllers().AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
@@ -28,3 +31,6 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+// Expone Program a WebApplicationFactory en Chiga.IntegrationTests.
+public partial class Program { }
