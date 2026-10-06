@@ -74,9 +74,8 @@ Se consultan cuando hacen falta, no son parte del recorrido.
 - [ERS](docs/ERS.md): requisitos del sistema.
 - [CONTEXT](docs/CONTEXT.md): glosario del dominio. Usá estos términos en código, issues y PRs.
 - [ADR de negocio](docs/adr/negocio/) y [técnicos](docs/adr/tecnico/): decisiones tomadas y por qué.
-- [Diagrama de la BD](docs/disenio/base-de-datos.mmd) (Mermaid).
-
-
+- [Contratos de api](docs/contracts/): docs de los endpoints antes inicializar una feature, nos brinda un punto de inicio y fin en común para que front y back trabajen en paralelo. Una vez se implementa se puede ir ampliando y todo debería quedar documentado en Swagger.
+- [Diagrama de la BD](docs/disenio/base-de-datos.mmd) (Mermaid): se actualiza con IA a partir de las migraciones y se lo usa para presentar en clases.
 
 ---
 
