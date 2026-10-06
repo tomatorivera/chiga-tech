@@ -22,4 +22,4 @@ El usuario inicia sesión con nombre de usuario y contraseña (RF-01). El backen
 
 No se definió lo siguiente:
 
-- Duración de la sesión
+- Duración de la sesión (por defecto usaremos 24 hs, todavía no lo analizamos)
