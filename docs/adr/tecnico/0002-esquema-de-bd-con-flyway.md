@@ -1,5 +1,5 @@
 ---
-status: proposal
+status: accepted
 ---
 
 # El esquema de la BD se versiona con migraciones SQL de Flyway, no con EF Core
