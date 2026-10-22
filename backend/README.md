@@ -18,6 +18,38 @@ API en ASP.NET Core (.NET 10), tests con xUnit. Abrí `Chiga.slnx` en Visual Stu
 
 La API queda en http://localhost:5098, que redirige a **Swagger** para ver y probar endpoints. `GET /ping` → `pong` confirma que anda. También podés usar [`api.http`](Chiga.Api/api.http) desde Visual Studio, Rider o VS Code (extensión REST Client).
 
+## Estructura
+
+```
+Chiga.Api/             # Proyecto webapi
+├── Controllers/          # Controladores principales (sólo manejan respuestas HTTP)
+│   ├── AuthController.cs
+│   ├── VentasController.cs/
+│   └── EmpleadosController.cs/
+├── Services/             # Capa de servicios (lógica de negocio de la app)
+│   ├── AuthService.cs/
+│   ├── VentasService.cs/
+│   └── EmpleadosService.cs/
+├── Models/             # Capa de datos
+│   ├── Entities/       # Entidades de las bases de datos
+│   │   ├── User.cs
+│   │   └── Empleado.cs
+│   ├── Dtos/           # DTOs específicos para las peticiones
+│   │   ├── LoginDto.cs
+│   │   ├── CreateEmpleadoDto.cs
+│   │   └── UpdateEmpleadoDto.cs
+├── Repositories/       # Capa de conexión a la BD
+│   ├── AuthRepository.cs/
+│   ├── VentasRepository.cs/
+│   └── EmpleadosRepository.cs/
+├── Exceptions/         # Errores personalizados de la app
+│   ├── UsuarioInactivoException.cs/
+│   ├── ProductoSinStockException.cs/
+│   └── CreditoClienteExcedidoException.cs/
+├── Filters/            # Filtros / middlewares
+└── Program.cs         # Config. de la app
+```
+
 ## Convenciones
 
 - **Código en general:** en `../AGENTS.md`
