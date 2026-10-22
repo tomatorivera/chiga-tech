@@ -45,8 +45,15 @@ jobs:
         with:
           dotnet-version: 10.0.x
       - run: dotnet build backend/Chiga.slnx
+      # Los tests de integración consultan la BD (conexión por defecto de appsettings.Development.json)
+      - run: docker compose up -d --wait db
+      - run: docker compose run --rm flyway migrate
+      - run: docker compose run --rm seed
       - run: dotnet test backend/Chiga.UnitTests --no-build
       - run: dotnet test backend/Chiga.IntegrationTests --no-build
+      - name: Logs de la BD
+        if: failure()
+        run: docker compose logs db
 
   # Verifica que no haya errores en las migraciones de la BD
   database:
