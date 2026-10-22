@@ -16,7 +16,13 @@ API en ASP.NET Core (.NET 10), tests con xUnit. Abrí `Chiga.slnx` en Visual Stu
 | `dotnet build Chiga.slnx` | `backend` | Compila todo |
 | `dotnet test` | `Chiga.UnitTests` o `Chiga.IntegrationTests` | Corre esos tests |
 
-La API queda en http://localhost:5098, que redirige a **Swagger** para ver y probar endpoints. `GET /ping` → `pong` confirma que anda. También podés usar [`api.http`](Chiga.Api/api.http) desde Visual Studio, Rider o VS Code (extensión REST Client).
+## Base de datos
+
+La API se conecta a la BD de Docker con Npgsql ([ADR técnico 0004](../docs/adr/tecnico/0004-acceso-a-datos-con-ado-net.md)). La cadena de conexión es `ConnectionStrings:Default`: en Development viene en `appsettings.Development.json` con los valores de `docker-compose.yml`, y en cualquier entorno la podés sobreescribir con la variable de entorno `ConnectionStrings__Default` (p. ej. `Host=localhost;Port=5433;Database=chiga;Username=chiga;Password=chiga` si cambiaste `DB_PORT`). Fuera de Development es obligatoria.
+
+**Los tests de integración necesitan la BD levantada y con migraciones y seeds**: corré `npm run db:reset` desde la raíz antes de `npm run test:integration`. Si fallan con `password authentication failed`, revisá que otro Postgres (p. ej. uno instalado en Windows) no esté ocupando el puerto 5432.
+
+La API queda en http://localhost:5098, que redirige a **Swagger** para ver y probar endpoints.
 
 ## Estructura
 
@@ -54,6 +60,7 @@ Chiga.Api/             # Proyecto webapi
 
 - **Código en general:** en `../AGENTS.md`
 - **Controllers:** en `Chiga.Api/Controllers/`, uno por recurso, `ControllerBase` + `[ApiController]`.
+- **Errores:** formato ProblemDetails. Devolvé `return Problem(statusCode: ..., detail: "...")`, no `NotFound("mensaje")` ni otros resultados con un string, que se escapan del formato. Ver [`docs/contracts`](../docs/contracts/README.md#formato-de-error).
 - **Tests:** misma ruta que el archivo probado (`Controllers/HealthController.cs` → `Chiga.UnitTests/Controllers/HealthControllerTests.cs`); nombre `Metodo_Resultado`.
 - **Dinero:** `decimal`; los cálculos se hacen acá, no en el frontend.
 - **Enums:** se serializan como texto.

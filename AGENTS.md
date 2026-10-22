@@ -66,3 +66,4 @@ Contexto único: `docs/CONTEXT.md` y ADR en `docs/adr/negocio/` y `docs/adr/tecn
 
 - Los tests siguen siempre las convenciones de este archivo (xUnit y Vitest, en las rutas indicadas), aunque una skill proponga otro formato.
 - En tareas de UI (diseño, estilos, layout, interacción) manda `impeccable`. `ponytail` aplica solo a la lógica: backend, BD, hooks, servicios y estado del frontend.
+- En tareas de lógica, aplicá `ponytail` (full) siempre, sin esperar a que se lo pidan.
