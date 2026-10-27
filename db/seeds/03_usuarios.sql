@@ -1,20 +1,23 @@
--- Usuarios de prueba para desarrollo, con uno por rol.
+-- Usuarios de prueba para desarrollo: uno por rol, uno con dos roles (para probar la
+-- unión de permisos) y uno inactivo.
 --
 -- Contraseña de todos: chiga1234
 -- Código de supervisor (solo Supervisor o superior):
---   supervisor = 1111, admin = 2222, dueno = 3333
+--   supervisor = 1111, admin = 2222, dueno = 3333, multirol = 4444
 --
 -- Los hashes se calculan con pgcrypto: la contraseña con bcrypt y el código con
 -- HMAC-SHA256 (hex, 64 caracteres) usando el secreto 'dev-secret' (ADR negocio 0003).
 -- El backend tiene que verificar con el mismo algoritmo y, para el código, el mismo secreto.
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
-INSERT INTO usuario (nombre_usuario, nombre, apellido, correo, contrasena, codigo_autorizacion)
+INSERT INTO usuario (nombre_usuario, nombre, apellido, correo, contrasena, codigo_autorizacion, estado)
 VALUES
-    ('vendedor',   'Valeria', 'Vendedor',   'vendedor@chiga.example',   crypt('chiga1234', gen_salt('bf')), NULL),
-    ('supervisor', 'Sergio',  'Supervisor', 'supervisor@chiga.example', crypt('chiga1234', gen_salt('bf')), encode(hmac('1111', 'dev-secret', 'sha256'), 'hex')),
-    ('admin',      'Adriana', 'Admin',      'admin@chiga.example',      crypt('chiga1234', gen_salt('bf')), encode(hmac('2222', 'dev-secret', 'sha256'), 'hex')),
-    ('dueno',      'Daniel',  'Dueño',      'dueno@chiga.example',      crypt('chiga1234', gen_salt('bf')), encode(hmac('3333', 'dev-secret', 'sha256'), 'hex'))
+    ('vendedor',   'Valeria', 'Vendedor',   'vendedor@chiga.example',   crypt('chiga1234', gen_salt('bf')), NULL, true),
+    ('supervisor', 'Sergio',  'Supervisor', 'supervisor@chiga.example', crypt('chiga1234', gen_salt('bf')), encode(hmac('1111', 'dev-secret', 'sha256'), 'hex'), true),
+    ('admin',      'Adriana', 'Admin',      'admin@chiga.example',      crypt('chiga1234', gen_salt('bf')), encode(hmac('2222', 'dev-secret', 'sha256'), 'hex'), true),
+    ('dueno',      'Daniel',  'Dueño',      'dueno@chiga.example',      crypt('chiga1234', gen_salt('bf')), encode(hmac('3333', 'dev-secret', 'sha256'), 'hex'), true),
+    ('multirol',   'Marta',   'Multirol',   'multirol@chiga.example',   crypt('chiga1234', gen_salt('bf')), encode(hmac('4444', 'dev-secret', 'sha256'), 'hex'), true),
+    ('inactivo',   'Ivan',    'Inactivo',   'inactivo@chiga.example',   crypt('chiga1234', gen_salt('bf')), NULL, false)
 ON CONFLICT (nombre_usuario) DO NOTHING;
 
 INSERT INTO usuario_rol (id_usuario, id_rol)
@@ -23,7 +26,10 @@ FROM (VALUES
     ('vendedor',   'Vendedor'),
     ('supervisor', 'Supervisor'),
     ('admin',      'Administrador'),
-    ('dueno',      'Dueño')
+    ('dueno',      'Dueño'),
+    ('multirol',   'Vendedor'),
+    ('multirol',   'Supervisor'),
+    ('inactivo',   'Vendedor')
 ) AS v(nombre_usuario, rol)
 JOIN usuario u ON u.nombre_usuario = v.nombre_usuario
 JOIN rol r ON r.rol = v.rol
