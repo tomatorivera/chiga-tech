@@ -179,11 +179,11 @@ public class AuthControllerTests(WebApplicationFactory<Program> factory)
   }
 
   [Theory]
-  [InlineData("{}", new[] { "NombreUsuario", "Contrasena" })]
-  [InlineData("""{"password":"chiga1234"}""", new[] { "NombreUsuario" })]
-  [InlineData("""{"username":"vendedor"}""", new[] { "Contrasena" })]
-  [InlineData("""{"username":"","password":""}""", new[] { "NombreUsuario", "Contrasena" })]
-  [InlineData("""{"username":null,"password":null}""", new[] { "NombreUsuario", "Contrasena" })]
+  [InlineData("{}", new[] { "username", "password" })]
+  [InlineData("""{"password":"chiga1234"}""", new[] { "username" })]
+  [InlineData("""{"username":"vendedor"}""", new[] { "password" })]
+  [InlineData("""{"username":"","password":""}""", new[] { "username", "password" })]
+  [InlineData("""{"username":null,"password":null}""", new[] { "username", "password" })]
   public async Task Login_MissingFields_ReturnsErrorsNamingEachField(string json, string[] expectedFields)
   {
     var response = await PostLogin(json);

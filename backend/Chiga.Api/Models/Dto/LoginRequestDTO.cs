@@ -7,12 +7,12 @@ public class LoginRequestDTO
 {
   [JsonPropertyName("username")]
   [Display(Name = "nombre de usuario")]
+  [Required(ErrorMessage = "El {0} es requerido")]
   [StringLength(maximumLength: 50, MinimumLength = 4, ErrorMessage = "El {0} debe tener entre {1} y {2} caracteres")]
-  [Required]
   public string NombreUsuario { get; set; } = "";
 
   [JsonPropertyName("password")]
   [Display(Name = "contraseña")]
-  [Required]
+  [Required(ErrorMessage = "La {0} es requerida")]
   public string Contrasena { get; set; } = "";
 }
