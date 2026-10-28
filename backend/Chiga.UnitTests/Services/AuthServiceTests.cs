@@ -1,5 +1,5 @@
 using Api.Exceptions;
-using Api.Models;
+using Api.Models.Entities;
 using Api.Models.Dto;
 using Api.Repositories;
 using Api.Services;

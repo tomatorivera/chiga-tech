@@ -98,6 +98,6 @@ public class UserRepositoryTests(WebApplicationFactory<Program> factory)
     Assert.True((long)(await cmd.ExecuteScalarAsync())! > 0);
   }
 
-  private static string[] PermisosDe(Api.Models.Usuario usuario, string rol) =>
+  private static string[] PermisosDe(Api.Models.Entities.Usuario usuario, string rol) =>
     usuario.Roles.Single(r => r.Nombre == rol).Permisos.Select(p => p.Modulo).Order().ToArray();
 }

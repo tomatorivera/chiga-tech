@@ -3,7 +3,7 @@ using System.Net.Http.Json;
 using System.Text;
 using Api.Models.Dto;
 using System.Text.Json;
-using Api.Models;
+using Api.Models.Entities;
 using Api.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;

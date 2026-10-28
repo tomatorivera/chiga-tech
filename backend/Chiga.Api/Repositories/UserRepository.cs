@@ -1,4 +1,4 @@
-using Api.Models;
+using Api.Models.Entities;
 using Npgsql;
 
 namespace Api.Repositories;
