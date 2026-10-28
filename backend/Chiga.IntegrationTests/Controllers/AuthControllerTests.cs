@@ -2,6 +2,9 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Text;
 using Api.Models.Dto;
+using System.Text.Json;
+using Api.Models;
+using Api.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
@@ -38,6 +41,54 @@ public class AuthControllerTests(WebApplicationFactory<Program> factory)
     Assert.NotNull(usuario);
     Assert.Equal("multirol", usuario.NombreUsuario);
     Assert.Equal(["Supervisor", "Vendedor"], usuario.Roles.Order());
+  }
+
+  [Fact]
+  public async Task Login_ValidCredentials_BodyHasExactlyTheContractFields()
+  {
+    var response = await factory.CreateClient().PostAsJsonAsync("/auth/login", new { username = "multirol", password = "chiga1234" });
+
+    using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+    var root = json.RootElement;
+    Assert.Equal(
+      ["apellido", "id", "nombre", "nombreUsuario", "permisos", "roles"],
+      root.EnumerateObject().Select(p => p.Name).Order());
+    Assert.Equal(JsonValueKind.Number, root.GetProperty("id").ValueKind);
+    Assert.Equal("Marta", root.GetProperty("nombre").GetString());
+    Assert.Equal("Multirol", root.GetProperty("apellido").GetString());
+    Assert.Equal("multirol", root.GetProperty("nombreUsuario").GetString());
+    Assert.Equal(JsonValueKind.Array, root.GetProperty("roles").ValueKind);
+    Assert.Equal(JsonValueKind.Array, root.GetProperty("permisos").ValueKind);
+  }
+
+  [Fact]
+  public async Task Login_UserWithOverlappingRolePermissions_ReturnsPermissionUnionWithoutDuplicates()
+  {
+    // Los seeds aún no cargan permisos de rol, así que el repositorio se reemplaza por uno falso.
+    var usuario = new Usuario
+    {
+      Id = 1,
+      NombreUsuario = "multirol",
+      Nombre = "Marta",
+      Apellido = "Multirol",
+      Roles =
+      [
+        new Rol { Id = 1, Nombre = "Vendedor", Permisos = [new Permiso { Id = 1, Modulo = "ventas.crear" }, new Permiso { Id = 2, Modulo = "ventas.ver" }] },
+        new Rol { Id = 2, Nombre = "Supervisor", Permisos = [new Permiso { Id = 2, Modulo = "ventas.ver" }, new Permiso { Id = 3, Modulo = "ventas.autorizar" }] },
+      ],
+    };
+    var hash = BCrypt.Net.BCrypt.HashPassword("chiga1234", workFactor: 4);
+    var client = factory
+      .WithWebHostBuilder(builder => builder.ConfigureServices(services =>
+        services.AddScoped<IUserRepository>(_ => new FakeUserRepository((usuario, hash)))))
+      .CreateClient();
+
+    var response = await client.PostAsJsonAsync("/auth/login", new { username = "multirol", password = "chiga1234" });
+
+    Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+    var permisos = json.RootElement.GetProperty("permisos").EnumerateArray().Select(p => p.GetString());
+    Assert.Equal(["ventas.crear", "ventas.ver", "ventas.autorizar"], permisos);
   }
 
   [Fact]
@@ -127,6 +178,22 @@ public class AuthControllerTests(WebApplicationFactory<Program> factory)
     AssertNoCookie(response);
   }
 
+  [Theory]
+  [InlineData("{}", new[] { "NombreUsuario", "Contrasena" })]
+  [InlineData("""{"password":"chiga1234"}""", new[] { "NombreUsuario" })]
+  [InlineData("""{"username":"vendedor"}""", new[] { "Contrasena" })]
+  [InlineData("""{"username":"","password":""}""", new[] { "NombreUsuario", "Contrasena" })]
+  [InlineData("""{"username":null,"password":null}""", new[] { "NombreUsuario", "Contrasena" })]
+  public async Task Login_MissingFields_ReturnsErrorsNamingEachField(string json, string[] expectedFields)
+  {
+    var response = await PostLogin(json);
+
+    Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    var problem = (await response.Content.ReadFromJsonAsync<ValidationProblemDetails>())!;
+    Assert.Equal(expectedFields.Order(), problem.Errors.Keys.Order());
+    Assert.All(problem.Errors.Values, messages => Assert.All(messages, m => Assert.False(string.IsNullOrWhiteSpace(m))));
+  }
+
   [Fact]
   public async Task Login_UsernameLongerThan50_ReturnsBadRequest()
   {
@@ -196,5 +263,11 @@ public class AuthControllerTests(WebApplicationFactory<Program> factory)
 
     Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     AssertNoCookie(response);
+  }
+
+  private class FakeUserRepository((Usuario User, string Contrasenia)? resultado) : IUserRepository
+  {
+    public Task<(Usuario User, string Contrasenia)?> FindByNombreUsuarioAsync(string nombreUsuario, CancellationToken ct = default)
+      => Task.FromResult(resultado);
   }
 }
