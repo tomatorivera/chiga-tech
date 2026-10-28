@@ -119,6 +119,24 @@ public class AuthControllerTests(WebApplicationFactory<Program> factory)
   }
 
   [Fact]
+  public async Task Login_DisabledUserCorrectPassword_ReturnsUnauthorizedWithOwnDetail()
+  {
+    var client = factory.CreateClient();
+
+    var disabled = await client.PostAsJsonAsync("/auth/login", new { username = "inactivo", password = "chiga1234" });
+    var generic = await client.PostAsJsonAsync("/auth/login", new { username = "vendedor", password = "incorrecta" });
+
+    // Todo: validar que se cree la cookie
+
+    Assert.Equal(HttpStatusCode.Unauthorized, disabled.StatusCode);
+    Assert.Equal("application/problem+json", disabled.Content.Headers.ContentType?.MediaType);
+    var detailDisabled = (await disabled.Content.ReadFromJsonAsync<ProblemDetails>())!.Detail;
+    var detailGeneric = (await generic.Content.ReadFromJsonAsync<ProblemDetails>())!.Detail;
+    Assert.False(string.IsNullOrWhiteSpace(detailDisabled));
+    Assert.NotEqual(detailGeneric, detailDisabled);
+  }
+
+  [Fact]
   public async Task Login_StoredHashUsedAsPassword_ReturnsUnauthorized()
   {
     var dataSource = factory.Services.GetRequiredService<NpgsqlDataSource>();

@@ -78,9 +78,46 @@ public class AuthServiceTests
       () => service.LoginAsync(new LoginRequestDTO { NombreUsuario = "vendedor", Contrasena = "chiga1234" }));
   }
 
-  private class FakeUserRepository((Usuario usuario, string Contrasenia)? resultado) : IUserRepository
+  [Fact]
+  public async Task LoginAsync_DisabledUserCorrectPassword_ThrowsDisabledUser()
   {
-    public Task<(Usuario usuario, string Contrasenia)?> FindByNombreUsuarioAsync(string nombreUsuario, CancellationToken ct = default)
+    var service = ServiceWithUser(estado: false);
+
+    await Assert.ThrowsAsync<DisabledUserException>(() => service.LoginAsync(LoginAs("chiga1234")));
+  }
+
+  [Fact]
+  public async Task LoginAsync_DisabledUserWrongPassword_ThrowsInvalidCredentialsNotDisabledUser()
+  {
+    // Si el estado se revisara antes que la contraseña, cualquiera podría saber qué cuentas están inhabilitadas.
+    var service = ServiceWithUser(estado: false);
+
+    await Assert.ThrowsAsync<InvalidCredentialsException>(() => service.LoginAsync(LoginAs("incorrecta")));
+  }
+
+  [Fact]
+  public async Task LoginAsync_EnabledUserCorrectPassword_DoesNotThrow()
+  {
+    var service = ServiceWithUser(estado: true);
+
+    var result = await service.LoginAsync(LoginAs("chiga1234"));
+
+    Assert.Equal("vendedor", result.NombreUsuario);
+  }
+
+  private static AuthService ServiceWithUser(bool estado)
+  {
+    var usuario = new Usuario { Id = 1, NombreUsuario = "vendedor", Nombre = "Valeria", Apellido = "Vendedor", Estado = estado };
+    var hash = BCrypt.Net.BCrypt.HashPassword("chiga1234", workFactor: 4);
+    return new AuthService(new FakeUserRepository((usuario, hash)));
+  }
+
+  private static LoginRequestDTO LoginAs(string password) =>
+    new() { NombreUsuario = "vendedor", Contrasena = password };
+
+  private class FakeUserRepository((Usuario User, string Contrasenia)? resultado) : IUserRepository
+  {
+    public Task<(Usuario User, string Contrasenia)?> FindByNombreUsuarioAsync(string nombreUsuario, CancellationToken ct = default)
       => Task.FromResult(resultado);
   }
 }

@@ -5,7 +5,7 @@ namespace Api.Repositories;
 
 public class UserRepository(NpgsqlDataSource ds) : IUserRepository
 {
-  public async Task<(Usuario usuario, string Contrasenia)?> FindByNombreUsuarioAsync(
+  public async Task<(Usuario User, string Contrasenia)?> FindByNombreUsuarioAsync(
     string nombreUsuario, CancellationToken ct = default
   ){
     const string sql = """

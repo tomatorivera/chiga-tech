@@ -17,7 +17,7 @@ public class AuthController(IAuthService authService) : ControllerBase
       var user = await authService.LoginAsync(req, ct);
       return Ok(user);
     }
-    catch (InvalidCredentialsException ex)
+    catch (Exception ex) when (ex is InvalidCredentialsException or DisabledUserException)
     {
       return Problem(
         statusCode: StatusCodes.Status401Unauthorized, 

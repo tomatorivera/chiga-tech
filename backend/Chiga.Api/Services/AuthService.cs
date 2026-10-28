@@ -17,7 +17,10 @@ public class AuthService(IUserRepository userRepository) : IAuthService
     if (result is null || !PasswordMatches(req.Contrasena, result.Value.Contrasenia))
       throw new InvalidCredentialsException("Las credenciales son inválidas");
 
-    var usuario = result.Value.usuario;
+    if (!result.Value.User.Estado)
+      throw new DisabledUserException("La cuenta se encuentra inhabilitada");
+
+    var usuario = result.Value.User;
 
     return new UsuarioDTO
     {

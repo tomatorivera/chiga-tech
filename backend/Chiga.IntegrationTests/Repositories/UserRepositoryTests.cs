@@ -75,9 +75,9 @@ public class UserRepositoryTests(WebApplicationFactory<Program> factory)
     var result = await Repository.FindByNombreUsuarioAsync("test_sin_roles");
 
     Assert.NotNull(result);
-    Assert.Equal("test_sin_roles", result.Value.usuario.NombreUsuario);
+    Assert.Equal("test_sin_roles", result.Value.User.NombreUsuario);
     Assert.Equal("hash-sin-roles", result.Value.Contrasenia);
-    Assert.Empty(result.Value.usuario.Roles);
+    Assert.Empty(result.Value.User.Roles);
   }
 
   [Fact]
