@@ -9,10 +9,10 @@ public class LoginRequestDTO
   [Display(Name = "nombre de usuario")]
   [MaxLength(50, ErrorMessage = "El {0} admite hasta {1} caracteres")]
   [Required]
-  public required string NombreUsuario { get; set; }
+  public string NombreUsuario { get; set; } = "";
 
   [JsonPropertyName("password")]
   [Display(Name = "contraseña")]
   [Required]
-  public required string Contrasena { get; set; }
+  public string Contrasena { get; set; } = "";
 }
