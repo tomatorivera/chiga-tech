@@ -194,12 +194,18 @@ public class AuthControllerTests(WebApplicationFactory<Program> factory)
     Assert.All(problem.Errors.Values, messages => Assert.All(messages, m => Assert.False(string.IsNullOrWhiteSpace(m))));
   }
 
-  [Fact]
-  public async Task Login_UsernameLongerThan50_ReturnsBadRequest()
+  // Largo permitido: 4 a 50. Dentro del rango el usuario no existe, así que llega al 401 y no se rechaza por formato.
+  [Theory]
+  [InlineData(1, HttpStatusCode.BadRequest)]
+  [InlineData(3, HttpStatusCode.BadRequest)]
+  [InlineData(4, HttpStatusCode.Unauthorized)]
+  [InlineData(50, HttpStatusCode.Unauthorized)]
+  [InlineData(51, HttpStatusCode.BadRequest)]
+  public async Task Login_UsernameLengthBoundaries_ReturnsExpectedStatus(int length, HttpStatusCode expected)
   {
-    var response = await PostLogin($$"""{"username":"{{new string('a', 51)}}","password":"chiga1234"}""");
+    var response = await PostLogin($$"""{"username":"{{new string('a', length)}}","password":"chiga1234"}""");
 
-    Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    Assert.Equal(expected, response.StatusCode);
     AssertNoCookie(response);
   }
 

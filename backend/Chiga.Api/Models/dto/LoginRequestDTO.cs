@@ -7,7 +7,7 @@ public class LoginRequestDTO
 {
   [JsonPropertyName("username")]
   [Display(Name = "nombre de usuario")]
-  [MaxLength(50, ErrorMessage = "El {0} admite hasta {1} caracteres")]
+  [StringLength(maximumLength: 50, MinimumLength = 4, ErrorMessage = "El {0} debe tener entre {1} y {2} caracteres")]
   [Required]
   public string NombreUsuario { get; set; } = "";
 
