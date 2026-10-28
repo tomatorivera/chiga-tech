@@ -5,6 +5,7 @@ using Npgsql;
 namespace Chiga.IntegrationTests.Data;
 
 // Necesita la BD levantada con migraciones (npm run db:reset).
+[Collection("BD")]
 public class NpgsqlDataSourceTests(WebApplicationFactory<Program> factory)
   : IClassFixture<WebApplicationFactory<Program>>
 {

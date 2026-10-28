@@ -1,0 +1,132 @@
+using System.Net;
+using System.Net.Http.Json;
+using System.Text;
+using Api.Models.Dto;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.DependencyInjection;
+using Npgsql;
+
+namespace Chiga.IntegrationTests.Controllers;
+
+// Necesita la BD levantada con migraciones y seeds (npm run db:reset).
+public class AuthControllerTests(WebApplicationFactory<Program> factory)
+  : IClassFixture<WebApplicationFactory<Program>>
+{
+  private Task<HttpResponseMessage> PostLogin(string json) =>
+    factory.CreateClient().PostAsync("/auth/login", new StringContent(json, Encoding.UTF8, "application/json"));
+
+  [Fact]
+  public async Task Login_ValidCredentials_ReturnsOkWithUser()
+  {
+    var client = factory.CreateClient();
+
+    var response = await client.PostAsJsonAsync("/auth/login", new { username = "multirol", password = "chiga1234" });
+
+    Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    var body = await response.Content.ReadAsStringAsync();
+    Assert.DoesNotContain("$2a$", body);
+    Assert.DoesNotContain("contrasena", body, StringComparison.OrdinalIgnoreCase);
+    Assert.DoesNotContain("password", body, StringComparison.OrdinalIgnoreCase);
+    var usuario = await response.Content.ReadFromJsonAsync<UsuarioDTO>();
+    Assert.NotNull(usuario);
+    Assert.Equal("multirol", usuario.NombreUsuario);
+    Assert.Equal(["Supervisor", "Vendedor"], usuario.Roles.Order());
+  }
+
+  [Fact]
+  public async Task Login_WrongPassword_ReturnsUnauthorizedProblemDetails()
+  {
+    var client = factory.CreateClient();
+
+    var response = await client.PostAsJsonAsync("/auth/login", new { username = "vendedor", password = "incorrecta" });
+
+    Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
+  }
+
+  [Fact]
+  public async Task Login_UnknownUser_ReturnsSameDetailAsWrongPassword()
+  {
+    var client = factory.CreateClient();
+
+    var wrongPassword = await client.PostAsJsonAsync("/auth/login", new { username = "vendedor", password = "incorrecta" });
+    var unknownUser = await client.PostAsJsonAsync("/auth/login", new { username = "noexiste", password = "chiga1234" });
+
+    Assert.Equal(HttpStatusCode.Unauthorized, unknownUser.StatusCode);
+    var detailWrongPassword = (await wrongPassword.Content.ReadFromJsonAsync<ProblemDetails>())!.Detail;
+    var detailUnknownUser = (await unknownUser.Content.ReadFromJsonAsync<ProblemDetails>())!.Detail;
+    Assert.False(string.IsNullOrWhiteSpace(detailUnknownUser));
+    Assert.Equal(detailWrongPassword, detailUnknownUser);
+  }
+
+  [Theory]
+  [InlineData("{}")]
+  [InlineData("""{"username":"vendedor"}""")]
+  [InlineData("""{"password":"chiga1234"}""")]
+  [InlineData("""{"username":"","password":""}""")]
+  [InlineData("""{"username":"","password":"chiga1234"}""")]
+  [InlineData("""{"username":"   ","password":"chiga1234"}""")]
+  [InlineData("""{"username":"vendedor","password":""}""")]
+  [InlineData("""{"username":null,"password":null}""")]
+  [InlineData("""{"username":123,"password":true}""")]
+  [InlineData("null")]
+  [InlineData("")]
+  public async Task Login_InvalidBody_ReturnsBadRequestProblemDetails(string json)
+  {
+    var response = await PostLogin(json);
+
+    Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
+  }
+
+  [Fact]
+  public async Task Login_UsernameLongerThan50_ReturnsBadRequest()
+  {
+    var response = await PostLogin($$"""{"username":"{{new string('a', 51)}}","password":"chiga1234"}""");
+
+    Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+  }
+
+  [Theory]
+  [InlineData("vendedor", "chiga1234 ")]             // espacio de más
+  [InlineData("vendedor", " chiga1234")]
+  [InlineData("vendedor", "CHIGA1234")]              // la contraseña distingue mayúsculas
+  [InlineData("vendedor", "chiga123")]               // prefijo de la contraseña real
+  [InlineData("vendedor", "' OR '1'='1")]            // inyección SQL en la contraseña
+  [InlineData("' OR '1'='1", "chiga1234")]           // inyección SQL en el usuario
+  [InlineData("vendedor' --", "chiga1234")]
+  [InlineData("vendedor\0", "chiga1234")]            // carácter nulo
+  [InlineData("vendedor ", "chiga1234")]             // el usuario no se recorta
+  [InlineData("vendedor", "chiga1234\0")]            // carácter nulo en la contraseña
+  public async Task Login_TrickyCredentials_ReturnsUnauthorized(string username, string password)
+  {
+    var client = factory.CreateClient();
+
+    var response = await client.PostAsJsonAsync("/auth/login", new { username, password });
+
+    Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+  }
+
+  [Fact]
+  public async Task Login_VeryLongPassword_ReturnsUnauthorizedAndNotServerError()
+  {
+    var client = factory.CreateClient();
+
+    var response = await client.PostAsJsonAsync("/auth/login", new { username = "vendedor", password = new string('x', 100_000) });
+
+    Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+  }
+
+  [Fact]
+  public async Task Login_StoredHashUsedAsPassword_ReturnsUnauthorized()
+  {
+    var dataSource = factory.Services.GetRequiredService<NpgsqlDataSource>();
+    await using var cmd = dataSource.CreateCommand("SELECT contrasena FROM usuario WHERE nombre_usuario = 'vendedor'");
+    var hash = (string)(await cmd.ExecuteScalarAsync())!;
+
+    var response = await factory.CreateClient().PostAsJsonAsync("/auth/login", new { username = "vendedor", password = hash });
+
+    Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+  }
+}
