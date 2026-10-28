@@ -17,6 +17,12 @@ Desde `frontend/`:
 
 `npm run dev` **no muestra errores de tipos**: miralos en el editor o con `typecheck`.
 
+## Conexión con el backend
+
+Se utiliza la librería de Axios para hacer las peticiones.
+
+En desarrollo, Vite manda `/api` y `/auth` al backend en http://localhost:5098 ([ADR técnico 0003](../docs/adr/tecnico/0003-autenticacion-con-cookie.md)): llamalos con rutas relativas (`/auth/login`), sin host.
+
 ## Estructura
 
 ```
