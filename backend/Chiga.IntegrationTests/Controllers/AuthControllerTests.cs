@@ -16,6 +16,12 @@ public class AuthControllerTests(WebApplicationFactory<Program> factory)
   private Task<HttpResponseMessage> PostLogin(string json) =>
     factory.CreateClient().PostAsync("/auth/login", new StringContent(json, Encoding.UTF8, "application/json"));
 
+  private static IEnumerable<string> SetCookies(HttpResponseMessage response) =>
+    response.Headers.TryGetValues("Set-Cookie", out var values) ? values : [];
+
+  // Ningún Set-Cookie: ni la cookie de sesión ni otra con distinto nombre.
+  private static void AssertNoCookie(HttpResponseMessage response) => Assert.Empty(SetCookies(response));
+
   [Fact]
   public async Task Login_ValidCredentials_ReturnsOkWithUser()
   {
@@ -35,6 +41,44 @@ public class AuthControllerTests(WebApplicationFactory<Program> factory)
   }
 
   [Fact]
+  public async Task Login_ValidCredentials_SetsSessionCookieWithSecureAttributes()
+  {
+    var response = await factory.CreateClient().PostAsJsonAsync("/auth/login", new { username = "multirol", password = "chiga1234" });
+
+    var cookie = Assert.Single(SetCookies(response));
+    var parts = cookie.Split(';').Select(part => part.Trim()).ToList();
+    Assert.StartsWith("chiga_auth=", parts[0]);
+    Assert.False(string.IsNullOrWhiteSpace(parts[0]["chiga_auth=".Length..]));
+    var attributes = parts.Skip(1).Select(attribute => attribute.ToLowerInvariant()).ToList();
+    Assert.Contains("httponly", attributes);
+    Assert.Contains("secure", attributes);
+    Assert.Contains("samesite=strict", attributes);
+    Assert.Contains("path=/", attributes);
+  }
+
+  [Fact]
+  public async Task Login_ValidCredentialsWithExistingSessionCookie_IssuesNewCookie()
+  {
+    var client = factory.CreateClient();
+    var first = await client.PostAsJsonAsync("/auth/login", new { username = "vendedor", password = "chiga1234" });
+    var firstCookie = Assert.Single(SetCookies(first)).Split(';')[0];
+
+    var request = new HttpRequestMessage(HttpMethod.Post, "/auth/login")
+    {
+      Content = JsonContent.Create(new { username = "multirol", password = "chiga1234" }),
+    };
+    request.Headers.Add("Cookie", firstCookie);
+    var second = await client.SendAsync(request);
+
+    Assert.Equal(HttpStatusCode.OK, second.StatusCode);
+    var secondUser = await second.Content.ReadFromJsonAsync<UsuarioDTO>();
+    Assert.Equal("multirol", secondUser!.NombreUsuario);
+    var secondCookie = Assert.Single(SetCookies(second)).Split(';')[0];
+    Assert.StartsWith("chiga_auth=", secondCookie);
+    Assert.NotEqual(firstCookie, secondCookie);
+  }
+
+  [Fact]
   public async Task Login_WrongPassword_ReturnsUnauthorizedProblemDetails()
   {
     var client = factory.CreateClient();
@@ -43,6 +87,7 @@ public class AuthControllerTests(WebApplicationFactory<Program> factory)
 
     Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
+    AssertNoCookie(response);
   }
 
   [Fact]
@@ -54,6 +99,7 @@ public class AuthControllerTests(WebApplicationFactory<Program> factory)
     var unknownUser = await client.PostAsJsonAsync("/auth/login", new { username = "noexiste", password = "chiga1234" });
 
     Assert.Equal(HttpStatusCode.Unauthorized, unknownUser.StatusCode);
+    AssertNoCookie(unknownUser);
     var detailWrongPassword = (await wrongPassword.Content.ReadFromJsonAsync<ProblemDetails>())!.Detail;
     var detailUnknownUser = (await unknownUser.Content.ReadFromJsonAsync<ProblemDetails>())!.Detail;
     Assert.False(string.IsNullOrWhiteSpace(detailUnknownUser));
@@ -78,6 +124,7 @@ public class AuthControllerTests(WebApplicationFactory<Program> factory)
 
     Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
+    AssertNoCookie(response);
   }
 
   [Fact]
@@ -86,6 +133,7 @@ public class AuthControllerTests(WebApplicationFactory<Program> factory)
     var response = await PostLogin($$"""{"username":"{{new string('a', 51)}}","password":"chiga1234"}""");
 
     Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    AssertNoCookie(response);
   }
 
   [Theory]
@@ -106,6 +154,7 @@ public class AuthControllerTests(WebApplicationFactory<Program> factory)
     var response = await client.PostAsJsonAsync("/auth/login", new { username, password });
 
     Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    AssertNoCookie(response);
   }
 
   [Fact]
@@ -116,6 +165,7 @@ public class AuthControllerTests(WebApplicationFactory<Program> factory)
     var response = await client.PostAsJsonAsync("/auth/login", new { username = "vendedor", password = new string('x', 100_000) });
 
     Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    AssertNoCookie(response);
   }
 
   [Fact]
@@ -126,9 +176,8 @@ public class AuthControllerTests(WebApplicationFactory<Program> factory)
     var disabled = await client.PostAsJsonAsync("/auth/login", new { username = "inactivo", password = "chiga1234" });
     var generic = await client.PostAsJsonAsync("/auth/login", new { username = "vendedor", password = "incorrecta" });
 
-    // Todo: validar que se cree la cookie
-
     Assert.Equal(HttpStatusCode.Unauthorized, disabled.StatusCode);
+    AssertNoCookie(disabled);
     Assert.Equal("application/problem+json", disabled.Content.Headers.ContentType?.MediaType);
     var detailDisabled = (await disabled.Content.ReadFromJsonAsync<ProblemDetails>())!.Detail;
     var detailGeneric = (await generic.Content.ReadFromJsonAsync<ProblemDetails>())!.Detail;
@@ -146,5 +195,6 @@ public class AuthControllerTests(WebApplicationFactory<Program> factory)
     var response = await factory.CreateClient().PostAsJsonAsync("/auth/login", new { username = "vendedor", password = hash });
 
     Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    AssertNoCookie(response);
   }
 }
