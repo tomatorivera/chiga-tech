@@ -121,6 +121,18 @@ button {
   box-shadow: 0 0 0 3px rgba(100, 138, 112, 0.13);
 }
 
+.login-input[aria-invalid="true"] {
+  border-color: #c4604d;
+}
+
+.login-input[aria-invalid="true"]:focus {
+  box-shadow: 0 0 0 3px rgba(196, 96, 77, 0.14);
+}
+
+.field-error {
+  color: #a13d2d;
+}
+
 .submit-button {
   background: #285644;
   box-shadow: 0 5px 12px rgba(34, 77, 58, 0.13);
@@ -129,6 +141,12 @@ button {
 .submit-button:hover {
   background: #204b3a;
   box-shadow: 0 7px 16px rgba(34, 77, 58, 0.18);
+}
+
+.submit-button:disabled {
+  background: #557868;
+  box-shadow: none;
+  cursor: wait;
 }
 
 .skip-link {
