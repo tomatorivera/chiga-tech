@@ -15,7 +15,7 @@ export function getErrorMessage(error: unknown): string {
 
   if (!response || [502, 503, 504].includes(response.status)) return MENSAJE_SIN_CONEXION;
 
-  return response?.data?.detail ?? MENSAJE_ERROR_INESPERADO;
+  return response.data?.detail || MENSAJE_ERROR_INESPERADO;
 }
 
 export function getFieldErrors<TCampo extends string>(
@@ -23,10 +23,11 @@ export function getFieldErrors<TCampo extends string>(
 ): Partial<Record<TCampo, string>> | undefined {
   if (!axios.isAxiosError<ProblemDetails>(error)) return undefined;
 
-  const errors = error.response?.data?.errors;
-  if (!errors) return undefined;
+  const errors = error.response?.data?.errors ?? {};
+  const entries = Object.entries(errors).filter(([, mensajes]) => mensajes.length > 0);
+  if (entries.length === 0) return undefined;
 
-  return Object.fromEntries(
-    Object.entries(errors).map(([campo, mensajes]) => [campo, mensajes[0]]),
-  ) as Partial<Record<TCampo, string>>;
+  return Object.fromEntries(entries.map(([campo, mensajes]) => [campo, mensajes[0]])) as Partial<
+    Record<TCampo, string>
+  >;
 }
