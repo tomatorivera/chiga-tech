@@ -1,13 +1,7 @@
 import axios from "axios";
+import type { ProblemDetails } from "../types/api.types";
 
 export const http = axios.create();
-
-interface ProblemDetails {
-  status?: number;
-  title?: string;
-  detail?: string;
-  errors?: Record<string, string[]>;
-}
 
 export const MENSAJE_SIN_CONEXION =
   "No se pudo conectar con el servidor. Revisá tu conexión e intentá de nuevo.";
