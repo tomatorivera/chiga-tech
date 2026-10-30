@@ -328,6 +328,41 @@ public class AuthControllerTests(WebApplicationFactory<Program> factory)
     Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
   }
 
+  [Fact]
+  public async Task Me_UserDisabledWhileSessionOpen_ReturnsUnauthorizedAndExpiresCookie()
+  {
+    // Usuario propio del test: dar de baja a uno de los seeds rompería los demás tests
+    var dataSource = factory.Services.GetRequiredService<NpgsqlDataSource>();
+    var hash = BCrypt.Net.BCrypt.HashPassword("chiga1234", workFactor: 4);
+    await ExecuteSql(dataSource, "DELETE FROM usuario WHERE nombre_usuario = 'test_baja'");
+    await ExecuteSql(dataSource, "INSERT INTO usuario (nombre_usuario, nombre, apellido, contrasena) VALUES ('test_baja', 'Test', 'Baja', @hash)", hash);
+
+    try
+    {
+      var client = factory.CreateClient();
+      var login = await client.PostAsJsonAsync("/auth/login", new { username = "test_baja", password = "chiga1234" });
+      var sessionCookie = Assert.Single(SetCookies(login)).Split(';')[0];
+      Assert.Equal(HttpStatusCode.OK, (await GetMe(client, sessionCookie)).StatusCode);
+
+      await ExecuteSql(dataSource, "UPDATE usuario SET estado = false WHERE nombre_usuario = 'test_baja'");
+      var response = await GetMe(client, sessionCookie);
+
+      Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+      AssertExpiresSessionCookie(response);
+    }
+    finally
+    {
+      await ExecuteSql(dataSource, "DELETE FROM usuario WHERE nombre_usuario = 'test_baja'");
+    }
+  }
+
+  private static async Task ExecuteSql(NpgsqlDataSource dataSource, string sql, string? hash = null)
+  {
+    await using var cmd = dataSource.CreateCommand(sql);
+    if (hash is not null) cmd.Parameters.AddWithValue("hash", hash);
+    await cmd.ExecuteNonQueryAsync();
+  }
+
   private static Task<HttpResponseMessage> GetMe(HttpClient client, string cookie)
   {
     var request = new HttpRequestMessage(HttpMethod.Get, "/auth/me");
