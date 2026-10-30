@@ -149,6 +149,21 @@ button {
   cursor: wait;
 }
 
+.logout-button {
+  border-color: #d5ddd6;
+  color: #34463e;
+}
+
+.logout-button:hover {
+  border-color: #b7c4ba;
+  background: #f2f5f0;
+}
+
+.logout-button:disabled {
+  color: #7c8b81;
+  cursor: wait;
+}
+
 .skip-link {
   position: fixed;
   z-index: 20;
