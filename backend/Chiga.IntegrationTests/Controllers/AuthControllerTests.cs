@@ -290,6 +290,52 @@ public class AuthControllerTests(WebApplicationFactory<Program> factory)
   }
 
   [Fact]
+  public async Task Me_WithSession_ReturnsSessionUser()
+  {
+    var client = factory.CreateClient();
+    var login = await client.PostAsJsonAsync("/auth/login", new { username = "vendedor", password = "chiga1234" });
+    var sessionCookie = Assert.Single(SetCookies(login)).Split(';')[0];
+
+    var response = await GetMe(client, sessionCookie);
+
+    Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    var usuario = await response.Content.ReadFromJsonAsync<UsuarioDTO>();
+    Assert.Equal("vendedor", usuario!.NombreUsuario);
+    Assert.Equal("Valeria", usuario.Nombre);
+    Assert.Equal(["Vendedor"], usuario.Roles);
+  }
+
+  [Fact]
+  public async Task Me_WithoutSession_ReturnsUnauthorized()
+  {
+    var response = await factory.CreateClient().GetAsync("/auth/me");
+
+    Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+  }
+
+  [Fact]
+  public async Task Me_TamperedCookie_ReturnsUnauthorized()
+  {
+    var client = factory.CreateClient();
+    var login = await client.PostAsJsonAsync("/auth/login", new { username = "vendedor", password = "chiga1234" });
+    var sessionCookie = Assert.Single(SetCookies(login)).Split(';')[0];
+    // Cambia un carácter del medio (el último puede no alterar ningún byte): la firma ya no coincide.
+    var middle = sessionCookie.Length / 2;
+    var tampered = sessionCookie[..middle] + (sessionCookie[middle] == 'A' ? 'B' : 'A') + sessionCookie[(middle + 1)..];
+
+    var response = await GetMe(client, tampered);
+
+    Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+  }
+
+  private static Task<HttpResponseMessage> GetMe(HttpClient client, string cookie)
+  {
+    var request = new HttpRequestMessage(HttpMethod.Get, "/auth/me");
+    request.Headers.Add("Cookie", cookie);
+    return client.SendAsync(request);
+  }
+
+  [Fact]
   public async Task Logout_WithSession_ReturnsNoContentAndExpiresCookie()
   {
     var client = factory.CreateClient();
@@ -326,5 +372,8 @@ public class AuthControllerTests(WebApplicationFactory<Program> factory)
   {
     public Task<(Usuario User, string Contrasenia)?> FindByNombreUsuarioAsync(string nombreUsuario, CancellationToken ct = default)
       => Task.FromResult(resultado);
+
+    public Task<Usuario?> FindByIdAsync(int id, CancellationToken ct = default)
+      => Task.FromResult(resultado?.User);
   }
 }

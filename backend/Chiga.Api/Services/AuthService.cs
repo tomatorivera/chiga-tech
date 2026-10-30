@@ -1,5 +1,6 @@
 using Api.Exceptions;
 using Api.Models.Dto;
+using Api.Models.Entities;
 using Api.Repositories;
 
 namespace Api.Services;
@@ -20,18 +21,29 @@ public class AuthService(IUserRepository userRepository) : IAuthService
     if (!result.Value.User.Estado)
       throw new DisabledUserException("La cuenta se encuentra inhabilitada, si cree que se trata de un error consulte con un administrador.");
 
-    var usuario = result.Value.User;
-
-    return new UsuarioDTO
-    {
-      Id = usuario.Id,
-      NombreUsuario = usuario.NombreUsuario,
-      Nombre = usuario.Nombre,
-      Apellido = usuario.Apellido,
-      Roles = usuario.Roles.Select(r => r.Nombre).ToList(),
-      Permisos = usuario.Roles.SelectMany(r => r.Permisos).Select(p => p.Modulo).Distinct().ToList(),
-    };
+    return ToDto(result.Value.User);
   }
+
+  // Null si el usuario ya no existe o fue dado de baja: en los dos casos la sesión deja de valer.
+  public async Task<UsuarioDTO?> GetSessionUserAsync(int id, CancellationToken ct = default)
+  {
+    var usuario = await userRepository.FindByIdAsync(id, ct);
+
+    if (usuario is null || !usuario.Estado)
+      return null;
+
+    return ToDto(usuario);
+  }
+
+  private static UsuarioDTO ToDto(Usuario usuario) => new()
+  {
+    Id = usuario.Id,
+    NombreUsuario = usuario.NombreUsuario,
+    Nombre = usuario.Nombre,
+    Apellido = usuario.Apellido,
+    Roles = usuario.Roles.Select(r => r.Nombre).ToList(),
+    Permisos = usuario.Roles.SelectMany(r => r.Permisos).Select(p => p.Modulo).Distinct().ToList(),
+  };
 
   private static bool PasswordMatches(string password, string hash)
   {
