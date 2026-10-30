@@ -5,6 +5,7 @@ using Api.Models.Dto;
 using System.Text.Json;
 using Api.Models.Entities;
 using Api.Repositories;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
@@ -353,6 +354,32 @@ public class AuthControllerTests(WebApplicationFactory<Program> factory)
     finally
     {
       await ExecuteSql(dataSource, "DELETE FROM usuario WHERE nombre_usuario = 'test_baja'");
+    }
+  }
+
+  [Fact]
+  public async Task Me_AfterApiRestart_KeepsSession()
+  {
+    // Dos instancias de la API con el mismo directorio de claves simulan un reinicio
+    var keysPath = Directory.CreateTempSubdirectory("chiga-keys-").FullName;
+    try
+    {
+      string sessionCookie;
+      await using (var before = factory.WithWebHostBuilder(builder => builder.UseSetting("DataProtection:KeysPath", keysPath)))
+      {
+        var login = await before.CreateClient().PostAsJsonAsync("/auth/login", new { username = "vendedor", password = "chiga1234" });
+        sessionCookie = Assert.Single(SetCookies(login)).Split(';')[0];
+      }
+      Assert.NotEmpty(Directory.GetFiles(keysPath, "key-*.xml"));
+
+      await using var after = factory.WithWebHostBuilder(builder => builder.UseSetting("DataProtection:KeysPath", keysPath));
+      var response = await GetMe(after.CreateClient(), sessionCookie);
+
+      Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    }
+    finally
+    {
+      Directory.Delete(keysPath, recursive: true);
     }
   }
 

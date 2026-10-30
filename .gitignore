@@ -526,3 +526,6 @@ $RECYCLE.BIN/
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,windows,linux,macos,node,react,dotnetcore,aspnetcore
 # Claude Code: configuración personal
 .claude/settings.local.json
+
+# Claves de Data Protection del backend: cifran la cookie de sesión, son secretas
+backend/Chiga.Api/keys/

@@ -4,6 +4,7 @@ using Api.Repositories;
 using Api.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Npgsql;
 
@@ -56,6 +57,13 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
             }
         };
     });
+
+// Claves con las que ASP.NET cifra y firma la cookie (ADR técnico 0003). Van en un directorio fijo para que reiniciar
+// la API no cierre las sesiones. Por defecto backend/Chiga.Api/keys, ignorado por git: son secretas.
+// Se cambia con DataProtection:KeysPath (variable de entorno DataProtection__KeysPath).
+var keysPath = builder.Configuration["DataProtection:KeysPath"]
+    ?? Path.Combine(builder.Environment.ContentRootPath, "keys");
+builder.Services.AddDataProtection().PersistKeysToFileSystem(new DirectoryInfo(keysPath));
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
