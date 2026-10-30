@@ -33,6 +33,14 @@ public class AuthController(IAuthService authService) : ControllerBase
     }
   }
 
+  // No requiere sesión: borra la cookie aunque no exista (contrato 0001)
+  [HttpPost("logout")]
+  public async Task<IActionResult> Logout()
+  {
+    await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+    return NoContent();
+  }
+
   private static ClaimsIdentity BuildIdentity(UsuarioDTO user)
   {
     var claims = new List<Claim>

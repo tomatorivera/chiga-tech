@@ -289,6 +289,39 @@ public class AuthControllerTests(WebApplicationFactory<Program> factory)
     AssertNoCookie(response);
   }
 
+  [Fact]
+  public async Task Logout_WithSession_ReturnsNoContentAndExpiresCookie()
+  {
+    var client = factory.CreateClient();
+    var login = await client.PostAsJsonAsync("/auth/login", new { username = "vendedor", password = "chiga1234" });
+    var sessionCookie = Assert.Single(SetCookies(login)).Split(';')[0];
+
+    var request = new HttpRequestMessage(HttpMethod.Post, "/auth/logout");
+    request.Headers.Add("Cookie", sessionCookie);
+    var response = await client.SendAsync(request);
+
+    Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+    AssertExpiresSessionCookie(response);
+  }
+
+  [Fact]
+  public async Task Logout_WithoutSession_ReturnsNoContentAndExpiresCookie()
+  {
+    var response = await factory.CreateClient().PostAsync("/auth/logout", null);
+
+    Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+    AssertExpiresSessionCookie(response);
+  }
+
+  // Borrar una cookie es mandarla vacía y con una fecha de vencimiento ya pasada.
+  private static void AssertExpiresSessionCookie(HttpResponseMessage response)
+  {
+    var parts = Assert.Single(SetCookies(response)).Split(';').Select(part => part.Trim()).ToList();
+    Assert.Equal("chiga_auth=", parts[0]);
+    var expires = parts.Single(part => part.StartsWith("expires=", StringComparison.OrdinalIgnoreCase));
+    Assert.True(DateTimeOffset.Parse(expires["expires=".Length..]) < DateTimeOffset.UtcNow);
+  }
+
   private class FakeUserRepository((Usuario User, string Contrasenia)? resultado) : IUserRepository
   {
     public Task<(Usuario User, string Contrasenia)?> FindByNombreUsuarioAsync(string nombreUsuario, CancellationToken ct = default)
