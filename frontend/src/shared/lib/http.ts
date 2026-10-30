@@ -15,10 +15,19 @@ export function getErrorMessage(error: unknown): string {
 
   if (!response || [502, 503, 504].includes(response.status)) return MENSAJE_SIN_CONEXION;
 
-  const { detail, errors } = response.data ?? {};
+  return response.data?.detail || MENSAJE_ERROR_INESPERADO;
+}
 
-  if (detail) return detail;
-  if (errors) return Object.values(errors).flat().join(" ");
+export function getFieldErrors<TCampo extends string>(
+  error: unknown,
+): Partial<Record<TCampo, string>> | undefined {
+  if (!axios.isAxiosError<ProblemDetails>(error)) return undefined;
 
-  return MENSAJE_ERROR_INESPERADO;
+  const errors = error.response?.data?.errors ?? {};
+  const entries = Object.entries(errors).filter(([, mensajes]) => mensajes.length > 0);
+  if (entries.length === 0) return undefined;
+
+  return Object.fromEntries(entries.map(([campo, mensajes]) => [campo, mensajes[0]])) as Partial<
+    Record<TCampo, string>
+  >;
 }

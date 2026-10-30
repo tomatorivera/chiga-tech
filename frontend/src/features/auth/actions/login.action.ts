@@ -1,4 +1,4 @@
-import { getErrorMessage } from "../../../shared/lib/http";
+import { getErrorMessage, getFieldErrors } from "../../../shared/lib/http";
 import type { ActionStatus } from "../../../shared/types/action.types";
 import { useSesion } from "../hooks/useSesion";
 import type { LoginRequestDTO } from "../models/LoginRequestDTO";
@@ -10,7 +10,7 @@ type LoginStatus = ActionStatus<LoginFields>;
 export const loginAction = async (_prev: LoginStatus, formData: FormData): Promise<LoginStatus> => {
   const username = (formData.get("username") as string | null) ?? "";
   const password = (formData.get("password") as string | null) ?? "";
-  const previousValues = { username: username };
+  const previousValues = { username };
 
   const errors: Partial<Record<LoginFields, string>> = {};
 
@@ -23,12 +23,15 @@ export const loginAction = async (_prev: LoginStatus, formData: FormData): Promi
     return { status: "error", fieldErrors: errors, previousValues };
 
   try {
-    const user = await authService.login({ username, password });
+    const user = await authService.login({ username: username.trim(), password });
 
     // Si el inicio de sesión es correcto, guardo sus datos en el estado global de la app
     useSesion.getState().login(user);
     return { status: "ok" };
   } catch (error) {
+    const fieldErrors = getFieldErrors<LoginFields>(error);
+    if (fieldErrors) return { status: "error", fieldErrors, previousValues };
+
     return { status: "error", message: getErrorMessage(error), previousValues };
   }
 };

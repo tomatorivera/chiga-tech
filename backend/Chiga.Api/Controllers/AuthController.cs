@@ -19,9 +19,11 @@ public class AuthController(IAuthService authService) : ControllerBase
     try
     {
       var user = await authService.LoginAsync(req, ct);
+
       await HttpContext.SignInAsync(
         CookieAuthenticationDefaults.AuthenticationScheme,
         new ClaimsPrincipal(BuildIdentity(user)));
+        
       return Ok(user);
     }
     catch (Exception ex) when (ex is InvalidCredentialsException or DisabledUserException)

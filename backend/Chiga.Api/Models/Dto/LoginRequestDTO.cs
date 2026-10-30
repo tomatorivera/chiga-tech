@@ -6,13 +6,11 @@ namespace Api.Models.Dto;
 public class LoginRequestDTO
 {
   [JsonPropertyName("username")]
-  [Display(Name = "nombre de usuario")]
-  [Required(ErrorMessage = "El {0} es requerido")]
-  [TrimmedStringLength(maximumLength: 50, MinimumLength = 4,ErrorMessage = "El {0} debe tener entre {1} y {2} caracteres")]
-  public string NombreUsuario { get; set; } = "";
+  [Required(ErrorMessage = "El nombre de usuario es requerido")]
+  [StringLength(maximumLength: 50, MinimumLength = 4,ErrorMessage = "El nombre de usuario debe tener entre {2} y {1} caracteres")]
+  public string NombreUsuario { get; set => field = value?.Trim()!; } = "";
 
   [JsonPropertyName("password")]
-  [Display(Name = "contraseña")]
-  [Required(ErrorMessage = "La {0} es requerida")]
+  [Required(ErrorMessage = "La contraseña es requerida")]
   public string Contrasena { get; set; } = "";
 }
