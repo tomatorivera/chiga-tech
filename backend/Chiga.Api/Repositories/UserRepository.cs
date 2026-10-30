@@ -5,10 +5,21 @@ namespace Api.Repositories;
 
 public class UserRepository(NpgsqlDataSource ds) : IUserRepository
 {
-  public async Task<(Usuario User, string Contrasenia)?> FindByNombreUsuarioAsync(
+  public Task<(Usuario User, string Contrasenia)?> FindByNombreUsuarioAsync(
     string nombreUsuario, CancellationToken ct = default
+  ) => FindAsync("u.nombre_usuario = @valor", nombreUsuario, ct);
+
+  public async Task<Usuario?> FindByIdAsync(int id, CancellationToken ct = default)
+  {
+    var result = await FindAsync("u.id_usuario = @valor", id, ct);
+    return result?.User;
+  }
+
+  // El filtro lo arma el código, nunca el usuario: el valor buscado viaja siempre como parámetro.
+  private async Task<(Usuario User, string Contrasenia)?> FindAsync(
+    string filtro, object valor, CancellationToken ct
   ){
-    const string sql = """
+    var sql = $"""
       SELECT u.id_usuario, u.nombre_usuario, u.nombre, u.apellido, u.contrasena, u.estado,
              r.id_rol, r.rol,
              p.id_permiso, p.modulo
@@ -17,11 +28,11 @@ public class UserRepository(NpgsqlDataSource ds) : IUserRepository
       LEFT JOIN rol r          ON r.id_rol = ur.id_rol
       LEFT JOIN rol_permiso rp ON rp.id_rol = r.id_rol
       LEFT JOIN permiso p      ON p.id_permiso = rp.id_permiso
-      WHERE u.nombre_usuario = @nombreUsuario
+      WHERE {filtro}
       """;
 
     await using var cmd = ds.CreateCommand(sql);
-    cmd.Parameters.AddWithValue("nombreUsuario", nombreUsuario);
+    cmd.Parameters.AddWithValue("valor", valor);
     
     await using var reader = await cmd.ExecuteReaderAsync(ct);
 

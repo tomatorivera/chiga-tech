@@ -1,7 +1,14 @@
 import { ArrowRight, PackageCheck } from "lucide-react";
+import { Navigate } from "react-router-dom";
 import { LoginForm } from "./components/LoginForm";
+import { useSesion } from "./hooks/useSesion";
 
 export function Login() {
+  const usuario = useSesion((state) => state.usuario);
+
+  // Con sesión iniciada no tiene sentido mostrar el formulario: incluye el momento justo después del login
+  if (usuario) return <Navigate to="/inicio" replace />;
+
   return (
     <main className="login-shell min-h-screen w-full lg:grid lg:grid-cols-[1.08fr_0.92fr]">
       <a className="skip-link" href="#login-form">
@@ -23,9 +30,6 @@ export function Login() {
               Gestión comercial
             </p>
           </div>
-          <span className="ml-auto rounded-full border border-white/15 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/65">
-            Vista previa
-          </span>
         </header>
 
         <div className="relative z-10 mt-12 max-w-xl sm:mt-16 lg:my-auto lg:mt-0 lg:pb-14">

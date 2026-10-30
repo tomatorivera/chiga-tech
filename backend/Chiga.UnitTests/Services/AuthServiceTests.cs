@@ -105,6 +105,34 @@ public class AuthServiceTests
     Assert.Equal("vendedor", result.NombreUsuario);
   }
 
+  [Fact]
+  public async Task GetSessionUserAsync_ActiveUser_ReturnsUser()
+  {
+    var service = ServiceWithUser(estado: true);
+
+    var result = await service.GetSessionUserAsync(1);
+
+    Assert.NotNull(result);
+    Assert.Equal("vendedor", result.NombreUsuario);
+    Assert.Equal("Valeria", result.Nombre);
+  }
+
+  [Fact]
+  public async Task GetSessionUserAsync_DisabledUser_ReturnsNull()
+  {
+    var service = ServiceWithUser(estado: false);
+
+    Assert.Null(await service.GetSessionUserAsync(1));
+  }
+
+  [Fact]
+  public async Task GetSessionUserAsync_UnknownUser_ReturnsNull()
+  {
+    var service = new AuthService(new FakeUserRepository(null));
+
+    Assert.Null(await service.GetSessionUserAsync(1));
+  }
+
   private static AuthService ServiceWithUser(bool estado)
   {
     var usuario = new Usuario { Id = 1, NombreUsuario = "vendedor", Nombre = "Valeria", Apellido = "Vendedor", Estado = estado };
@@ -119,5 +147,8 @@ public class AuthServiceTests
   {
     public Task<(Usuario User, string Contrasenia)?> FindByNombreUsuarioAsync(string nombreUsuario, CancellationToken ct = default)
       => Task.FromResult(resultado);
+
+    public Task<Usuario?> FindByIdAsync(int id, CancellationToken ct = default)
+      => Task.FromResult(resultado?.User);
   }
 }
