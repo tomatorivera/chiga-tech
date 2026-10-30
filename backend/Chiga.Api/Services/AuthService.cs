@@ -12,7 +12,7 @@ public class AuthService(IUserRepository userRepository) : IAuthService
     // armado a mano, así que se trata como un usuario inexistente.
     var result = req.NombreUsuario.Contains('\0')
       ? null
-      : await userRepository.FindByNombreUsuarioAsync(req.NombreUsuario.Trim(), ct);
+      : await userRepository.FindByNombreUsuarioAsync(req.NombreUsuario, ct);
 
     if (result is null || !PasswordMatches(req.Contrasena, result.Value.Contrasenia))
       throw new InvalidCredentialsException("Las credenciales son inválidas.");

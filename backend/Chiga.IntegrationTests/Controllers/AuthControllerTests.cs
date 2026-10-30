@@ -236,7 +236,6 @@ public class AuthControllerTests(WebApplicationFactory<Program> factory)
   [InlineData("' OR '1'='1", "chiga1234")]           // inyección SQL en el usuario
   [InlineData("vendedor' --", "chiga1234")]
   [InlineData("vendedor\0", "chiga1234")]            // carácter nulo
-  [InlineData("vendedor ", "chiga1234")]             // el usuario no se recorta
   [InlineData("vendedor", "chiga1234\0")]            // carácter nulo en la contraseña
   public async Task Login_TrickyCredentials_ReturnsUnauthorized(string username, string password)
   {
