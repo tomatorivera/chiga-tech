@@ -1,4 +1,4 @@
-import { ArrowRight, PackageCheck, ShieldCheck } from "lucide-react";
+import { ArrowRight, PackageCheck } from "lucide-react";
 import { LoginForm } from "./components/LoginForm";
 
 export function Login() {
@@ -106,19 +106,6 @@ export function Login() {
           </p>
 
           <LoginForm />
-
-          <div className="mt-7 flex items-start gap-3 border-t border-[#e8ece7] pt-5">
-            <div
-              className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-full bg-[#f0f3ee] text-[#6b8274]"
-              aria-hidden="true"
-            >
-              <ShieldCheck size={15} />
-            </div>
-            <p className="text-[11px] leading-[1.65] text-[#818d85]">
-              <span className="font-semibold text-[#617168]">Entorno de avance.</span> La validación
-              es visual; la autenticación segura se integrará con el backend.
-            </p>
-          </div>
         </div>
         <p className="mt-auto w-full max-w-105 pt-12 text-center text-[10px] tracking-[0.02em] text-[#a0aaa3] lg:absolute lg:bottom-7">
           Proyecto académico · Facultad de Ciencias Exactas · UNT

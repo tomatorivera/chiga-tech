@@ -64,15 +64,6 @@ export function LoginForm() {
           </div>
         </div>
 
-        <label className="flex w-fit cursor-pointer items-center gap-2.5 py-1 text-xs text-[#69776f]">
-          <input
-            className="remember-check size-4 cursor-pointer rounded border-[#bdc8bf] accent-[#315d4a]"
-            type="checkbox"
-            name="remember"
-          />
-          Mantener mi sesión iniciada
-        </label>
-
         <button
           className="submit-button group flex w-full items-center justify-center gap-2 rounded-lg px-5 py-3.5 text-sm font-semibold text-white transition focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#315d4a]"
           type="submit"
