@@ -209,6 +209,24 @@ public class AuthControllerTests(WebApplicationFactory<Program> factory)
     AssertNoCookie(response);
   }
 
+  // El largo se mide sin los espacios de los extremos, pero el valor no se recorta: por eso los válidos llegan al 401.
+  [Theory]
+  [InlineData("ab  ", HttpStatusCode.BadRequest)]
+  [InlineData("  ab", HttpStatusCode.BadRequest)]
+  [InlineData(" ab ", HttpStatusCode.BadRequest)]
+  [InlineData("    ", HttpStatusCode.BadRequest)]
+  [InlineData(" abcd ", HttpStatusCode.Unauthorized)]
+  [InlineData(" aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa ", HttpStatusCode.Unauthorized)] // 50 caracteres
+  public async Task Login_UsernameWithSurroundingSpaces_ValidatesTrimmedLength(string username, HttpStatusCode expected)
+  {
+    var client = factory.CreateClient();
+
+    var response = await client.PostAsJsonAsync("/auth/login", new { username, password = "chiga1234" });
+
+    Assert.Equal(expected, response.StatusCode);
+    AssertNoCookie(response);
+  }
+
   [Theory]
   [InlineData("vendedor", "chiga1234 ")]             // espacio de más
   [InlineData("vendedor", " chiga1234")]
