@@ -1,0 +1,14 @@
+import { http } from "../../../shared/lib/http";
+import type { LoginRequestDTO } from "../models/LoginRequestDTO";
+import type { UsuarioDTO } from "../models/UsuarioDTO";
+
+export interface IAuthService {
+  login: (credentials: LoginRequestDTO) => Promise<UsuarioDTO>;
+}
+
+export const authService: IAuthService = {
+  login: async (credentials: LoginRequestDTO): Promise<UsuarioDTO> => {
+    const response = await http.post<UsuarioDTO>("/auth/login", credentials);
+    return response.data;
+  },
+};
