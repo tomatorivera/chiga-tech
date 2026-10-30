@@ -30,9 +30,6 @@ export function Login() {
               Gestión comercial
             </p>
           </div>
-          <span className="ml-auto rounded-full border border-white/15 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/65">
-            Vista previa
-          </span>
         </header>
 
         <div className="relative z-10 mt-12 max-w-xl sm:mt-16 lg:my-auto lg:mt-0 lg:pb-14">
