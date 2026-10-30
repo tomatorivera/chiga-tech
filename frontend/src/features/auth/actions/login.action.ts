@@ -1,4 +1,4 @@
-import { getErrorMessage } from "../../../shared/lib/http";
+import { getErrorMessage, getFieldErrors } from "../../../shared/lib/http";
 import type { ActionStatus } from "../../../shared/types/action.types";
 import { useSesion } from "../hooks/useSesion";
 import type { LoginRequestDTO } from "../models/LoginRequestDTO";
@@ -29,6 +29,9 @@ export const loginAction = async (_prev: LoginStatus, formData: FormData): Promi
     useSesion.getState().login(user);
     return { status: "ok" };
   } catch (error) {
+    const fieldErrors = getFieldErrors<LoginFields>(error);
+    if (fieldErrors) return { status: "error", fieldErrors };
+
     return { status: "error", message: getErrorMessage(error), previousValues };
   }
 };
