@@ -24,6 +24,12 @@ La API se conecta a la BD de Docker con Npgsql ([ADR técnico 0004](../docs/adr/
 
 La API queda en http://localhost:5098, que redirige a **Swagger** para ver y probar endpoints.
 
+## Sesión
+
+La sesión es una cookie de ASP.NET Core ([ADR técnico 0003](../docs/adr/tecnico/0003-autenticacion-con-cookie.md)). Las claves con las que se cifra y firma (Data Protection) se guardan en `Chiga.Api/keys/`, que está en el `.gitignore` porque son secretas. El directorio se cambia con `DataProtection:KeysPath` (variable de entorno `DataProtection__KeysPath`).
+
+Si se borran las claves, la API genera otras y todas las sesiones abiertas se cierran: hay que volver a iniciar sesión. En un servidor, el directorio tiene que sobrevivir a los reinicios (por ejemplo, un volumen de Docker).
+
 ## Estructura
 
 ```
