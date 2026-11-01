@@ -14,7 +14,7 @@ export function Homepage() {
       <header className="border-b border-[#e4e8df] bg-white">
         <div className="mx-auto flex max-w-6xl items-center gap-3 px-6 py-4 sm:px-10">
           <div
-            className="brand-mark grid size-9 place-items-center rounded-lg text-[#173d33]"
+            className="grid size-9 place-items-center rounded-lg bg-[#c7e77e] text-[#173d33]"
             aria-hidden="true"
           >
             <PackageCheck size={19} strokeWidth={2.2} />
@@ -25,7 +25,7 @@ export function Homepage() {
             <button
               type="submit"
               disabled={isPending}
-              className="logout-button flex items-center gap-2 rounded-lg border px-3.5 py-2 text-[13px] font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#315d4a]"
+              className="flex cursor-pointer items-center gap-2 rounded-lg border border-[#d5ddd6] px-3.5 py-2 text-[#34463e] transition hover:border-[#b7c4ba] hover:bg-[#f2f5f0] disabled:cursor-wait disabled:text-[#7c8b81] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#315d4a]"
             >
               {isPending ? (
                 <LoaderCircle className="animate-spin" size={16} aria-hidden="true" />

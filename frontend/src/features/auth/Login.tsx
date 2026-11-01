@@ -10,16 +10,22 @@ export function Login() {
   if (usuario) return <Navigate to="/inicio" replace />;
 
   return (
-    <main className="login-shell min-h-screen w-full lg:grid lg:grid-cols-[1.08fr_0.92fr]">
-      <a className="skip-link" href="#login-form">
+    <main className="min-h-screen w-full bg-[#f6f7f2] lg:grid lg:grid-cols-[1.08fr_0.92fr]">
+      <a
+        className="fixed top-3 left-3 z-20 -translate-y-[160%] rounded-md bg-white px-3.5 py-2.5 text-[#173b32] focus:translate-y-0"
+        href="#login-form"
+      >
         Saltar al inicio de sesión
       </a>
 
-      <section className="brand-panel relative flex min-h-85 flex-col overflow-hidden px-7 py-7 text-white sm:px-10 sm:py-9 lg:min-h-screen lg:px-14 lg:py-12 xl:px-20">
-        <div className="brand-grain" aria-hidden="true" />
+      <section className="relative flex flex-col overflow-hidden bg-[radial-gradient(ellipse_at_90%_12%,rgba(180,210,123,0.17),transparent_31%),linear-gradient(145deg,#204a3d_0%,#173b32_55%,#18372f_100%)] px-7 py-7 text-white sm:px-10 sm:py-9 lg:min-h-screen lg:px-14 lg:py-12 xl:px-20">
+        <div
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.12)_0.65px,transparent_0.65px)] bg-size-[9px_9px] opacity-20"
+          aria-hidden="true"
+        />
         <header className="relative z-10 flex items-center gap-3">
           <div
-            className="brand-mark grid size-11 place-items-center rounded-xl text-[#173d33]"
+            className="grid size-11 place-items-center rounded-xl bg-[#c7e77e] text-[#173d33]"
             aria-hidden="true"
           >
             <PackageCheck size={23} strokeWidth={2.2} />
@@ -33,19 +39,19 @@ export function Login() {
         </header>
 
         <div className="relative z-10 mt-12 max-w-xl sm:mt-16 lg:my-auto lg:mt-0 lg:pb-14">
-          <p className="mb-4 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#c7e77e]">
+          <p className="mb-4 flex animate-[rise-in_650ms_180ms_both] items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#c7e77e]">
             <span className="h-px w-7 bg-[#c7e77e]" />
             Todo en su lugar
           </p>
-          <h1 className="max-w-lg font-display text-[clamp(2.45rem,5vw,4.6rem)] font-semibold leading-[1.04] tracking-[-0.035em]">
+          <h1 className="max-w-lg animate-[rise-in_650ms_80ms_both] font-display text-[clamp(2.45rem,5vw,4.6rem)] font-semibold leading-[1.04] tracking-[-0.035em]">
             Tu negocio, <span className="text-[#c7e77e]">en buenas manos.</span>
           </h1>
-          <p className="mt-5 max-w-md text-sm leading-6 text-white/65 sm:text-base sm:leading-7">
+          <p className="mt-5 max-w-md animate-[rise-in_650ms_180ms_both] text-sm leading-6 text-white/65 sm:text-base sm:leading-7">
             Ventas, productos y stock reunidos en un solo lugar. Una herramienta clara para el
             trabajo de todos los días.
           </p>
 
-          <div className="inventory-preview mt-9 max-w-md overflow-hidden rounded-2xl border border-white/10 bg-[#f8f8ef] text-[#24352f] shadow-[0_24px_60px_-32px_rgba(0,0,0,0.65)] sm:mt-12">
+          <div className="mt-9 max-w-md animate-[rise-in_650ms_180ms_both] overflow-hidden rounded-2xl border border-white/10 bg-[#f8f8ef] text-[#24352f] shadow-[0_24px_60px_-32px_rgba(0,0,0,0.65)] sm:mt-12">
             <div className="flex items-center justify-between border-b border-[#e4e8df] px-5 py-4">
               <div>
                 <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#7c8b81]">
@@ -92,11 +98,17 @@ export function Login() {
           <span>Casa de Tecnología · Tucumán</span>
           <span className="hidden sm:inline">Sistema de gestión comercial</span>
         </footer>
-        <div className="brand-orbit brand-orbit-one" aria-hidden="true" />
-        <div className="brand-orbit brand-orbit-two" aria-hidden="true" />
+        <div
+          className="pointer-events-none absolute -right-[195px] bottom-[7%] size-75 rounded-full border border-[rgba(211,235,177,0.08)] max-lg:hidden"
+          aria-hidden="true"
+        />
+        <div
+          className="pointer-events-none absolute -right-[115px] bottom-[calc(7%-80px)] size-115 rounded-full border border-[rgba(211,235,177,0.08)] max-lg:hidden"
+          aria-hidden="true"
+        />
       </section>
 
-      <section className="form-panel flex min-h-140 flex-col items-center justify-center px-6 py-12 sm:px-10 lg:min-h-screen lg:px-12">
+      <section className="relative flex min-h-140 flex-col items-center justify-center bg-[#f8f9f5] bg-[radial-gradient(ellipse_at_85%_100%,rgba(216,226,203,0.25),transparent_32%)] px-6 py-12 sm:px-10 lg:min-h-screen lg:px-12">
         <div className="w-full max-w-105 animate-enter">
           <div className="mb-9 flex items-center gap-2 text-xs font-medium text-[#617168]">
             <span className="size-2 rounded-full bg-[#8cb46a]" />
