@@ -67,17 +67,17 @@ public class UserRepository(NpgsqlDataSource ds) : IUserRepository
 
   public async Task<Usuario?> FindByIdAsync(int id, CancellationToken ct = default)
   {
-    var sql = """
-    SELECT u.id_usuario, u.nombre_usuario, u.nombre, u.apellido, u.estado,
-           r.id_rol, r.rol,
-           p.id_permiso, p.modulo
-    FROM usuario u
-    LEFT JOIN usuario_rol ur ON ur.id_usuario = u.id_usuario
-    LEFT JOIN rol r          ON r.id_rol = ur.id_rol
-    LEFT JOIN rol_permiso rp ON rp.id_rol = r.id_rol
-    LEFT JOIN permiso p      ON p.id_permiso = rp.id_permiso
-    WHERE u.id_usuario = @id
-    """;
+    var sql = $"""
+      SELECT u.id_usuario, u.nombre_usuario, u.nombre, u.apellido, u.estado,
+            r.id_rol, r.rol,
+            p.id_permiso, p.modulo
+      FROM usuario u
+      LEFT JOIN usuario_rol ur ON ur.id_usuario = u.id_usuario
+      LEFT JOIN rol r          ON r.id_rol = ur.id_rol
+      LEFT JOIN rol_permiso rp ON rp.id_rol = r.id_rol
+      LEFT JOIN permiso p      ON p.id_permiso = rp.id_permiso
+      WHERE u.id_usuario = @id
+      """;
 
     await using var cmd = ds.CreateCommand(sql);
     cmd.Parameters.AddWithValue("id", id);
