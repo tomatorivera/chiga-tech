@@ -98,6 +98,24 @@ public class UserRepositoryTests(WebApplicationFactory<Program> factory)
     Assert.True((long)(await cmd.ExecuteScalarAsync())! > 0);
   }
 
+  [Fact]
+  public async Task FindByIdAsync_ExistingUser_ReturnsUserWithRoles()
+  {
+    var id = (await Repository.FindByNombreUsuarioAsync("test_con_roles"))!.Value.User.Id;
+
+    var usuario = await Repository.FindByIdAsync(id);
+
+    Assert.NotNull(usuario);
+    Assert.Equal("test_con_roles", usuario.NombreUsuario);
+    Assert.Equal(["Test Rol A", "Test Rol B", "Test Rol C"], usuario.Roles.Select(r => r.Nombre).Order());
+  }
+
+  [Fact]
+  public async Task FindByIdAsync_UnknownId_ReturnsNull()
+  {
+    Assert.Null(await Repository.FindByIdAsync(-1));
+  }
+
   private static string[] PermisosDe(Api.Models.Entities.Usuario usuario, string rol) =>
     usuario.Roles.Single(r => r.Nombre == rol).Permisos.Select(p => p.Modulo).Order().ToArray();
 }

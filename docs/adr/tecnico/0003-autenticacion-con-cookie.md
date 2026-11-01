@@ -18,5 +18,5 @@ La sesión tiene una duración por defecto de 24 hs sin actividad, y es NO persi
 
 - El frontend y la API se sirven desde el mismo origen. En desarrollo, Vite hace de proxy de `/api` y `/auth` hacia el backend, así no hace falta configurar CORS con credenciales.
 - Dar de baja a un usuario corta su acceso de inmediato (ERS 2.3): `OnValidatePrincipal` consulta en cada request si el usuario sigue activo y, si no, rechaza la cookie. Es una consulta por id con clave primaria.
-- Las claves con las que ASP.NET cifra la cookie (Data Protection) se guardan en un directorio persistente. Si se pierden, por ejemplo al recrear el contenedor, todas las sesiones se cierran.
+- Las claves con las que ASP.NET cifra la cookie (Data Protection) se guardan en un directorio persistente: por defecto `backend/Chiga.Api/keys/`, ignorado por git porque son secretas, y se cambia con `DataProtection:KeysPath` (variable de entorno `DataProtection__KeysPath`). Si se borran o se pierden, por ejemplo al recrear el contenedor, la API genera otras y todas las sesiones abiertas se cierran: hay que volver a iniciar sesión. En un servidor, el directorio tiene que sobrevivir a los reinicios (por ejemplo, un volumen de Docker).
 - La sesión se pierde cuando se cierra el navegador, para el contexto de uso del sistema no parece ser un problema.

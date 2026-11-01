@@ -5,6 +5,7 @@ using Api.Models.Dto;
 using System.Text.Json;
 using Api.Models.Entities;
 using Api.Repositories;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
@@ -288,9 +289,152 @@ public class AuthControllerTests(WebApplicationFactory<Program> factory)
     AssertNoCookie(response);
   }
 
+  [Fact]
+  public async Task Me_WithSession_ReturnsSessionUser()
+  {
+    var client = factory.CreateClient();
+    var login = await client.PostAsJsonAsync("/auth/login", new { username = "vendedor", password = "chiga1234" });
+    var sessionCookie = Assert.Single(SetCookies(login)).Split(';')[0];
+
+    var response = await GetMe(client, sessionCookie);
+
+    Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    var usuario = await response.Content.ReadFromJsonAsync<UsuarioDTO>();
+    Assert.Equal("vendedor", usuario!.NombreUsuario);
+    Assert.Equal("Valeria", usuario.Nombre);
+    Assert.Equal(["Vendedor"], usuario.Roles);
+  }
+
+  [Fact]
+  public async Task Me_WithoutSession_ReturnsUnauthorized()
+  {
+    var response = await factory.CreateClient().GetAsync("/auth/me");
+
+    Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+  }
+
+  [Fact]
+  public async Task Me_TamperedCookie_ReturnsUnauthorized()
+  {
+    var client = factory.CreateClient();
+    var login = await client.PostAsJsonAsync("/auth/login", new { username = "vendedor", password = "chiga1234" });
+    var sessionCookie = Assert.Single(SetCookies(login)).Split(';')[0];
+    // Cambia un carácter del medio (el último puede no alterar ningún byte): la firma ya no coincide.
+    var middle = sessionCookie.Length / 2;
+    var tampered = sessionCookie[..middle] + (sessionCookie[middle] == 'A' ? 'B' : 'A') + sessionCookie[(middle + 1)..];
+
+    var response = await GetMe(client, tampered);
+
+    Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+  }
+
+  [Fact]
+  public async Task Me_UserDisabledWhileSessionOpen_ReturnsUnauthorizedAndExpiresCookie()
+  {
+    // Usuario propio del test: dar de baja a uno de los seeds rompería los demás tests
+    var dataSource = factory.Services.GetRequiredService<NpgsqlDataSource>();
+    var hash = BCrypt.Net.BCrypt.HashPassword("chiga1234", workFactor: 4);
+    await ExecuteSql(dataSource, "DELETE FROM usuario WHERE nombre_usuario = 'test_baja'");
+    await ExecuteSql(dataSource, "INSERT INTO usuario (nombre_usuario, nombre, apellido, contrasena) VALUES ('test_baja', 'Test', 'Baja', @hash)", hash);
+
+    try
+    {
+      var client = factory.CreateClient();
+      var login = await client.PostAsJsonAsync("/auth/login", new { username = "test_baja", password = "chiga1234" });
+      var sessionCookie = Assert.Single(SetCookies(login)).Split(';')[0];
+      Assert.Equal(HttpStatusCode.OK, (await GetMe(client, sessionCookie)).StatusCode);
+
+      await ExecuteSql(dataSource, "UPDATE usuario SET estado = false WHERE nombre_usuario = 'test_baja'");
+      var response = await GetMe(client, sessionCookie);
+
+      Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+      AssertExpiresSessionCookie(response);
+    }
+    finally
+    {
+      await ExecuteSql(dataSource, "DELETE FROM usuario WHERE nombre_usuario = 'test_baja'");
+    }
+  }
+
+  [Fact]
+  public async Task Me_AfterApiRestart_KeepsSession()
+  {
+    // Dos instancias de la API con el mismo directorio de claves simulan un reinicio
+    var keysPath = Directory.CreateTempSubdirectory("chiga-keys-").FullName;
+    try
+    {
+      string sessionCookie;
+      await using (var before = factory.WithWebHostBuilder(builder => builder.UseSetting("DataProtection:KeysPath", keysPath)))
+      {
+        var login = await before.CreateClient().PostAsJsonAsync("/auth/login", new { username = "vendedor", password = "chiga1234" });
+        sessionCookie = Assert.Single(SetCookies(login)).Split(';')[0];
+      }
+      Assert.NotEmpty(Directory.GetFiles(keysPath, "key-*.xml"));
+
+      await using var after = factory.WithWebHostBuilder(builder => builder.UseSetting("DataProtection:KeysPath", keysPath));
+      var response = await GetMe(after.CreateClient(), sessionCookie);
+
+      Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    }
+    finally
+    {
+      Directory.Delete(keysPath, recursive: true);
+    }
+  }
+
+  private static async Task ExecuteSql(NpgsqlDataSource dataSource, string sql, string? hash = null)
+  {
+    await using var cmd = dataSource.CreateCommand(sql);
+    if (hash is not null) cmd.Parameters.AddWithValue("hash", hash);
+    await cmd.ExecuteNonQueryAsync();
+  }
+
+  private static Task<HttpResponseMessage> GetMe(HttpClient client, string cookie)
+  {
+    var request = new HttpRequestMessage(HttpMethod.Get, "/auth/me");
+    request.Headers.Add("Cookie", cookie);
+    return client.SendAsync(request);
+  }
+
+  [Fact]
+  public async Task Logout_WithSession_ReturnsNoContentAndExpiresCookie()
+  {
+    var client = factory.CreateClient();
+    var login = await client.PostAsJsonAsync("/auth/login", new { username = "vendedor", password = "chiga1234" });
+    var sessionCookie = Assert.Single(SetCookies(login)).Split(';')[0];
+
+    var request = new HttpRequestMessage(HttpMethod.Post, "/auth/logout");
+    request.Headers.Add("Cookie", sessionCookie);
+    var response = await client.SendAsync(request);
+
+    Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+    AssertExpiresSessionCookie(response);
+  }
+
+  [Fact]
+  public async Task Logout_WithoutSession_ReturnsNoContentAndExpiresCookie()
+  {
+    var response = await factory.CreateClient().PostAsync("/auth/logout", null);
+
+    Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+    AssertExpiresSessionCookie(response);
+  }
+
+  // Borrar una cookie es mandarla vacía y con una fecha de vencimiento ya pasada.
+  private static void AssertExpiresSessionCookie(HttpResponseMessage response)
+  {
+    var parts = Assert.Single(SetCookies(response)).Split(';').Select(part => part.Trim()).ToList();
+    Assert.Equal("chiga_auth=", parts[0]);
+    var expires = parts.Single(part => part.StartsWith("expires=", StringComparison.OrdinalIgnoreCase));
+    Assert.True(DateTimeOffset.Parse(expires["expires=".Length..]) < DateTimeOffset.UtcNow);
+  }
+
   private class FakeUserRepository((Usuario User, string Contrasenia)? resultado) : IUserRepository
   {
     public Task<(Usuario User, string Contrasenia)?> FindByNombreUsuarioAsync(string nombreUsuario, CancellationToken ct = default)
       => Task.FromResult(resultado);
+
+    public Task<Usuario?> FindByIdAsync(int id, CancellationToken ct = default)
+      => Task.FromResult(resultado?.User);
   }
 }

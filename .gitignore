@@ -526,3 +526,5 @@ $RECYCLE.BIN/
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,windows,linux,macos,node,react,dotnetcore,aspnetcore
 # Claude Code: configuración personal
 .claude/settings.local.json
+
+backend/Chiga.Api/keys/

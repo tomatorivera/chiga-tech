@@ -13,8 +13,14 @@ export const useSesion = create<SessionState>()(
   devtools(
     (set) => ({
       usuario: null,
-      login: (usuario) => set({ usuario }, false, "sesion/login"),
-      logout: () => set({ usuario: null }, false, "sesion/logout"),
+
+      login: (usuario) => {
+        set({ usuario }, false, "sesion/login");
+      },
+
+      logout: () => {
+        set({ usuario: null }, false, "sesion/logout");
+      },
     }),
     { name: "session", enabled: import.meta.env.VITE_ENV === "development" },
   ),
