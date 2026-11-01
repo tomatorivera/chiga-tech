@@ -1,6 +1,6 @@
 # Flujo de trabajo
 
-Cómo un cambio llega desde una issue hasta `dev`.
+Cómo un cambio llega desde una issue hasta `dev` y después a `main`.
 
 ## Ramas
 
@@ -26,11 +26,15 @@ Cómo un cambio llega desde una issue hasta `dev`.
 | `chore` | Configuración, dependencias, scripts, CI |
 | `style` | Formato sin cambiar la lógica |
 
-El alcance es opcional: `frontend`, `backend` o `db`.
+El alcance es opcional:
+
+- **Módulo** (`auth`, `users`, `productos`, etc.): para los cambios que se pueden ubicar en uno.
+- **`frontend`, `backend` o `db`**: para cambios generales de esa parte, como agregar un esquema, configurar una dependencia del frontend o actualizar un middleware general del backend.
 
 ```
-feat(backend): agregar endpoint de alta de clientes
-fix(frontend): mostrar error cuando falla el login
+feat(clientes): agregar endpoint de alta de clientes
+fix(auth): mostrar error cuando falla el login
+chore(frontend): configurar una dependencia nueva
 chore(db): agregar migración de la tabla de proveedores
 ```
 
@@ -63,10 +67,10 @@ Si el `pull` trajo migraciones: `npm run db:migrate`. Si trajo dependencias: `np
 
 ```bash
 git add <archivos>
-git commit -m "feat(frontend): agregar formulario de alta de clientes"
+git commit -m "feat(clientes): agregar formulario de alta de clientes"
 ```
 
-Commits chicos, cada uno con sentido propio.
+Commits chicos, cada uno con sentido propio. Un commit que agrega lógica de negocio, conexión con una base de datos o integración entre frontend, backend y BD incluye tests que evidencien que cumple su objetivo.
 
 ### 3. Pushear
 
@@ -97,6 +101,10 @@ git pull
 git branch -d feat/alta-de-clientes
 ```
 
+### 7. Pasar a `main`
+
+Cuando la funcionalidad está validada y terminada en `dev`, abrí una PR de `dev` a `main`.
+
 ## Validaciones automáticas
 
 Si algo falla, la acción se cancela y te muestra el error. Corregilo y repetí.
@@ -117,6 +125,12 @@ Cada merge de `dev` a `main` es una nueva iteración del sistema. La cátedra si
 - Usa el token de Bitbucket guardado en el secret `BITBUCKET_API_KEY` del repo de GitHub. Si vence o se revoca, el workflow falla en la pestaña **Actions**: generá uno nuevo con permiso de escritura en repositorios, actualizá el secret y tocá **Re-run jobs**.
 
 ## Otros casos
+
+### PRs concatenadas
+
+Cuando un trabajo se apoya en otra funcionalidad todavía abierta, su rama sale de ella y su PR apunta a ella, en lugar de a `dev`. Por ejemplo, `feat/auth-session-logout` implementó tickets sobre lo que ya existía en `feat/auth`. Después, la rama base llega a `dev` con su propia PR.
+
+El [CI](../.github/workflows/ci.yml) solo corre en PRs hacia `dev` y `main`: en una PR concatenada, corré la verificación a mano y dejá el resultado en la PR. `Closes #12` recién cierra la issue cuando el cambio llega a `dev`.
 
 ### Traer cambios de `dev` a tu rama
 
