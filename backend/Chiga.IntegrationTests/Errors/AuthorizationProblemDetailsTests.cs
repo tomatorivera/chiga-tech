@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
+using Npgsql;
 
 namespace Chiga.IntegrationTests.Errors;
 
@@ -15,6 +16,15 @@ public class SoloDuenoController : ControllerBase
 {
   [Authorize(Roles = "Dueño")]
   [HttpGet("/test-solo-dueno")]
+  public IActionResult Get() => Ok();
+}
+
+// Endpoint que solo existe en los tests: pide sesión, sin rol, y no valida al usuario por su cuenta como /auth/me.
+[ApiController]
+public class ConSesionController : ControllerBase
+{
+  [Authorize]
+  [HttpGet("/test-con-sesion")]
   public IActionResult Get() => Ok();
 }
 
@@ -48,6 +58,76 @@ public class AuthorizationProblemDetailsTests(WebApplicationFactory<Program> fac
     var response = await client.SendAsync(request);
 
     await AssertProblemDetails(response, HttpStatusCode.Forbidden);
+  }
+
+  [Fact]
+  public async Task ProtectedEndpoint_SessionWithoutRequiredRole_KeepsSessionCookie()
+  {
+    var client = CreateClient();
+    var sessionCookie = await Login(client, "vendedor");
+
+    var response = await Get(client, "/test-solo-dueno", sessionCookie);
+
+    Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+    Assert.False(response.Headers.Contains("Set-Cookie"));
+  }
+
+  [Fact]
+  public async Task ProtectedEndpoint_SessionWithRequiredRole_ReturnsOk()
+  {
+    var client = CreateClient();
+    var sessionCookie = await Login(client, "dueno");
+
+    var response = await Get(client, "/test-solo-dueno", sessionCookie);
+
+    Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+  }
+
+  [Fact]
+  public async Task ProtectedEndpoint_UserDisabledWhileSessionOpen_ReturnsUnauthorizedProblemDetailsAndExpiresCookie()
+  {
+    // Usuario propio del test: dar de baja a uno de los seeds rompería los demás tests
+    var dataSource = factory.Services.GetRequiredService<NpgsqlDataSource>();
+    var hash = BCrypt.Net.BCrypt.HashPassword("chiga1234", workFactor: 4);
+    await ExecuteSql(dataSource, "DELETE FROM usuario WHERE nombre_usuario = 'test_baja_endpoint'");
+    await ExecuteSql(dataSource, "INSERT INTO usuario (nombre_usuario, nombre, apellido, contrasena) VALUES ('test_baja_endpoint', 'Test', 'Baja', @hash)", hash);
+
+    try
+    {
+      var client = CreateClient();
+      var sessionCookie = await Login(client, "test_baja_endpoint");
+      Assert.Equal(HttpStatusCode.OK, (await Get(client, "/test-con-sesion", sessionCookie)).StatusCode);
+
+      await ExecuteSql(dataSource, "UPDATE usuario SET estado = false WHERE nombre_usuario = 'test_baja_endpoint'");
+      var response = await Get(client, "/test-con-sesion", sessionCookie);
+
+      await AssertProblemDetails(response, HttpStatusCode.Unauthorized);
+      Assert.StartsWith("chiga_auth=;", response.Headers.GetValues("Set-Cookie").Single());
+    }
+    finally
+    {
+      await ExecuteSql(dataSource, "DELETE FROM usuario WHERE nombre_usuario = 'test_baja_endpoint'");
+    }
+  }
+
+  private static async Task<string> Login(HttpClient client, string username)
+  {
+    var login = await client.PostAsJsonAsync("/auth/login", new { username, password = "chiga1234" });
+    return login.Headers.GetValues("Set-Cookie").Single().Split(';')[0];
+  }
+
+  private static Task<HttpResponseMessage> Get(HttpClient client, string url, string cookie)
+  {
+    var request = new HttpRequestMessage(HttpMethod.Get, url);
+    request.Headers.Add("Cookie", cookie);
+    return client.SendAsync(request);
+  }
+
+  private static async Task ExecuteSql(NpgsqlDataSource dataSource, string sql, string? hash = null)
+  {
+    await using var cmd = dataSource.CreateCommand(sql);
+    if (hash is not null) cmd.Parameters.AddWithValue("hash", hash);
+    await cmd.ExecuteNonQueryAsync();
   }
 
   private static async Task AssertProblemDetails(HttpResponseMessage response, HttpStatusCode expected)

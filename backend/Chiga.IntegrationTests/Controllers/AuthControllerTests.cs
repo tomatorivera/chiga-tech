@@ -299,10 +299,48 @@ public class AuthControllerTests(WebApplicationFactory<Program> factory)
     var response = await GetMe(client, sessionCookie);
 
     Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    AssertNoCookie(response);
+    var loginUser = await login.Content.ReadFromJsonAsync<UsuarioDTO>();
     var usuario = await response.Content.ReadFromJsonAsync<UsuarioDTO>();
-    Assert.Equal("vendedor", usuario!.NombreUsuario);
+    Assert.Equal(loginUser!.Id, usuario!.Id);
+    Assert.Equal("vendedor", usuario.NombreUsuario);
     Assert.Equal("Valeria", usuario.Nombre);
+    Assert.Equal("Vendedor", usuario.Apellido);
     Assert.Equal(["Vendedor"], usuario.Roles);
+  }
+
+  [Fact]
+  public async Task Me_UserWithPermissions_ReturnsSameBodyAsLogin()
+  {
+    // Los seeds aún no cargan permisos de rol, así que el repositorio se reemplaza por uno falso.
+    var usuario = new Usuario
+    {
+      Id = 7,
+      NombreUsuario = "multirol",
+      Nombre = "Marta",
+      Apellido = "Multirol",
+      Roles = [new Rol { Id = 1, Nombre = "Vendedor", Permisos = [new Permiso { Id = 1, Modulo = "ventas.ver" }] }],
+    };
+    var hash = BCrypt.Net.BCrypt.HashPassword("chiga1234", workFactor: 4);
+    var client = factory
+      .WithWebHostBuilder(builder => builder.ConfigureServices(services =>
+        services.AddScoped<IUserRepository>(_ => new FakeUserRepository((usuario, hash)))))
+      .CreateClient();
+    var login = await client.PostAsJsonAsync("/auth/login", new { username = "multirol", password = "chiga1234" });
+    var sessionCookie = Assert.Single(SetCookies(login)).Split(';')[0];
+
+    var response = await GetMe(client, sessionCookie);
+
+    Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    AssertNoCookie(response);
+    var body = await response.Content.ReadAsStringAsync();
+    Assert.Equal(await login.Content.ReadAsStringAsync(), body);
+    using var json = JsonDocument.Parse(body);
+    var root = json.RootElement;
+    Assert.Equal(7, root.GetProperty("id").GetInt32());
+    Assert.Equal("Multirol", root.GetProperty("apellido").GetString());
+    Assert.Equal(["Vendedor"], root.GetProperty("roles").EnumerateArray().Select(r => r.GetString()));
+    Assert.Equal(["ventas.ver"], root.GetProperty("permisos").EnumerateArray().Select(p => p.GetString()));
   }
 
   [Fact]
@@ -420,11 +458,12 @@ public class AuthControllerTests(WebApplicationFactory<Program> factory)
     AssertExpiresSessionCookie(response);
   }
 
-  // Borrar una cookie es mandarla vacía y con una fecha de vencimiento ya pasada.
+  // Borrar una cookie es mandarla vacía, con una fecha de vencimiento ya pasada y el mismo Path con el que se creó.
   private static void AssertExpiresSessionCookie(HttpResponseMessage response)
   {
     var parts = Assert.Single(SetCookies(response)).Split(';').Select(part => part.Trim()).ToList();
     Assert.Equal("chiga_auth=", parts[0]);
+    Assert.Contains("path=/", parts.Skip(1).Select(attribute => attribute.ToLowerInvariant()));
     var expires = parts.Single(part => part.StartsWith("expires=", StringComparison.OrdinalIgnoreCase));
     Assert.True(DateTimeOffset.Parse(expires["expires=".Length..]) < DateTimeOffset.UtcNow);
   }

@@ -99,7 +99,7 @@ public class UserRepositoryTests(WebApplicationFactory<Program> factory)
   }
 
   [Fact]
-  public async Task FindByIdAsync_ExistingUser_ReturnsUserWithRoles()
+  public async Task FindByIdAsync_ExistingUser_ReturnsUserWithRolesAndPermissions()
   {
     var id = (await Repository.FindByNombreUsuarioAsync("test_con_roles"))!.Value.User.Id;
 
@@ -108,6 +108,9 @@ public class UserRepositoryTests(WebApplicationFactory<Program> factory)
     Assert.NotNull(usuario);
     Assert.Equal("test_con_roles", usuario.NombreUsuario);
     Assert.Equal(["Test Rol A", "Test Rol B", "Test Rol C"], usuario.Roles.Select(r => r.Nombre).Order());
+    Assert.Equal(["test_auth.crear", "test_auth.leer"], PermisosDe(usuario, "Test Rol A"));
+    Assert.Equal(["test_auth.borrar", "test_auth.crear"], PermisosDe(usuario, "Test Rol B"));
+    Assert.Empty(PermisosDe(usuario, "Test Rol C"));
   }
 
   [Fact]
