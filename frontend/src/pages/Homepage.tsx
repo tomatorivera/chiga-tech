@@ -1,16 +1,11 @@
 import { useActionState } from "react";
-import { Navigate } from "react-router-dom";
 import { CircleAlert, LoaderCircle, LogOut, PackageCheck } from "lucide-react";
 import { logoutAction } from "../features/auth/actions/logout.action";
 import { useSesion } from "../features/auth/hooks/useSesion";
 
 export function Homepage() {
-  const usuario = useSesion((state) => state.usuario);
+  const usuario = useSesion((state) => state.usuario!);
   const [state, formAction, isPending] = useActionState(logoutAction, { status: "idle" });
-
-  // Sin usuario en memoria (nunca inició sesión, o la cerró) vuelve al login.
-  // Recuperar la sesión al recargar la página con GET /auth/me es el ticket #10.
-  if (!usuario) return <Navigate to="/login" replace />;
 
   const message = !isPending && state.status === "error" ? state.message : undefined;
 
