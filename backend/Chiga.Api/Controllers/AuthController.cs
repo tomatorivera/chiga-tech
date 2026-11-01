@@ -47,6 +47,8 @@ public class AuthController(IAuthService authService) : ControllerBase
 
     if (user is null)
     {
+      await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
       return Problem(
         statusCode: StatusCodes.Status401Unauthorized,
         title: "No autorizado",

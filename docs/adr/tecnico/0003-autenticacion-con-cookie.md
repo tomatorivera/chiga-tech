@@ -6,7 +6,7 @@ status: accepted
 
 El usuario inicia sesión con nombre de usuario y contraseña (RF-01). El backend responde con una cookie `HttpOnly`, `Secure` y `SameSite=Strict` que genera `AddCookie()` de ASP.NET Core: contiene los claims del usuario cifrados y firmados, y el navegador la manda sola en cada request. Se eligió porque el sistema tiene una sola API y una sola SPA, así que la ventaja principal de JWT (que varios servicios validen el mismo token sin compartir estado) no aplica. Además, con la cookie JavaScript nunca toca la credencial y el logout la invalida de verdad.
 
-La sesión tiene una duración por defecto de 24 hs sin actividad, y es NO persistente.
+La sesión dura 10 hs sin actividad y es NO persistente (ver [ADR 0005](0005-baja-de-usuario-sin-corte-inmediato-de-sesion.md)).
 
 ## Considered Options
 
@@ -17,6 +17,6 @@ La sesión tiene una duración por defecto de 24 hs sin actividad, y es NO persi
 ## Consequences
 
 - El frontend y la API se sirven desde el mismo origen. En desarrollo, Vite hace de proxy de `/api` y `/auth` hacia el backend, así no hace falta configurar CORS con credenciales.
-- Dar de baja a un usuario corta su acceso de inmediato (ERS 2.3): `OnValidatePrincipal` consulta en cada request si el usuario sigue activo y, si no, rechaza la cookie. Es una consulta por id con clave primaria.
+- Dar de baja a un usuario impide nuevos inicios de sesión, pero no corta de inmediato una sesión abierta (ver [ADR 0005](0005-baja-de-usuario-sin-corte-inmediato-de-sesion.md)).
 - Las claves con las que ASP.NET cifra la cookie (Data Protection) se guardan en un directorio persistente: por defecto `backend/Chiga.Api/keys/`, ignorado por git porque son secretas, y se cambia con `DataProtection:KeysPath` (variable de entorno `DataProtection__KeysPath`). Si se borran o se pierden, por ejemplo al recrear el contenedor, la API genera otras y todas las sesiones abiertas se cierran: hay que volver a iniciar sesión. En un servidor, el directorio tiene que sobrevivir a los reinicios (por ejemplo, un volumen de Docker).
 - La sesión se pierde cuando se cierra el navegador, para el contexto de uso del sistema no parece ser un problema.

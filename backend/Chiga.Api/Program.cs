@@ -1,8 +1,6 @@
-using System.Security.Claims;
 using System.Text.Json.Serialization;
 using Api.Repositories;
 using Api.Services;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
@@ -28,7 +26,7 @@ builder.Services.AddSingleton(sp => NpgsqlDataSource.Create(
     sp.GetRequiredService<IConfiguration>().GetConnectionString("Default")
         ?? throw new InvalidOperationException("Falta ConnectionStrings:Default (variable de entorno ConnectionStrings__Default).")));
 
-// Sesión con cookie de ASP.NET Core (ADR técnico 0003). Duración provisoria: 24 h sin actividad
+// Sesión con cookie de ASP.NET Core (ADR técnico 0003). Dura 10 h sin actividad y una baja no la corta (ADR técnico 0005)
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
@@ -36,28 +34,11 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.Cookie.HttpOnly = true;
         options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
         options.Cookie.SameSite = SameSiteMode.Strict;
-        options.ExpireTimeSpan = TimeSpan.FromHours(24);
+        options.ExpireTimeSpan = TimeSpan.FromHours(10);
         options.SlidingExpiration = true;
 
         options.Events.OnRedirectToLogin = ctx => { ctx.Response.StatusCode = StatusCodes.Status401Unauthorized; return Task.CompletedTask; };
         options.Events.OnRedirectToAccessDenied = ctx => { ctx.Response.StatusCode = StatusCodes.Status403Forbidden; return Task.CompletedTask; };
-
-        // En cada request con cookie, revisa en la BD que el usuario siga activo: dar de baja a alguien
-        // le corta el acceso en su próxima request, aunque su cookie no haya vencido (ADR técnico 0003)
-        options.Events.OnValidatePrincipal = async ctx =>
-        {
-            var idClaim = ctx.Principal!.FindFirstValue(ClaimTypes.NameIdentifier)!;
-            var id = int.Parse(idClaim);
-
-            var authService = ctx.HttpContext.RequestServices.GetRequiredService<IAuthService>();
-            var user = await authService.GetSessionUserAsync(id, ctx.HttpContext.RequestAborted);
-
-            if (user is null)
-            {
-                ctx.RejectPrincipal();
-                await ctx.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            }
-        };
     });
 
 // Claves con las que ASP.NET cifra y firma la cookie (ADR técnico 0003). Van en un directorio fijo para que reiniciar

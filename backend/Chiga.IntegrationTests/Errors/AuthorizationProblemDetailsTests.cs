@@ -84,7 +84,7 @@ public class AuthorizationProblemDetailsTests(WebApplicationFactory<Program> fac
   }
 
   [Fact]
-  public async Task ProtectedEndpoint_UserDisabledWhileSessionOpen_ReturnsUnauthorizedProblemDetailsAndExpiresCookie()
+  public async Task ProtectedEndpoint_UserDisabledWhileSessionOpen_KeepsAccess()
   {
     // Usuario propio del test: dar de baja a uno de los seeds rompería los demás tests
     var dataSource = factory.Services.GetRequiredService<NpgsqlDataSource>();
@@ -101,8 +101,7 @@ public class AuthorizationProblemDetailsTests(WebApplicationFactory<Program> fac
       await ExecuteSql(dataSource, "UPDATE usuario SET estado = false WHERE nombre_usuario = 'test_baja_endpoint'");
       var response = await Get(client, "/test-con-sesion", sessionCookie);
 
-      await AssertProblemDetails(response, HttpStatusCode.Unauthorized);
-      Assert.StartsWith("chiga_auth=;", response.Headers.GetValues("Set-Cookie").Single());
+      Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
     finally
     {
