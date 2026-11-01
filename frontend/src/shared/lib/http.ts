@@ -1,20 +1,7 @@
 import axios from "axios";
-import { useSesion } from "../../features/auth/hooks/useSesion";
 import type { ProblemDetails } from "../types/api.types";
 
 export const http = axios.create();
-
-// Sin usuario en el store, AuthGuard lleva al login. El 401 del login son credenciales inválidas, no una sesión caída
-http.interceptors.response.use(undefined, (error: unknown) => {
-  if (
-    axios.isAxiosError(error) &&
-    error.response?.status === 401 &&
-    error.config?.url !== "/auth/login"
-  ) {
-    useSesion.getState().logout();
-  }
-  return Promise.reject(error);
-});
 
 export const MENSAJE_SIN_CONEXION =
   "No se pudo conectar con el servidor. Revisá tu conexión e intentá de nuevo.";
