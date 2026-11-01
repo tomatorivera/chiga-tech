@@ -39,7 +39,7 @@ Punto de venta para una casa de computación. Monorepo: `backend/` (ASP.NET Core
 
 ## Frontend
 
-- Código por funcionalidad en `src/features/<feature>/` (`components/`, `hooks/`, `models/`); lo compartido en `src/shared/`. Rutas en `src/routes.tsx`.
+- Código por funcionalidad en `src/features/<feature>/` (`components/`, `hooks/`, `models/`); las páginas que no pertenecen a ninguna feature, en `src/pages/`; lo compartido en `src/shared/`. Rutas en `src/routes.tsx`.
 - Estilos con Tailwind CSS v4 siempre que sea posible. CSS propio solo si Tailwind no puede lograr lo buscado de ningún modo, si lo escribió el usuario o si pidió CSS explícitamente.
 - Íconos de `lucide-react`.
 - HTML5 con etiquetas semánticas siempre que se pueda y corresponda.

@@ -37,6 +37,7 @@ src/
 │   ├── empleados/
 │   ├── stock/
 │   └── ventas/
+├── pages/             # Páginas que no pertenecen a ninguna feature
 ├── shared/            # Compartido por toda la app
 │   ├── components/
 │   ├── hooks/
@@ -46,7 +47,7 @@ src/
 └── index.css          # Estilos globales y Tailwind
 ```
 
-Para agregar una página: creala en su feature y registrala en `routes.tsx`. Estilos con clases de Tailwind en el JSX; íconos de [lucide-react](https://lucide.dev/icons/).
+Para agregar una página: creala en su feature, o en `pages/` si no pertenece a ninguna, y registrala en `routes.tsx`. Estilos con clases de Tailwind en el JSX; íconos de [lucide-react](https://lucide.dev/icons/).
 
 ## Convenciones
 

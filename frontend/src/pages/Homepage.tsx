@@ -1,11 +1,10 @@
 import { useActionState } from "react";
 import { Navigate } from "react-router-dom";
 import { CircleAlert, LoaderCircle, LogOut, PackageCheck } from "lucide-react";
-import { logoutAction } from "../auth/actions/logout.action";
-import { useSesion } from "../auth/hooks/useSesion";
+import { logoutAction } from "../features/auth/actions/logout.action";
+import { useSesion } from "../features/auth/hooks/useSesion";
 
-// Base del futuro dashboard: por ahora solo saluda al usuario y permite cerrar la sesión
-export function Inicio() {
+export function Homepage() {
   const usuario = useSesion((state) => state.usuario);
   const [state, formAction, isPending] = useActionState(logoutAction, { status: "idle" });
 
