@@ -527,5 +527,4 @@ $RECYCLE.BIN/
 # Claude Code: configuración personal
 .claude/settings.local.json
 
-# Claves de Data Protection del backend: cifran la cookie de sesión, son secretas
 backend/Chiga.Api/keys/

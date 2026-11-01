@@ -16,8 +16,10 @@ var builder = WebApplication.CreateBuilder(args);
 // Las claves de "errors" en los 400 usan el nombre del JSON ([JsonPropertyName]), no el de la propiedad de C#.
 builder.Services.AddControllers(options => options.ModelMetadataDetailsProviders.Add(new SystemTextJsonValidationMetadataProvider()))
     .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
 // Errores en formato ProblemDetails (RFC 9457), ver docs/contracts/README.md.
 builder.Services.AddProblemDetails();
 

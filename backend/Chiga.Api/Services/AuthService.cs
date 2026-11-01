@@ -24,7 +24,6 @@ public class AuthService(IUserRepository userRepository) : IAuthService
     return ToDto(result.Value.User);
   }
 
-  // Null si el usuario ya no existe o fue dado de baja: en los dos casos la sesión deja de valer.
   public async Task<UsuarioDTO?> GetSessionUserAsync(int id, CancellationToken ct = default)
   {
     var usuario = await userRepository.FindByIdAsync(id, ct);

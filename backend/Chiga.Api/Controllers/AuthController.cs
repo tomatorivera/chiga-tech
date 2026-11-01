@@ -36,18 +36,15 @@ public class AuthController(IAuthService authService) : ControllerBase
     }
   }
 
-  // [Authorize]: si no hay cookie, o es falsa o está vencida, responde 401 sin entrar al método
   [Authorize]
   [HttpGet("me")]
   public async Task<ActionResult<UsuarioDTO>> Me(CancellationToken ct = default)
   {
-    // Al iniciar sesión se guardó el id del usuario dentro de la cookie (ver BuildIdentity)
     var idClaim = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
     var id = int.Parse(idClaim);
 
     var user = await authService.GetSessionUserAsync(id, ct);
 
-    // La cookie es válida, pero el usuario ya no existe o fue dado de baja
     if (user is null)
     {
       return Problem(
@@ -60,7 +57,6 @@ public class AuthController(IAuthService authService) : ControllerBase
     return Ok(user);
   }
 
-  // No requiere sesión: borra la cookie aunque no exista (contrato 0001)
   [HttpPost("logout")]
   public async Task<IActionResult> Logout()
   {
