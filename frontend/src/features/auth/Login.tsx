@@ -1,13 +1,15 @@
 import { ArrowRight, PackageCheck } from "lucide-react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation, type Location } from "react-router-dom";
 import { LoginForm } from "./components/LoginForm";
 import { useSesion } from "./hooks/useSesion";
 
 export function Login() {
   const usuario = useSesion((state) => state.usuario);
+  const location = useLocation();
+  const locationState = location.state as { from?: Location } | null;
 
   // Con sesión iniciada no tiene sentido mostrar el formulario: incluye el momento justo después del login
-  if (usuario) return <Navigate to="/inicio" replace />;
+  if (usuario) return <Navigate to={locationState?.from ?? "/inicio"} replace />;
 
   return (
     <main className="min-h-screen w-full bg-[#f6f7f2] lg:grid lg:grid-cols-[1.08fr_0.92fr]">

@@ -5,6 +5,7 @@ import type { UsuarioDTO } from "../models/UsuarioDTO";
 export interface IAuthService {
   login: (credentials: LoginRequestDTO) => Promise<UsuarioDTO>;
   logout: () => Promise<void>;
+  me: () => Promise<UsuarioDTO>;
 }
 
 export const authService: IAuthService = {
@@ -16,5 +17,10 @@ export const authService: IAuthService = {
   // El backend borra la cookie de sesión, que JavaScript no puede tocar (ADR técnico 0003)
   logout: async (): Promise<void> => {
     await http.post("/auth/logout");
+  },
+
+  me: async (): Promise<UsuarioDTO> => {
+    const response = await http.get<UsuarioDTO>("/auth/me");
+    return response.data;
   },
 };
