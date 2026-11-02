@@ -1,6 +1,6 @@
 import { AxiosError, type AxiosResponse } from "axios";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { MENSAJE_SIN_CONEXION } from "../../../shared/lib/http";
+import { NO_CONNECTION_MSG } from "../../../shared/lib/http";
 import { useSesion } from "../hooks/useSesion";
 import type { UsuarioDTO } from "../models/UsuarioDTO";
 import { authService } from "../services/auth.service";
@@ -149,7 +149,7 @@ describe("loginAction", () => {
 
     expect(resultado).toEqual({
       status: "error",
-      message: MENSAJE_SIN_CONEXION,
+      message: NO_CONNECTION_MSG,
       previousValues: { username: "vendedor" },
     });
   });

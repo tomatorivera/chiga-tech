@@ -14,7 +14,7 @@ Error de validación (400), que genera `[ApiController]` solo:
 {
   "status": 400,
   "title": "One or more validation errors occurred.",
-  "errors": { "Username": ["The Username field is required."] }
+  "errors": { "username": ["El nombre de usuario es requerido"] }
 }
 ```
 
@@ -24,8 +24,8 @@ Tipo en el frontend:
 
 ```ts
 interface ProblemDetails {
-  status: number;
-  title: string;
+  status?: number;
+  title?: string;
   detail?: string;
   errors?: Record<string, string[]>;
 }

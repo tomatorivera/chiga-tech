@@ -38,18 +38,18 @@ Chiga.Api/             # Proyecto webapi
 │   └── EmpleadosService.cs/
 ├── Models/             # Capa de datos
 │   ├── Entities/       # Entidades de las bases de datos
-│   │   ├── User.cs
+│   │   ├── Usuario.cs
 │   │   └── Empleado.cs
-│   ├── Dtos/           # DTOs específicos para las peticiones
-│   │   ├── LoginDto.cs
-│   │   ├── CreateEmpleadoDto.cs
-│   │   └── UpdateEmpleadoDto.cs
+│   ├── Dto/            # DTOs específicos para las peticiones
+│   │   ├── LoginRequestDTO.cs
+│   │   ├── CreateEmpleadoDTO.cs
+│   │   └── UpdateEmpleadoDTO.cs
 ├── Repositories/       # Capa de conexión a la BD
-│   ├── AuthRepository.cs/
+│   ├── UserRepository.cs/
 │   ├── VentasRepository.cs/
 │   └── EmpleadosRepository.cs/
 ├── Exceptions/         # Errores personalizados de la app
-│   ├── UsuarioInactivoException.cs/
+│   ├── DisabledUserException.cs/
 │   ├── ProductoSinStockException.cs/
 │   └── CreditoClienteExcedidoException.cs/
 ├── Filters/            # Filtros / middlewares
@@ -60,8 +60,8 @@ Chiga.Api/             # Proyecto webapi
 
 - **Código en general:** en `../AGENTS.md`
 - **Controllers:** en `Chiga.Api/Controllers/`, uno por recurso, `ControllerBase` + `[ApiController]`.
-- **Errores:** formato ProblemDetails. Devolvé `return Problem(statusCode: ..., detail: "...")`, no `NotFound("mensaje")` ni otros resultados con un string, que se escapan del formato. Ver [`docs/contracts`](../docs/contracts/README.md#formato-de-error).
-- **Tests:** misma ruta que el archivo probado (`Controllers/HealthController.cs` → `Chiga.UnitTests/Controllers/HealthControllerTests.cs`); nombre `Metodo_Resultado`.
+- **Errores:** formato ProblemDetails. Devolvé `return Problem(statusCode: ..., detail: "...")`, no `NotFound("mensaje")` ni otros resultados con un string, que se escapan del formato. Ver [`docs/contracts`](../docs/contracts/0000-errores.md).
+- **Tests:** misma ruta que el archivo probado (`Controllers/HealthController.cs` → `Chiga.UnitTests/Controllers/HealthControllerTests.cs`); nombre `Metodo_Resultado`. Los que no prueban un archivo puntual, como los de BD o errores, van en una carpeta que indique qué contienen (`Data/`, `Errors/`).
 - **Dinero:** `decimal`; los cálculos se hacen acá, no en el frontend.
 - **Enums:** se serializan como texto.
 - **DTOs:** si cambiás uno, actualizá su tipo en el frontend en el mismo cambio ([ADR técnico 0001](../docs/adr/tecnico/0001-typescript-en-el-frontend.md)).

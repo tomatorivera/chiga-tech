@@ -23,7 +23,8 @@ Cómo un cambio llega desde una issue hasta `dev` y después a `main`.
 | `refactor` | Cambio de código sin cambiar el comportamiento |
 | `test` | Tests |
 | `docs` | Documentación |
-| `chore` | Configuración, dependencias, scripts, CI |
+| `chore` | Configuración, dependencias, scripts |
+| `ci` | Workflows de CI |
 | `style` | Formato sin cambiar la lógica |
 
 El alcance es opcional:

@@ -18,7 +18,7 @@ builder.Services.AddControllers(options => options.ModelMetadataDetailsProviders
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-// Errores en formato ProblemDetails (RFC 9457), ver docs/contracts/README.md.
+// Errores en formato ProblemDetails (RFC 9457), ver docs/contracts/0000-errores.md.
 builder.Services.AddProblemDetails();
 
 // Acceso a datos con ADO.NET + Npgsql (ADR técnico 0004). El contenedor libera el data source al cerrar.

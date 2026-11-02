@@ -36,7 +36,7 @@ No hace falta `.env`: los valores por defecto funcionan ([cómo cambiarlos](db/R
 
 ### Levantar el proyecto
 
-Todo junto, desde la raíz: `npm run dev` (Ctrl+C corta back y front; la BD sigue corriendo hasta `npm run db:down`).
+Todo junto, desde la raíz: `npm run app:dev` (Ctrl+C corta back y front; la BD sigue corriendo hasta `npm run db:down`).
 
 Por separado:
 

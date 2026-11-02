@@ -5,7 +5,7 @@ Punto de venta para una casa de computación. Monorepo: `backend/` (ASP.NET Core
 ## Idioma y dominio
 
 - Docs, commits, issues y PRs en español rioplatense (voseo).
-- Código en inglés. Los nombres de clases llevan los términos del dominio en español, tal como aparecen en `docs/CONTEXT.md`: `ClienteDTO`, `CuentaCorrienteController`. Los métodos y las variables pueden variar, pero preferentemente van en inglés: `getSessionUser`, `isLoading`, `handleSubmit`.
+- Código en inglés. Los nombres de clases que representan objetos del dominio del problema llevan sus términos en español, tal como aparecen en `docs/CONTEXT.md`: `ClienteDTO`, `CuentaCorrienteController`. El resto de las clases puede ir en inglés: `UserRepository`, `DisabledUserException`. Los métodos y las variables pueden variar, pero preferentemente van en inglés: `getSessionUser`, `isLoading`, `handleSubmit`.
 - Usá los términos de `docs/CONTEXT.md` y respetá los ADR de `docs/adr/` del área que tocás. Los requisitos están en `docs/ERS.md` (RF-XX, RNF-XX).
 
 ## Git
@@ -35,7 +35,7 @@ Punto de venta para una casa de computación. Monorepo: `backend/` (ASP.NET Core
 ## Backend
 
 - Controllers en `Chiga.Api/Controllers/`, uno por recurso, `ControllerBase` + `[ApiController]`.
-- Tests xUnit: misma ruta que el archivo probado dentro de `Chiga.UnitTests/` o `Chiga.IntegrationTests/`; nombre `Metodo_Resultado`.
+- Tests xUnit: misma ruta que el archivo probado dentro de `Chiga.UnitTests/` o `Chiga.IntegrationTests/`; nombre `Metodo_Resultado`. Los que no prueban un archivo puntual de la API, como los de BD o errores, van en una carpeta que indique qué contienen: `Data/`, `Errors/`.
 
 ## Frontend
 

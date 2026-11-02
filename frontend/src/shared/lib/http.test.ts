@@ -1,11 +1,6 @@
 import { AxiosError, type AxiosResponse } from "axios";
 import { describe, expect, it } from "vitest";
-import {
-  getErrorMessage,
-  getFieldErrors,
-  MENSAJE_ERROR_INESPERADO,
-  MENSAJE_SIN_CONEXION,
-} from "./http";
+import { getErrorMessage, getFieldErrors, UNEXPECTED_ERROR_MSG, NO_CONNECTION_MSG } from "./http";
 
 function errorConRespuesta(status: number, data: unknown): AxiosError {
   const response = { status, data } as AxiosResponse;
@@ -39,25 +34,25 @@ describe("getErrorMessage", () => {
   it("avisa de un problema de conexión si no hay respuesta", () => {
     const error = new AxiosError("Network Error", AxiosError.ERR_NETWORK);
 
-    expect(getErrorMessage(error)).toBe(MENSAJE_SIN_CONEXION);
+    expect(getErrorMessage(error)).toBe(NO_CONNECTION_MSG);
   });
 
   it("avisa de un problema de conexión si el proxy no llega al backend", () => {
-    expect(getErrorMessage(errorConRespuesta(502, ""))).toBe(MENSAJE_SIN_CONEXION);
+    expect(getErrorMessage(errorConRespuesta(502, ""))).toBe(NO_CONNECTION_MSG);
   });
 
   it("usa el mensaje de respaldo si la respuesta no es ProblemDetails", () => {
-    expect(getErrorMessage(errorConRespuesta(500, ""))).toBe(MENSAJE_ERROR_INESPERADO);
+    expect(getErrorMessage(errorConRespuesta(500, ""))).toBe(UNEXPECTED_ERROR_MSG);
   });
 
   it("usa el mensaje de respaldo si el error no viene de axios", () => {
-    expect(getErrorMessage(new Error("boom"))).toBe(MENSAJE_ERROR_INESPERADO);
+    expect(getErrorMessage(new Error("boom"))).toBe(UNEXPECTED_ERROR_MSG);
   });
 
   it.each([502, 503, 504])("prioriza el problema de conexión ante un %i con detail", (status) => {
     const error = errorConRespuesta(status, { status, detail: "Mensaje del proxy." });
 
-    expect(getErrorMessage(error)).toBe(MENSAJE_SIN_CONEXION);
+    expect(getErrorMessage(error)).toBe(NO_CONNECTION_MSG);
   });
 
   it.each([
@@ -66,7 +61,7 @@ describe("getErrorMessage", () => {
   ])("usa el mensaje de respaldo si el detail es %s", (_caso, detail) => {
     const error = errorConRespuesta(400, { status: 400, detail });
 
-    expect(getErrorMessage(error)).toBe(MENSAJE_ERROR_INESPERADO);
+    expect(getErrorMessage(error)).toBe(UNEXPECTED_ERROR_MSG);
   });
 });
 

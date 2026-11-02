@@ -210,7 +210,7 @@ public class AuthControllerTests(WebApplicationFactory<Program> factory)
     AssertNoCookie(response);
   }
 
-  // El largo se mide sin los espacios de los extremos, pero el valor no se recorta: por eso los válidos llegan al 401.
+  // El valor se recorta antes de validarlo: así "ab    " no pasa como un nombre de usuario válido. Los válidos llegan al 401.
   [Theory]
   [InlineData("ab  ", HttpStatusCode.BadRequest)]
   [InlineData("  ab", HttpStatusCode.BadRequest)]
