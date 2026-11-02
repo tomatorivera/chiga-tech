@@ -16,4 +16,6 @@ La API se conecta a PostgreSQL con Npgsql, el proveedor de ADO.NET, y escribe el
 - Npgsql es la única dependencia de acceso a datos. No se agrega EF Core ni Dapper sin un ADR nuevo.
 - La cadena de conexión sale de `ConnectionStrings:Default`. En desarrollo, `appsettings.Development.json` trae los valores de `docker-compose.yml`; en cualquier entorno se sobreescribe con la variable `ConnectionStrings__Default`. Fuera de Development no hay valor por defecto.
 - Los tests de integración usan la BD real, así que necesitan que esté levantada y con migraciones (`npm run db:reset`).
+- Las consultas usan siempre parámetros (`@nombre`), nunca concatenación de strings, para evitar inyección SQL.
+- Las operaciones que tocan varias tablas abren una transacción explícita (`NpgsqlTransaction`).
 - El mapeo de filas a objetos y el manejo de `NULL` se escriben a mano en cada repositorio.
