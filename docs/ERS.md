@@ -77,13 +77,13 @@ No forman parte de esta primera versión: comercio electrónico, pasarelas de pa
 Notas importantes respecto a los roles de los usuarios:
 
 - Un empleado puede poseer uno o más roles en el sistema. Sus permisos efectivos son la unión de los permisos de sus roles; excepto el administrador que con solo ese rol obtiene acceso a todo.
-- Cualquier empleado puede ser dado de baja del sistema en cualquier momento, con efecto inmediato en la restricción de sus accesos.
+- Cualquier empleado puede ser dado de baja del sistema en cualquier momento. Desde ese momento no puede iniciar sesión; una sesión ya abierta no se corta de inmediato (ver ADR técnico 0005).
 - Solo puede existir UN dueño en el sistema, para garantizar la seguridad.
 - Los usuarios con rol Supervisor o superior poseen un código de supervisor único para autorizar operaciones de excepción (ver ADR-0003).
 
 ### 2.4 Restricciones
 
-- El sistema debe poder utilizarse desde navegadores modernos con conexión a internet y desde distintas computadoras.
+- El sistema debe poder utilizarse desde navegadores modernos con conexión a internet y desde distintas computadoras del local. No se puede acceder desde otras máquinas (ver ADR técnico 0005).
 - Se debe poder operar con comprobantes internos mientras la facturación fiscal no esté habilitada.
 - Las operaciones sensibles deberán conservar trazabilidad de usuario, fecha y hora.
 

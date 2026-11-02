@@ -14,6 +14,6 @@ La BD es PostgreSQL y en desarrollo corre en Docker. El esquema se escribe en ar
 
 ## Consequences
 
-- Si se usa EF Core en el backend, es solo como ORM, sin sus migraciones: las entidades se mapean a las tablas que crea Flyway.
+- El backend no usa EF Core: accede a la BD con ADO.NET ([ADR técnico 0004](0004-acceso-a-datos-con-ado-net.md)).
 - Los cambios hechos a mano en la BD (desde pgAdmin, por ejemplo) no se propagan: todo cambio de esquema tiene que terminar en un archivo de `db/migrations`.
 - Los datos que el sistema necesita en cualquier entorno (configuración, roles, Consumidor Final) van en migraciones; los datos de prueba, en `db/seeds`.

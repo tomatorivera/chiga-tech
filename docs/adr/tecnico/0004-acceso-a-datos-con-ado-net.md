@@ -2,19 +2,20 @@
 status: accepted
 ---
 
-# El backend accede a la BD con ADO.NET y SQL escrito a mano, sin ORM
+# El backend accede a la BD con ADO.NET y Npgsql, sin ORM
 
-Los repositorios del backend abren conexiones y ejecutan consultas SQL con ADO.NET, mediante Npgsql (el proveedor de ADO.NET para PostgreSQL), y leen los resultados a mano para armar los objetos. Se eligió así porque nadie en el grupo usó EF Core ni Dapper, pero todos escribimos SQL a mano en las materias de la facultad, así que es la opción que menos frena el desarrollo. Por otro lado, el esquema de la BD ya se maneja desde el repo con Docker y las migraciones de Flyway (ADR técnico 0002): no hace falta un ORM que lo modele ni migraciones de EF Core.
+La API se conecta a PostgreSQL con Npgsql, el proveedor de ADO.NET, y escribe el SQL a mano. Hay un único `NpgsqlDataSource` registrado como singleton en el contenedor de dependencias; los repositorios le piden conexiones y comandos. Se eligió así porque el equipo ya escribe SQL (esquema, triggers y funciones en `db/migrations`, [ADR técnico 0002](0002-esquema-de-bd-con-flyway.md)) y nadie usó EF Core ni Dapper, así que no hay que aprender una herramienta más. Además, el esquema vive en Flyway: un ORM solo sumaría un segundo modelo para mantener sincronizado con las tablas.
 
 ## Considered Options
 
-- **EF Core como ORM, sin sus migraciones**: descartada. Hay que aprender el mapeo de entidades, el seguimiento de cambios y cómo se traduce LINQ a SQL, y mantener las entidades sincronizadas a mano con las tablas que crea Flyway.
-- **Dapper sobre Npgsql**: descartada. Ahorra el mapeo de columnas a propiedades, pero es una dependencia y una API más para aprender, y la ganancia es chica con las pocas consultas que se estima que tendrá cada repositorio.
+- **EF Core**: descartada. Nadie del equipo lo usa, y con el esquema en Flyway las entidades y el `DbContext` serían una copia de las tablas que hay que mantener a mano.
+- **Dapper**: descartada por ahora. Ahorra el mapeo de filas a objetos, pero es una dependencia más para algo que con ADO.NET son unas pocas líneas por consulta.
 
 ## Consequences
 
-- Npgsql es la única dependencia de acceso a datos. La conexión se configura una vez, con un `NpgsqlDataSource` registrado en el contenedor de dependencias, y la cadena de conexión se lee de la configuración.
+- Npgsql es la única dependencia de acceso a datos. No se agrega EF Core ni Dapper sin un ADR nuevo.
+- La cadena de conexión sale de `ConnectionStrings:Default`. En desarrollo, `appsettings.Development.json` trae los valores de `docker-compose.yml`; en cualquier entorno se sobreescribe con la variable `ConnectionStrings__Default`. Fuera de Development no hay valor por defecto.
+- Los tests de integración usan la BD real, así que necesitan que esté levantada y con migraciones (`npm run db:reset`).
 - Las consultas usan siempre parámetros (`@nombre`), nunca concatenación de strings, para evitar inyección SQL.
-- El mapeo de columnas a propiedades se escribe a mano en cada repositorio. Si una columna cambia en una migración, el compilador no lo detecta: lo detectan los tests de integración, que corren contra la BD de Docker.
 - Las operaciones que tocan varias tablas abren una transacción explícita (`NpgsqlTransaction`).
-- Si más adelante el mapeo manual se vuelve repetitivo, se puede sumar Dapper sin cambiar el modelo: trabaja sobre las mismas conexiones de ADO.NET.
+- El mapeo de filas a objetos y el manejo de `NULL` se escriben a mano en cada repositorio.

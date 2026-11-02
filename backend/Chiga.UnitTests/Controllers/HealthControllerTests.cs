@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using Controllers;
+using Api.Controllers;
 
 namespace Chiga.UnitTests.Controllers;
 

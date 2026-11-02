@@ -17,6 +17,12 @@ Desde `frontend/`:
 
 `npm run dev` **no muestra errores de tipos**: miralos en el editor o con `typecheck`.
 
+## Conexión con el backend
+
+Se utiliza la librería de Axios para hacer las peticiones.
+
+En desarrollo, Vite manda `/api` y `/auth` al backend en http://localhost:5098 ([ADR técnico 0003](../docs/adr/tecnico/0003-autenticacion-con-cookie.md)): llamalos con rutas relativas (`/auth/login`), sin host.
+
 ## Estructura
 
 ```
@@ -31,6 +37,7 @@ src/
 │   ├── empleados/
 │   ├── stock/
 │   └── ventas/
+├── pages/             # Páginas que no pertenecen a ninguna feature
 ├── shared/            # Compartido por toda la app
 │   ├── components/
 │   ├── hooks/
@@ -40,7 +47,7 @@ src/
 └── index.css          # Estilos globales y Tailwind
 ```
 
-Para agregar una página: creala en su feature y registrala en `routes.tsx`. Estilos con clases de Tailwind en el JSX; íconos de [lucide-react](https://lucide.dev/icons/).
+Para agregar una página: creala en su feature, o en `pages/` si no pertenece a ninguna, y registrala en `routes.tsx`. Estilos con clases de Tailwind en el JSX; íconos de [lucide-react](https://lucide.dev/icons/).
 
 ## Convenciones
 

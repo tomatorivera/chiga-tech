@@ -51,6 +51,19 @@ Pasos para cambiar el esquema: [caso 06](casos-de-uso.md#06-agregar-o-modificar-
 - No duplican: si editás un seed ya cargado, corré `npm run db:reset` para verlo.
 - Se pueden editar libremente; el cambio le llega a todos con el `pull`.
 
+### Usuarios de prueba
+
+Contraseña de todos: `chiga1234`.
+
+| Usuario | Roles | Código de supervisor |
+|---|---|---|
+| `vendedor` | Vendedor | — |
+| `supervisor` | Supervisor | `1111` |
+| `admin` | Administrador | `2222` |
+| `dueno` | Dueño | `3333` |
+| `multirol` | Vendedor y Supervisor | `4444` |
+| `inactivo` | Vendedor (usuario inactivo) | — |
+
 ---
 
 [**<- Anterior**](../README.md) (README) -- [**Siguiente ->**](../backend/README.md) (backend)
