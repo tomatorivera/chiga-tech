@@ -65,7 +65,17 @@ public class AuthController(IAuthService authService) : ControllerBase
     await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
     return NoContent();
   }
-
+  
+  /// <summary>
+  /// A partir de los datos de usuario obtenidos en el login, se
+  /// crea la cookie con Id, NombreUsuario, Roles y Permisos.
+  /// 
+  /// Los Roles y Permisos sirven a los endpoints que necesitan
+  /// usar Authorize para permitir el paso de la petición según
+  /// el rol del usuario logueado.
+  /// </summary>
+  /// <param name="user">Datos del usuario logueado</param>
+  /// <returns>ClaimsIdentity con datos de la cookie</returns>
   private static ClaimsIdentity BuildIdentity(UsuarioDTO user)
   {
     var claims = new List<Claim>
@@ -74,6 +84,9 @@ public class AuthController(IAuthService authService) : ControllerBase
       new(ClaimTypes.Name, user.NombreUsuario),
     };
     claims.AddRange(user.Roles.Select(r => new Claim(ClaimTypes.Role, r)));
+
+    // Warning: si los usuarios tienen MUCHOS permisos, evaluar el peso
+    // de la cookie en KBs en cada petición
     claims.AddRange(user.Permisos.Select(p => new Claim("permiso", p)));
 
     return new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);

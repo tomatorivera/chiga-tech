@@ -34,7 +34,7 @@ public class AuthService(IUserRepository userRepository) : IAuthService
     return ToDto(usuario);
   }
 
-  private static UsuarioDTO ToDto(Usuario usuario) => new()
+  private UsuarioDTO ToDto(Usuario usuario) => new()
   {
     Id = usuario.Id,
     NombreUsuario = usuario.NombreUsuario,
@@ -44,7 +44,7 @@ public class AuthService(IUserRepository userRepository) : IAuthService
     Permisos = usuario.Roles.SelectMany(r => r.Permisos).Select(p => p.Modulo).Distinct().ToList(),
   };
 
-  private static bool PasswordMatches(string password, string hash)
+  private bool PasswordMatches(string password, string hash)
   {
     try
     {

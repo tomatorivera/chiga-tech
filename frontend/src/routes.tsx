@@ -7,6 +7,10 @@ import { sesionLoader } from "./features/auth/loaders/sesion.loader";
 
 export const router = createBrowserRouter([
   {
+    path: "/login",
+    element: <Login />,
+  },
+  {
     loader: sesionLoader,
     shouldRevalidate: () => false,
     HydrateFallback: LoadingScreen,
@@ -14,10 +18,6 @@ export const router = createBrowserRouter([
       {
         path: "/",
         element: <Navigate to="/inicio" replace />,
-      },
-      {
-        path: "/login",
-        element: <Login />,
       },
       {
         element: <AuthGuard />,

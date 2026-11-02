@@ -27,7 +27,7 @@ export function LoginForm() {
           </label>
           <div className="relative">
             <UserRound
-              className="pointer-events-none absolute top-1/2 left-[15px] -translate-y-1/2 text-[#87948c]"
+              className="pointer-events-none absolute top-1/2 left-3.75 -translate-y-1/2 text-[#87948c]"
               size={18}
               aria-hidden="true"
             />
@@ -56,7 +56,7 @@ export function LoginForm() {
           </label>
           <div className="relative">
             <LockKeyhole
-              className="pointer-events-none absolute top-1/2 left-[15px] -translate-y-1/2 text-[#87948c]"
+              className="pointer-events-none absolute top-1/2 left-3.75 -translate-y-1/2 text-[#87948c]"
               size={18}
               aria-hidden="true"
             />

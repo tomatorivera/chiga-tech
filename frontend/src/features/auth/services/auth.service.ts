@@ -14,7 +14,6 @@ export const authService: IAuthService = {
     return response.data;
   },
 
-  // El backend borra la cookie de sesión, que JavaScript no puede tocar (ADR técnico 0003)
   logout: async (): Promise<void> => {
     await http.post("/auth/logout");
   },
