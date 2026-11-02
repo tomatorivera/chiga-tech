@@ -18,11 +18,14 @@
     "db:seed": "docker compose run --rm seed",
     "db:reset": "docker compose down -v db && npm run db:up && npm run db:seed",
     "db:psql": "docker compose exec db psql",
-    "db:gui": "docker compose up -d pgadmin"
+    "db:gui": "docker compose up -d pgadmin",
+
+    "app:dev": "npm run db:up && concurrently -k -n back,front -c blue,green \"dotnet watch --project backend/Chiga.Api\" \"npm --prefix frontend run dev\""
   },
   "devDependencies": {
     "@commitlint/cli": "^21.2.3",
     "@commitlint/config-conventional": "^21.2.3",
+    "concurrently": "^10.0.6",
     "husky": "^9.1.7",
     "lint-staged": "^17.6.0"
   }

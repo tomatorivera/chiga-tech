@@ -14,7 +14,7 @@ export function Login() {
   return (
     <main className="min-h-screen w-full bg-[#f6f7f2] lg:grid lg:grid-cols-[1.08fr_0.92fr]">
       <a
-        className="fixed top-3 left-3 z-20 -translate-y-[160%] rounded-md bg-white px-3.5 py-2.5 text-[#173b32] focus:translate-y-0"
+        className="fixed top-3 left-3 z-20 translate-y-[-160%] rounded-md bg-white px-3.5 py-2.5 text-[#173b32] focus:translate-y-0"
         href="#login-form"
       >
         Saltar al inicio de sesión
@@ -101,11 +101,11 @@ export function Login() {
           <span className="hidden sm:inline">Sistema de gestión comercial</span>
         </footer>
         <div
-          className="pointer-events-none absolute -right-[195px] bottom-[7%] size-75 rounded-full border border-[rgba(211,235,177,0.08)] max-lg:hidden"
+          className="pointer-events-none absolute -right-48.75 bottom-[7%] size-75 rounded-full border border-[rgba(211,235,177,0.08)] max-lg:hidden"
           aria-hidden="true"
         />
         <div
-          className="pointer-events-none absolute -right-[115px] bottom-[calc(7%-80px)] size-115 rounded-full border border-[rgba(211,235,177,0.08)] max-lg:hidden"
+          className="pointer-events-none absolute -right-28.75 bottom-[calc(7%-80px)] size-115 rounded-full border border-[rgba(211,235,177,0.08)] max-lg:hidden"
           aria-hidden="true"
         />
       </section>
