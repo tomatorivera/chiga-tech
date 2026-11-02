@@ -395,9 +395,9 @@ public class AuthControllerTests(WebApplicationFactory<Program> factory)
   }
 
   [Fact]
-  public async Task Me_AfterApiRestart_KeepsSession()
+  public async Task Me_AfterApiRestart_ClosesSession()
   {
-    // Dos instancias de la API con el mismo directorio de claves simulan un reinicio
+    // Dos instancias de la API con el mismo directorio de claves simulan un reinicio: la cookie se puede descifrar, pero su sesión ya no existe
     var keysPath = Directory.CreateTempSubdirectory("chiga-keys-").FullName;
     try
     {
@@ -412,7 +412,7 @@ public class AuthControllerTests(WebApplicationFactory<Program> factory)
       await using var after = factory.WithWebHostBuilder(builder => builder.UseSetting("DataProtection:KeysPath", keysPath));
       var response = await GetMe(after.CreateClient(), sessionCookie);
 
-      Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+      Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     }
     finally
     {
@@ -447,6 +447,39 @@ public class AuthControllerTests(WebApplicationFactory<Program> factory)
 
     Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
     AssertExpiresSessionCookie(response);
+  }
+
+  [Fact]
+  public async Task Me_CopiedCookieAfterLogout_ReturnsUnauthorized()
+  {
+    var client = factory.CreateClient();
+    var login = await client.PostAsJsonAsync("/auth/login", new { username = "vendedor", password = "chiga1234" });
+    var sessionCookie = Assert.Single(SetCookies(login)).Split(';')[0];
+    Assert.Equal(HttpStatusCode.OK, (await GetMe(client, sessionCookie)).StatusCode);
+
+    var logout = new HttpRequestMessage(HttpMethod.Post, "/auth/logout");
+    logout.Headers.Add("Cookie", sessionCookie);
+    await client.SendAsync(logout);
+    var response = await GetMe(client, sessionCookie);
+
+    Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+  }
+
+  [Fact]
+  public async Task Logout_SameUserWithAnotherSession_KeepsTheOtherSession()
+  {
+    var client = factory.CreateClient();
+    var first = await client.PostAsJsonAsync("/auth/login", new { username = "vendedor", password = "chiga1234" });
+    var firstCookie = Assert.Single(SetCookies(first)).Split(';')[0];
+    var second = await client.PostAsJsonAsync("/auth/login", new { username = "vendedor", password = "chiga1234" });
+    var secondCookie = Assert.Single(SetCookies(second)).Split(';')[0];
+
+    var logout = new HttpRequestMessage(HttpMethod.Post, "/auth/logout");
+    logout.Headers.Add("Cookie", firstCookie);
+    await client.SendAsync(logout);
+
+    Assert.Equal(HttpStatusCode.Unauthorized, (await GetMe(client, firstCookie)).StatusCode);
+    Assert.Equal(HttpStatusCode.OK, (await GetMe(client, secondCookie)).StatusCode);
   }
 
   [Fact]

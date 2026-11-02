@@ -109,6 +109,47 @@ public class AuthorizationProblemDetailsTests(WebApplicationFactory<Program> fac
     }
   }
 
+  [Fact]
+  public async Task ProtectedEndpoint_CopiedCookieAfterLogout_ReturnsUnauthorizedProblemDetails()
+  {
+    var client = CreateClient();
+    var sessionCookie = await Login(client, "vendedor");
+    Assert.Equal(HttpStatusCode.OK, (await Get(client, "/test-con-sesion", sessionCookie)).StatusCode);
+
+    var logout = new HttpRequestMessage(HttpMethod.Post, "/auth/logout");
+    logout.Headers.Add("Cookie", sessionCookie);
+    await client.SendAsync(logout);
+    var response = await Get(client, "/test-con-sesion", sessionCookie);
+
+    await AssertProblemDetails(response, HttpStatusCode.Unauthorized);
+  }
+
+  [Fact]
+  public async Task ProtectedEndpoint_AfterMeDetectsDisabledUser_ReturnsUnauthorized()
+  {
+    // Usuario propio del test: dar de baja a uno de los seeds rompería los demás tests
+    var dataSource = factory.Services.GetRequiredService<NpgsqlDataSource>();
+    var hash = BCrypt.Net.BCrypt.HashPassword("chiga1234", workFactor: 4);
+    await ExecuteSql(dataSource, "DELETE FROM usuario WHERE nombre_usuario = 'test_baja_me'");
+    await ExecuteSql(dataSource, "INSERT INTO usuario (nombre_usuario, nombre, apellido, contrasena) VALUES ('test_baja_me', 'Test', 'Baja', @hash)", hash);
+
+    try
+    {
+      var client = CreateClient();
+      var sessionCookie = await Login(client, "test_baja_me");
+
+      await ExecuteSql(dataSource, "UPDATE usuario SET estado = false WHERE nombre_usuario = 'test_baja_me'");
+      Assert.Equal(HttpStatusCode.Unauthorized, (await Get(client, "/auth/me", sessionCookie)).StatusCode);
+      var response = await Get(client, "/test-con-sesion", sessionCookie);
+
+      Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
+    finally
+    {
+      await ExecuteSql(dataSource, "DELETE FROM usuario WHERE nombre_usuario = 'test_baja_me'");
+    }
+  }
+
   private static async Task<string> Login(HttpClient client, string username)
   {
     var login = await client.PostAsJsonAsync("/auth/login", new { username, password = "chiga1234" });

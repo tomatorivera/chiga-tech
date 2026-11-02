@@ -11,7 +11,7 @@ namespace Api.Controllers;
 
 [ApiController]
 [Route("auth")]
-public class AuthController(IAuthService authService) : ControllerBase
+public class AuthController(IAuthService authService, ActiveSessions sessions) : ControllerBase
 {
   [HttpPost("login")]
   public async Task<ActionResult<UsuarioDTO>> Login([FromBody] LoginRequestDTO req, CancellationToken ct = default)
@@ -22,7 +22,7 @@ public class AuthController(IAuthService authService) : ControllerBase
 
       await HttpContext.SignInAsync(
         CookieAuthenticationDefaults.AuthenticationScheme,
-        new ClaimsPrincipal(BuildIdentity(user)));
+        new ClaimsPrincipal(BuildIdentity(user, sessions.Start())));
         
       return Ok(user);
     }
@@ -47,7 +47,7 @@ public class AuthController(IAuthService authService) : ControllerBase
 
     if (user is null)
     {
-      await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+      await EndSession();
 
       return Problem(
         statusCode: StatusCodes.Status401Unauthorized,
@@ -62,10 +62,21 @@ public class AuthController(IAuthService authService) : ControllerBase
   [HttpPost("logout")]
   public async Task<IActionResult> Logout()
   {
-    await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+    await EndSession();
     return NoContent();
   }
-  
+
+  private Task EndSession()
+  {
+    var sid = User.FindFirstValue(ClaimTypes.Sid);
+    if (sid != null)
+    {
+      sessions.End(sid);
+    }
+
+    return HttpContext.SignOutAsync();
+  }
+
   /// <summary>
   /// A partir de los datos de usuario obtenidos en el login, se
   /// crea la cookie con Id, NombreUsuario, Roles y Permisos.
@@ -75,13 +86,14 @@ public class AuthController(IAuthService authService) : ControllerBase
   /// el rol del usuario logueado.
   /// </summary>
   /// <param name="user">Datos del usuario logueado</param>
+  /// <param name="sid">Identificador de la sesión que se abre</param>
   /// <returns>ClaimsIdentity con datos de la cookie</returns>
-  private static ClaimsIdentity BuildIdentity(UsuarioDTO user)
+  private static ClaimsIdentity BuildIdentity(UsuarioDTO user, string sid)
   {
     var claims = new List<Claim>
     {
       new(ClaimTypes.NameIdentifier, user.Id.ToString()),
-      new(ClaimTypes.Name, user.NombreUsuario),
+      new(ClaimTypes.Sid, sid),
     };
     claims.AddRange(user.Roles.Select(r => new Claim(ClaimTypes.Role, r)));
 

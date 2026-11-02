@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using System.Text.Json.Serialization;
 using Api.Repositories;
 using Api.Services;
@@ -27,6 +28,8 @@ builder.Services.AddSingleton(sp => NpgsqlDataSource.Create(
         ?? throw new InvalidOperationException("Falta ConnectionStrings:Default (variable de entorno ConnectionStrings__Default).")));
 
 // Sesión con cookie de ASP.NET Core (ADR técnico 0003). Dura 10 h sin actividad y una baja no la corta (ADR técnico 0005)
+builder.Services.AddMemoryCache();
+builder.Services.AddSingleton<ActiveSessions>();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
@@ -34,15 +37,20 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.Cookie.HttpOnly = true;
         options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
         options.Cookie.SameSite = SameSiteMode.Strict;
-        options.ExpireTimeSpan = TimeSpan.FromHours(10);
+        options.ExpireTimeSpan = ActiveSessions.Duration;
         options.SlidingExpiration = true;
 
+        options.Events.OnValidatePrincipal = ctx =>
+        {
+            var sessions = ctx.HttpContext.RequestServices.GetRequiredService<ActiveSessions>();
+            if (ctx.Principal?.FindFirstValue(ClaimTypes.Sid) is not { } sid || !sessions.IsActive(sid)) ctx.RejectPrincipal();
+            return Task.CompletedTask;
+        };
         options.Events.OnRedirectToLogin = ctx => { ctx.Response.StatusCode = StatusCodes.Status401Unauthorized; return Task.CompletedTask; };
         options.Events.OnRedirectToAccessDenied = ctx => { ctx.Response.StatusCode = StatusCodes.Status403Forbidden; return Task.CompletedTask; };
     });
 
-// Claves con las que ASP.NET cifra y firma la cookie (ADR técnico 0003). Van en un directorio fijo para que reiniciar
-// la API no cierre las sesiones. Por defecto backend/Chiga.Api/keys, ignorado por git: son secretas.
+// Claves con las que ASP.NET cifra y firma la cookie (ADR técnico 0003). Por defecto backend/Chiga.Api/keys, ignorado por git: son secretas.
 // Se cambia con DataProtection:KeysPath (variable de entorno DataProtection__KeysPath).
 var keysPath = builder.Configuration["DataProtection:KeysPath"]
     ?? Path.Combine(builder.Environment.ContentRootPath, "keys");
