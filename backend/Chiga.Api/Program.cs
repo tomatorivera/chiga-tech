@@ -1,12 +1,68 @@
+using System.Security.Claims;
+using System.Text.Json.Serialization;
+using Api.Repositories;
+using Api.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
+using Npgsql;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+// Enums como texto: el frontend los tipa como uniones de strings (ADR técnico 0001).
+// Las claves de "errors" en los 400 usan el nombre del JSON ([JsonPropertyName]), no el de la propiedad de C#.
+builder.Services.AddControllers(options => options.ModelMetadataDetailsProviders.Add(new SystemTextJsonValidationMetadataProvider()))
+    .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+// Errores en formato ProblemDetails (RFC 9457), ver docs/contracts/0000-errores.md.
+builder.Services.AddProblemDetails();
+
+// Acceso a datos con ADO.NET + Npgsql (ADR técnico 0004). El contenedor libera el data source al cerrar.
+builder.Services.AddSingleton(sp => NpgsqlDataSource.Create(
+    sp.GetRequiredService<IConfiguration>().GetConnectionString("Default")
+        ?? throw new InvalidOperationException("Falta ConnectionStrings:Default (variable de entorno ConnectionStrings__Default).")));
+
+// Sesión con cookie de ASP.NET Core (ADR técnico 0003). Dura 10 h sin actividad y una baja no la corta (ADR técnico 0005)
+builder.Services.AddMemoryCache();
+builder.Services.AddSingleton<ActiveSessions>();
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.Cookie.Name = "chiga_auth";
+        options.Cookie.HttpOnly = true;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.Cookie.SameSite = SameSiteMode.Strict;
+        options.ExpireTimeSpan = ActiveSessions.Duration;
+        options.SlidingExpiration = true;
+
+        options.Events.OnValidatePrincipal = ctx =>
+        {
+            var sessions = ctx.HttpContext.RequestServices.GetRequiredService<ActiveSessions>();
+            if (ctx.Principal?.FindFirstValue(ClaimTypes.Sid) is not { } sid || !sessions.IsActive(sid)) ctx.RejectPrincipal();
+            return Task.CompletedTask;
+        };
+        options.Events.OnRedirectToLogin = ctx => { ctx.Response.StatusCode = StatusCodes.Status401Unauthorized; return Task.CompletedTask; };
+        options.Events.OnRedirectToAccessDenied = ctx => { ctx.Response.StatusCode = StatusCodes.Status403Forbidden; return Task.CompletedTask; };
+    });
+
+// Claves con las que ASP.NET cifra y firma la cookie (ADR técnico 0003). Por defecto backend/Chiga.Api/keys, ignorado por git: son secretas.
+// Se cambia con DataProtection:KeysPath (variable de entorno DataProtection__KeysPath).
+var keysPath = builder.Configuration["DataProtection:KeysPath"]
+    ?? Path.Combine(builder.Environment.ContentRootPath, "keys");
+builder.Services.AddDataProtection().PersistKeysToFileSystem(new DirectoryInfo(keysPath));
+
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+
 var app = builder.Build();
+
+app.UseExceptionHandler();
+app.UseStatusCodePages();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -24,7 +80,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+// Expone Program a WebApplicationFactory en Chiga.IntegrationTests.
+public partial class Program { }

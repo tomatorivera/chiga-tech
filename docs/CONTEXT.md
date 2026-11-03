@@ -75,3 +75,15 @@ _Avoid_: Excepción, override
 **Código de supervisor**:
 Código personal y único de un usuario con rol Supervisor o superior que, ingresado en el momento, otorga una autorización.
 _Avoid_: PIN, clave de autorización
+
+## Usuarios
+
+**Usuario**:
+Datos del usuario en sesión, junto con sus roles y permisos, permite decidir qué puede hacer.
+_Avoid_: Contraseña hasheada en bd
+
+**Rol**:
+Representa un rol del sistema, que contiene dentro de sí la lista de permisos asociados a dicho rol.
+
+**Permiso**:
+Representa un permiso concreto del sistema.

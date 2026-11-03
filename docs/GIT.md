@@ -1,12 +1,12 @@
 # Flujo de trabajo
 
-Cómo un cambio llega desde una issue hasta `dev`.
+Cómo un cambio llega desde una issue hasta `dev` y después a `main`.
 
 ## Ramas
 
 | Rama | Qué es |
 |---|---|
-| `main` | Producción. Solo recibe PRs desde `dev` |
+| `main` | Producción. Solo recibe PRs desde `dev`. Cada merge es una iteración y se replica en [Bitbucket](#iteraciones-y-bitbucket) |
 | `dev` | Integración y rama por defecto. Recibe PRs de las ramas de trabajo |
 | `tipo/descripcion` | Tu rama de trabajo, una por tarea |
 
@@ -23,14 +23,19 @@ Cómo un cambio llega desde una issue hasta `dev`.
 | `refactor` | Cambio de código sin cambiar el comportamiento |
 | `test` | Tests |
 | `docs` | Documentación |
-| `chore` | Configuración, dependencias, scripts, CI |
+| `chore` | Configuración, dependencias, scripts |
+| `ci` | Workflows de CI |
 | `style` | Formato sin cambiar la lógica |
 
-El alcance es opcional: `frontend`, `backend` o `db`.
+El alcance es opcional:
+
+- **Módulo** (`auth`, `users`, `productos`, etc.): para los cambios que se pueden ubicar en uno.
+- **`frontend`, `backend` o `db`**: para cambios generales de esa parte, como agregar un esquema, configurar una dependencia del frontend o actualizar un middleware general del backend.
 
 ```
-feat(backend): agregar endpoint de alta de clientes
-fix(frontend): mostrar error cuando falla el login
+feat(clientes): agregar endpoint de alta de clientes
+fix(auth): mostrar error cuando falla el login
+chore(frontend): configurar una dependencia nueva
 chore(db): agregar migración de la tabla de proveedores
 ```
 
@@ -63,10 +68,10 @@ Si el `pull` trajo migraciones: `npm run db:migrate`. Si trajo dependencias: `np
 
 ```bash
 git add <archivos>
-git commit -m "feat(frontend): agregar formulario de alta de clientes"
+git commit -m "feat(clientes): agregar formulario de alta de clientes"
 ```
 
-Commits chicos, cada uno con sentido propio.
+Commits chicos, cada uno con sentido propio. Un commit que agrega lógica de negocio, conexión con una base de datos o integración entre frontend, backend y BD incluye tests que evidencien que cumple su objetivo.
 
 ### 3. Pushear
 
@@ -80,7 +85,7 @@ En GitHub, botón **Compare & pull request** (verificá que la base sea `dev`). 
 
 ### 5. CI y revisión
 
-Los checks corren con cada push. Si uno falla, abrí **Details**, corregí y pusheá. Otra persona revisa; los cambios pedidos van como commits nuevos en la misma rama.
+Los checks corren con cada push. Si uno falla, abrí **Details**, corregí y pusheá. Otra persona revisa y aprueba (se necesita al menos una aprobación); los cambios pedidos van como commits nuevos en la misma rama. Un push nuevo anula la aprobación anterior.
 
 ```bash
 gh pr checks       # estado de los checks
@@ -89,13 +94,17 @@ gh pr view --web   # abrir la PR en el navegador
 
 ### 6. Mergear
 
-Con checks en verde y revisión aprobada: **Merge pull request** y **Delete branch**. Después:
+Con checks en verde y revisión aprobada: si GitHub muestra **Update branch** (entraron cambios a la base después de abrir la PR), tocalo y esperá que el CI vuelva a pasar. Después, **Merge pull request** y **Delete branch**. Después:
 
 ```bash
 git switch dev
 git pull
 git branch -d feat/alta-de-clientes
 ```
+
+### 7. Pasar a `main`
+
+Cuando la funcionalidad está validada y terminada en `dev`, abrí una PR de `dev` a `main`.
 
 ## Validaciones automáticas
 
@@ -105,9 +114,24 @@ Si algo falla, la acción se cancela y te muestra el error. Corregilo y repetí.
 |---|---|
 | `git commit` | Formato del mensaje. Si tocaste el frontend, lint y formato de esos archivos (corrige lo que puede) |
 | `git push` | Tests unitarios de la parte que tocaste |
-| PR ([CI](../.github/workflows/ci.yml)) | `commitlint`: commits · `backend`: build y tests · `database`: migraciones y seeds desde cero ([si falla](../db/casos-de-uso.md#10-falla-el-job-database-del-ci-en-mi-pr)) · `frontend`: lint, formato, tipos, tests y build |
+| PR ([CI](../.github/workflows/ci.yml)) | `commitlint`: commits · `backend`: build y tests · `database`: migraciones y seeds desde cero ([si falla](../db/casos-de-uso.md#10-falla-el-job-database-del-ci-en-mi-pr)) · `frontend`: lint, formato, tipos, tests y build · `e2e` (solo PRs a `main`): flujos críticos con Playwright · `origen`: que las PRs a `main` vengan de `dev` |
+| Push a `main` ([espejo](../.github/workflows/bitbucket.yml)) | No valida: replica `main` en Bitbucket (ver [Iteraciones](#iteraciones-y-bitbucket)) |
+
+## Iteraciones y Bitbucket
+
+Cada merge de `dev` a `main` es una nueva iteración del sistema. La cátedra sigue el avance en [Bitbucket](https://bitbucket.org/EstebanSaborido/2026-grupo6), que es un espejo de `main`: con cada push a `main`, GitHub Actions lo replica solo. No se pushea a Bitbucket a mano.
+
+- Solo se replica `main`; `dev` y las ramas de trabajo quedan en GitHub.
+- El push pisa lo que haya en Bitbucket: cualquier cambio hecho allá se pierde.
+- Usa el token de Bitbucket guardado en el secret `BITBUCKET_API_KEY` del repo de GitHub. Si vence o se revoca, el workflow falla en la pestaña **Actions**: generá uno nuevo con permiso de escritura en repositorios, actualizá el secret y tocá **Re-run jobs**.
 
 ## Otros casos
+
+### PRs concatenadas
+
+Cuando un trabajo se apoya en otra funcionalidad todavía abierta, su rama sale de ella y su PR apunta a ella, en lugar de a `dev`. Por ejemplo, `feat/auth-session-logout` implementó tickets sobre lo que ya existía en `feat/auth`. Después, la rama base llega a `dev` con su propia PR.
+
+El [CI](../.github/workflows/ci.yml) solo corre en PRs hacia `dev` y `main`: en una PR concatenada, corré la verificación a mano y dejá el resultado en la PR. `Closes #12` recién cierra la issue cuando el cambio llega a `dev`.
 
 ### Traer cambios de `dev` a tu rama
 

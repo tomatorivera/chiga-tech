@@ -36,6 +36,10 @@ No hace falta `.env`: los valores por defecto funcionan ([cómo cambiarlos](db/R
 
 ### Levantar el proyecto
 
+Todo junto, desde la raíz: `npm run app:dev` (Ctrl+C corta back y front; la BD sigue corriendo hasta `npm run db:down`).
+
+Por separado:
+
 | Qué | Comando | Desde | URL |
 |---|---|---|---|
 | BD | `npm run db:up` | raíz | `localhost:5432` |
@@ -52,6 +56,7 @@ Desde la raíz:
 | `npm run test:unit` | Unitarios de backend y frontend |
 | `npm run test:unit:backend` / `test:unit:frontend` | Unitarios de una parte |
 | `npm run test:integration` | Integración del backend |
+| `npm run test:e2e` | Flujos completos en el navegador (necesita la BD levantada: `npm run db:up` y `npm run db:seed`) |
 
 ### Carpetas
 
@@ -74,9 +79,8 @@ Se consultan cuando hacen falta, no son parte del recorrido.
 - [ERS](docs/ERS.md): requisitos del sistema.
 - [CONTEXT](docs/CONTEXT.md): glosario del dominio. Usá estos términos en código, issues y PRs.
 - [ADR de negocio](docs/adr/negocio/) y [técnicos](docs/adr/tecnico/): decisiones tomadas y por qué.
-- [Diagrama de la BD](docs/disenio/base-de-datos.mmd) (Mermaid).
-
-
+- [Contratos de api](docs/contracts/): docs de los endpoints antes inicializar una feature, nos brinda un punto de inicio y fin en común para que front y back trabajen en paralelo. Una vez se implementa se puede ir ampliando y todo debería quedar documentado en Swagger.
+- [Diagrama de la BD](docs/disenio/base-de-datos.mmd) (Mermaid): se actualiza con IA a partir de las migraciones y se lo usa para presentar en clases.
 
 ---
 

@@ -25,6 +25,10 @@ contexto del problema resuelto en esta PR y además poner "Closes" antes del
 hashtag cierra automáticamente la issue cuando la PR se mergea a dev/
 -->
 
+## Revisión
+
+<!-- Si usaste la skill code-review: lo que decidiste no modificar y por qué (contexto, problema técnico o descubrimiento nuevo) -->
+
 ## Checklist
 
 ### Sobre el repositorio en general
