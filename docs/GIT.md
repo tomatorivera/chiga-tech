@@ -114,7 +114,7 @@ Si algo falla, la acción se cancela y te muestra el error. Corregilo y repetí.
 |---|---|
 | `git commit` | Formato del mensaje. Si tocaste el frontend, lint y formato de esos archivos (corrige lo que puede) |
 | `git push` | Tests unitarios de la parte que tocaste |
-| PR ([CI](../.github/workflows/ci.yml)) | `commitlint`: commits · `backend`: build y tests · `database`: migraciones y seeds desde cero ([si falla](../db/casos-de-uso.md#10-falla-el-job-database-del-ci-en-mi-pr)) · `frontend`: lint, formato, tipos, tests y build · `origen`: que las PRs a `main` vengan de `dev` |
+| PR ([CI](../.github/workflows/ci.yml)) | `commitlint`: commits · `backend`: build y tests · `database`: migraciones y seeds desde cero ([si falla](../db/casos-de-uso.md#10-falla-el-job-database-del-ci-en-mi-pr)) · `frontend`: lint, formato, tipos, tests y build · `e2e` (solo PRs a `main`): flujos críticos con Playwright · `origen`: que las PRs a `main` vengan de `dev` |
 | Push a `main` ([espejo](../.github/workflows/bitbucket.yml)) | No valida: replica `main` en Bitbucket (ver [Iteraciones](#iteraciones-y-bitbucket)) |
 
 ## Iteraciones y Bitbucket
