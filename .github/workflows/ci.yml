@@ -90,9 +90,35 @@ jobs:
       - run: npm test
       - run: npm run build
 
-# Activar cuando exista frontend/e2e (Playwright): levantar backend y
-# frontend en el runner y correr `npm run test:e2e`.
-  # e2e:
-  #   needs: [backend, frontend]
-  #   runs-on: ubuntu-latest
-  #   timeout-minutes: 15
+  # Flujos críticos con Playwright; solo en PRs a main por su costo
+  e2e:
+    if: github.base_ref == 'main'
+    needs: [backend, frontend]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      # Compila antes para que el webServer de Playwright solo espere el arranque
+      - run: dotnet build backend/Chiga.Api
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+        working-directory: frontend
+      - run: docker compose up -d --wait db
+      - run: docker compose run --rm flyway migrate
+      - run: docker compose run --rm seed
+      - run: npx playwright install --with-deps chromium
+        working-directory: frontend
+      - run: npm run test:e2e
+        working-directory: frontend
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: frontend/playwright-report

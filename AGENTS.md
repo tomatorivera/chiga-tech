@@ -55,6 +55,7 @@ Un cambio está terminado cuando pasan:
 - Backend: `npm run test:unit:backend` y `npm run test:integration`.
 - Frontend (desde `frontend/`): `npm run lint`, `npm run format:check`, `npm run typecheck`, `npm test`.
 - BD: `npm run db:reset`.
+- e2e (desde `frontend/`, con la BD levantada y con seeds): `npm run test:e2e`, antes de la PR de `dev` a `main` o cuando tocás un flujo cubierto en `frontend/e2e/`.
 
 Si el cambio afecta algo documentado en un README, un ADR o `docs/GIT.md`, actualizalo en el mismo cambio.
 

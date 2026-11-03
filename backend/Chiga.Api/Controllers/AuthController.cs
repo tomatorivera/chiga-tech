@@ -22,7 +22,8 @@ public class AuthController(IAuthService authService, ActiveSessions sessions) :
 
       await HttpContext.SignInAsync(
         CookieAuthenticationDefaults.AuthenticationScheme,
-        new ClaimsPrincipal(BuildIdentity(user, sessions.Start())));
+        new ClaimsPrincipal(BuildIdentity(user, sessions.Start()))
+      );
         
       return Ok(user);
     }
@@ -66,6 +67,7 @@ public class AuthController(IAuthService authService, ActiveSessions sessions) :
     return NoContent();
   }
 
+  [NonAction]
   private Task EndSession()
   {
     var sid = User.FindFirstValue(ClaimTypes.Sid);
@@ -74,7 +76,7 @@ public class AuthController(IAuthService authService, ActiveSessions sessions) :
       sessions.End(sid);
     }
 
-    return HttpContext.SignOutAsync();
+    return HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
   }
 
   /// <summary>
@@ -88,6 +90,7 @@ public class AuthController(IAuthService authService, ActiveSessions sessions) :
   /// <param name="user">Datos del usuario logueado</param>
   /// <param name="sid">Identificador de la sesión que se abre</param>
   /// <returns>ClaimsIdentity con datos de la cookie</returns>
+  [NonAction]
   private static ClaimsIdentity BuildIdentity(UsuarioDTO user, string sid)
   {
     var claims = new List<Claim>

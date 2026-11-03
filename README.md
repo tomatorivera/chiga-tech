@@ -56,6 +56,7 @@ Desde la raíz:
 | `npm run test:unit` | Unitarios de backend y frontend |
 | `npm run test:unit:backend` / `test:unit:frontend` | Unitarios de una parte |
 | `npm run test:integration` | Integración del backend |
+| `npm run test:e2e` | Flujos completos en el navegador (necesita la BD levantada: `npm run db:up` y `npm run db:seed`) |
 
 ### Carpetas
 
