@@ -532,3 +532,7 @@ backend/Chiga.Api/keys/
 
 # Otros documentos
 .archify
+
+# Skill archify: sus ejecutables sí van (bin/ se ignora por .NET); los ejemplos renderizados no
+!.claude/skills/archify/bin/
+.claude/skills/archify/examples/*.html
