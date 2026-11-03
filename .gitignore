@@ -527,4 +527,8 @@ $RECYCLE.BIN/
 # Claude Code: configuración personal
 .claude/settings.local.json
 
+# Keys de sesión del backend
 backend/Chiga.Api/keys/
+
+# Otros documentos
+.archify
