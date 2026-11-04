@@ -22,12 +22,12 @@ export function LoginForm() {
     <>
       <form id="login-form" className="mt-8 space-y-5" action={formAction} noValidate>
         <div>
-          <label htmlFor="username" className="mb-2 block text-[13px] font-semibold text-[#34463e]">
+          <label htmlFor="username" className="mb-2 block text-[13px] font-semibold text-ink-soft">
             Usuario
           </label>
           <div className="relative">
             <UserRound
-              className="pointer-events-none absolute top-1/2 left-3.75 -translate-y-1/2 text-[#87948c]"
+              className="pointer-events-none absolute top-1/2 left-3.75 -translate-y-1/2 text-muted"
               size={18}
               aria-hidden="true"
             />
@@ -40,23 +40,27 @@ export function LoginForm() {
               defaultValue={errorState?.previousValues?.username}
               aria-invalid={Boolean(fieldErrors?.username)}
               aria-describedby={fieldErrors?.username ? "username-error" : undefined}
-              className="w-full rounded-lg border border-[#dfe5de] bg-white py-3.5 pl-11 pr-4 text-[#26372f] shadow-[0_1px_2px_rgba(35,58,45,0.025)] outline-none transition placeholder:text-[#a2aca5] hover:border-[#c6d2c8] focus:border-[#648a70] focus:shadow-[0_0_0_3px_rgba(100,138,112,0.13)] aria-invalid:border-[#c4604d] aria-invalid:focus:shadow-[0_0_0_3px_rgba(196,96,77,0.14)]"
+              className="w-full rounded-lg border border-line-control bg-surface py-3.5 pl-11 pr-4 text-ink shadow-control transition placeholder:text-faint hover:border-muted focus:border-focus focus:outline-2 focus:outline-offset-2 focus:outline-focus aria-invalid:border-danger aria-invalid:focus:outline-danger"
             />
           </div>
           {fieldErrors?.username && (
-            <p id="username-error" className="mt-1.5 text-xs text-[#a13d2d]" role="alert">
+            <p
+              id="username-error"
+              className="mt-1.5 text-xs text-danger-ink motion-safe:animate-reveal"
+              role="alert"
+            >
               {fieldErrors.username}
             </p>
           )}
         </div>
 
         <div>
-          <label htmlFor="password" className="mb-2 block text-[13px] font-semibold text-[#34463e]">
+          <label htmlFor="password" className="mb-2 block text-[13px] font-semibold text-ink-soft">
             Contraseña
           </label>
           <div className="relative">
             <LockKeyhole
-              className="pointer-events-none absolute top-1/2 left-3.75 -translate-y-1/2 text-[#87948c]"
+              className="pointer-events-none absolute top-1/2 left-3.75 -translate-y-1/2 text-muted"
               size={18}
               aria-hidden="true"
             />
@@ -68,10 +72,10 @@ export function LoginForm() {
               placeholder="Ingresá tu contraseña"
               aria-invalid={Boolean(fieldErrors?.password)}
               aria-describedby={fieldErrors?.password ? "password-error" : undefined}
-              className="w-full rounded-lg border border-[#dfe5de] bg-white py-3.5 pl-11 pr-12 text-[#26372f] shadow-[0_1px_2px_rgba(35,58,45,0.025)] outline-none transition placeholder:text-[#a2aca5] hover:border-[#c6d2c8] focus:border-[#648a70] focus:shadow-[0_0_0_3px_rgba(100,138,112,0.13)] aria-invalid:border-[#c4604d] aria-invalid:focus:shadow-[0_0_0_3px_rgba(196,96,77,0.14)]"
+              className="w-full rounded-lg border border-line-control bg-surface py-3.5 pl-11 pr-12 text-ink shadow-control transition placeholder:text-faint hover:border-muted focus:border-focus focus:outline-2 focus:outline-offset-2 focus:outline-focus aria-invalid:border-danger aria-invalid:focus:outline-danger"
             />
             <button
-              className="absolute inset-y-0 right-0 grid w-11 cursor-pointer place-items-center rounded-r-lg text-[#86928b] transition hover:text-[#345849] focus-visible:outline focus-visible:-outline-offset-4 focus-visible:outline-[#527863]"
+              className="absolute inset-y-0 right-0 grid w-11 cursor-pointer place-items-center rounded-r-lg text-muted transition hover:text-primary focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-focus"
               type="button"
               onClick={() => setShowPassword((visible) => !visible)}
               aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
@@ -81,14 +85,18 @@ export function LoginForm() {
             </button>
           </div>
           {fieldErrors?.password && (
-            <p id="password-error" className="mt-1.5 text-xs text-[#a13d2d]" role="alert">
+            <p
+              id="password-error"
+              className="mt-1.5 text-xs text-danger-ink motion-safe:animate-reveal"
+              role="alert"
+            >
               {fieldErrors.password}
             </p>
           )}
         </div>
 
         <button
-          className="group mt-8 flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-[#285644] px-5 py-3.5 text-white shadow-[0_5px_12px_rgba(34,77,58,0.13)] transition hover:bg-[#204b3a] hover:shadow-[0_7px_16px_rgba(34,77,58,0.18)] disabled:cursor-wait disabled:bg-[#557868] disabled:shadow-none focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#315d4a]"
+          className="group mt-8 flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3.5 text-white shadow-action transition hover:bg-primary-hover hover:shadow-action-hover motion-safe:active:translate-y-px active:shadow-control disabled:cursor-wait disabled:bg-primary/85 disabled:shadow-none focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-focus"
           type="submit"
           disabled={isPending}
         >
@@ -101,7 +109,7 @@ export function LoginForm() {
             <>
               Iniciar sesión
               <ArrowRight
-                className="transition-transform group-hover:translate-x-1"
+                className="transition-transform group-hover:translate-x-0.5 motion-reduce:transition-none"
                 size={17}
                 aria-hidden="true"
               />
@@ -112,7 +120,7 @@ export function LoginForm() {
 
       {message && (
         <p
-          className="mt-4 flex items-start gap-2 rounded-lg border border-[#efd6cf] bg-[#fbf2ef] px-3.5 py-3 text-xs leading-5 text-[#8f3a2c]"
+          className="mt-4 flex items-start gap-2 rounded-lg motion-safe:animate-reveal border border-danger-line bg-danger-surface px-3.5 py-3 text-xs leading-5 text-danger-ink"
           role="alert"
         >
           <CircleAlert className="mt-0.5 shrink-0" size={16} aria-hidden="true" />

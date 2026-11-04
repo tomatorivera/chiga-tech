@@ -3,17 +3,57 @@
 @theme {
   --default-font-family: "DM Sans", sans-serif;
   --font-display: "Manrope", sans-serif;
-  --animate-enter: rise-in 550ms ease-out both;
 
-  @keyframes rise-in {
+  /* Marca: el verde del local y su lima de acento */
+  --color-brand: #173b32;
+  --color-accent: #c7e77e;
+
+  /* Superficies y texto sobre fondo claro */
+  --color-canvas: #f8f9f5;
+  --color-surface: #ffffff;
+  --color-ink: #1e3029;
+  --color-ink-soft: #34463e;
+  --color-muted: #636f68;
+  --color-faint: #6a766f;
+  --color-line: #dfe5de;
+  --color-line-strong: #c6d2c8;
+  /* Borde de los campos: debe contrastar 3:1 con la superficie para que se vea el control */
+  --color-line-control: #86918a;
+
+  /* Acción principal y foco */
+  --color-primary: #285644;
+  --color-primary-hover: #204b3a;
+  --color-focus: #527863;
+
+  /* Errores */
+  --color-danger: #c4604d;
+  --color-danger-ink: #a13d2d;
+  --color-danger-line: #efd6cf;
+  --color-danger-surface: #fbf2ef;
+
+  --shadow-control: 0 1px 2px color-mix(in oklab, var(--color-brand) 3%, transparent);
+  --shadow-action: 0 5px 12px color-mix(in oklab, var(--color-primary) 13%, transparent);
+  --shadow-action-hover: 0 7px 16px color-mix(in oklab, var(--color-primary) 18%, transparent);
+
+  /* Movimiento: corto y desacelerado, para que nada demore al que entra a trabajar */
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --default-transition-duration: 160ms;
+  --default-transition-timing-function: var(--ease-out-quart);
+
+  --animate-enter: enter 220ms var(--ease-out-quart) both;
+  --animate-reveal: reveal 160ms var(--ease-out-quart) both;
+
+  @keyframes enter {
     from {
       opacity: 0;
-      transform: translateY(12px);
+      transform: translateY(6px);
     }
+  }
 
-    to {
-      opacity: 1;
-      transform: translateY(0);
+  @keyframes reveal {
+    from {
+      opacity: 0;
+      transform: translateY(-3px);
     }
   }
 }
