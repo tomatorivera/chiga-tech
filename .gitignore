@@ -535,3 +535,4 @@ backend/Chiga.Api/keys/
 !.claude/skills/archify/bin/
 .claude/skills/archify/examples/*.html
 .impeccable/critique
+.playwright-mcp
