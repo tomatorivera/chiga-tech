@@ -130,13 +130,15 @@ describe("loginAction", () => {
   });
 
   it("devuelve el detail del backend como mensaje general", async () => {
-    login.mockRejectedValue(errorConRespuesta(401, { detail: "Las credenciales son inválidas." }));
+    login.mockRejectedValue(
+      errorConRespuesta(401, { detail: "El usuario o la contraseña son incorrectos." }),
+    );
 
     const resultado = await enviar("vendedor", "incorrecta");
 
     expect(resultado).toEqual({
       status: "error",
-      message: "Las credenciales son inválidas.",
+      message: "El usuario o la contraseña son incorrectos.",
       previousValues: { username: "vendedor" },
     });
     expect(useSesion.getState().usuario).toBeNull();

@@ -16,7 +16,7 @@ public class AuthService(IUserRepository userRepository) : IAuthService
       : await userRepository.FindByNombreUsuarioAsync(req.NombreUsuario, ct);
 
     if (result is null || !PasswordMatches(req.Contrasena, result.Value.Contrasenia))
-      throw new InvalidCredentialsException("Las credenciales son inválidas.");
+      throw new InvalidCredentialsException("El usuario o la contraseña son incorrectos.");
 
     if (!result.Value.User.Estado)
       throw new DisabledUserException("La cuenta se encuentra inhabilitada, si cree que se trata de un error consulte con un administrador.");
