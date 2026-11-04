@@ -68,6 +68,10 @@ describe("LoginForm", () => {
     expect(login).not.toHaveBeenCalled();
   });
 
+  it("indica a quién pedirle la contraseña si se la olvidaron", () => {
+    expect(screen.getByText(/te olvidaste la contraseña/i).textContent).toContain("administrador");
+  });
+
   it("avisa mientras Bloq Mayús está activado en la contraseña", () => {
     const password = screen.getByLabelText("Contraseña");
 

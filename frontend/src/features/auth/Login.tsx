@@ -30,7 +30,7 @@ export function Login() {
             <PackageCheck size={22} strokeWidth={2.2} />
           </div>
           <div>
-            <p className="text-[15px] font-bold leading-tight tracking-[0.02em]">CASA TECH</p>
+            <p className="text-[15px] font-bold leading-tight tracking-[0.02em]">CHIGA TECH</p>
             <p className="mt-1 text-xs font-medium uppercase tracking-wider text-white/55">
               Gestión comercial
             </p>
@@ -44,11 +44,11 @@ export function Login() {
 
         <div className="mt-auto mb-12 hidden max-w-md pt-16 lg:block">
           <p className="font-display text-[clamp(2.25rem,3.4vw,3.25rem)] font-semibold leading-[1.08] tracking-tight text-balance">
-            Tu negocio, en buenas manos.
+            Lo que necesitás para atender el local.
           </p>
           <p className="mt-4 text-base leading-7 text-white/65">
-            Ventas, productos y stock reunidos en un solo lugar. Una herramienta clara para el
-            trabajo de todos los días.
+            Registrá ventas, consultá precios y stock, y seguí las cuentas corrientes de los
+            clientes.
           </p>
         </div>
 
@@ -62,18 +62,14 @@ export function Login() {
       <main className="flex flex-1 flex-col items-center px-6 pt-10 pb-8 sm:px-10 sm:pt-16 lg:min-h-screen lg:px-12 lg:pt-[max(4rem,22vh)]">
         <div className="w-full max-w-105 motion-safe:animate-enter">
           <h1 className="font-display text-3xl font-semibold tracking-tight text-ink sm:text-[2.15rem]">
-            Qué bueno verte.
+            Iniciá sesión
           </h1>
           <p className="mt-2 text-sm leading-6 text-muted">
-            Ingresá tus credenciales para continuar.
+            Entrá con el usuario y la contraseña que te dio el administrador.
           </p>
 
           <LoginForm />
         </div>
-
-        <footer className="mt-auto w-full max-w-105 pt-12 text-center text-xs text-faint">
-          Proyecto académico · Facultad de Ciencias Exactas · UNT
-        </footer>
       </main>
     </div>
   );

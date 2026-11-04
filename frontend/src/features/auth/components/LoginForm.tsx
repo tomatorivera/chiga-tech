@@ -82,7 +82,6 @@ export function LoginForm() {
             autoFocus
             type="text"
             autoComplete="username"
-            placeholder="Ingresá tu usuario"
             defaultValue={errorState?.previousValues?.username}
             aria-invalid={Boolean(fieldErrors?.username)}
             aria-describedby={fieldErrors?.username ? "username-error" : undefined}
@@ -116,7 +115,6 @@ export function LoginForm() {
             name="password"
             type={showPassword ? "text" : "password"}
             autoComplete="current-password"
-            placeholder="Ingresá tu contraseña"
             aria-invalid={Boolean(fieldErrors?.password)}
             aria-describedby={
               [fieldErrors?.password && "password-error", capsLock && "password-caps"]
@@ -162,7 +160,7 @@ export function LoginForm() {
         {isPending ? (
           <>
             <LoaderCircle className="animate-spin" size={17} aria-hidden="true" />
-            Iniciando sesión...
+            Iniciando sesión…
           </>
         ) : (
           <>
@@ -175,6 +173,11 @@ export function LoginForm() {
           </>
         )}
       </button>
+
+      {/* No hay recuperación por correo: las cuentas y sus contraseñas las gestiona el administrador */}
+      <p className="text-center text-[13px] leading-5 text-muted">
+        ¿Te olvidaste la contraseña? Pedile una nueva al administrador.
+      </p>
     </form>
   );
 }

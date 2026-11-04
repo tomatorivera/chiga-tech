@@ -19,7 +19,7 @@ export function Homepage() {
           >
             <PackageCheck size={19} strokeWidth={2.2} />
           </div>
-          <p className="text-sm font-bold tracking-[0.02em] text-ink">CASA TECH</p>
+          <p className="text-sm font-bold tracking-[0.02em] text-ink">CHIGA TECH</p>
 
           <form action={formAction} className="ml-auto">
             <button
