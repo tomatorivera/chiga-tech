@@ -1,6 +1,7 @@
-import { ArrowRight, PackageCheck } from "lucide-react";
 import { Navigate, useLocation, type Location } from "react-router-dom";
+import { Wordmark } from "../../shared/components/Wordmark";
 import { LoginForm } from "./components/LoginForm";
+import { ReceiptPreview } from "./components/ReceiptPreview";
 import { useSesion } from "./hooks/useSesion";
 
 export function Login() {
@@ -12,123 +13,53 @@ export function Login() {
   if (usuario) return <Navigate to={locationState?.from ?? "/inicio"} replace />;
 
   return (
-    <main className="min-h-screen w-full bg-[#f6f7f2] lg:grid lg:grid-cols-[1.08fr_0.92fr]">
+    <div className="flex min-h-screen w-full flex-col bg-canvas lg:grid lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
       <a
-        className="fixed top-3 left-3 z-20 translate-y-[-160%] rounded-md bg-white px-3.5 py-2.5 text-[#173b32] focus:translate-y-0"
-        href="#login-form"
+        className="fixed top-3 left-3 z-20 translate-y-[-160%] rounded-md bg-surface px-3.5 py-2.5 text-brand focus:translate-y-0 focus:outline-2 focus:outline-offset-2 focus:outline-accent"
+        href="#username"
       >
         Saltar al inicio de sesión
       </a>
 
-      <section className="relative flex flex-col overflow-hidden bg-[radial-gradient(ellipse_at_90%_12%,rgba(180,210,123,0.17),transparent_31%),linear-gradient(145deg,#204a3d_0%,#173b32_55%,#18372f_100%)] px-7 py-7 text-white sm:px-10 sm:py-9 lg:min-h-screen lg:px-14 lg:py-12 xl:px-20">
+      <header className="relative isolate m-2 flex flex-col overflow-hidden rounded-2xl bg-brand bg-linear-160 from-brand to-[#0c211b] px-4 py-5 text-white sm:px-8 lg:m-4 lg:rounded-3xl lg:px-14 lg:py-12 xl:px-20">
         <div
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.12)_0.65px,transparent_0.65px)] bg-size-[9px_9px] opacity-20"
+          className="absolute inset-0 -z-10 bg-radial-[80%_60%_at_95%_62%] from-[#2e8f6c]/65 via-[#2e8f6c]/30 via-40% to-transparent to-100%"
           aria-hidden="true"
         />
-        <header className="relative z-10 flex items-center gap-3">
-          <div
-            className="grid size-11 place-items-center rounded-xl bg-[#c7e77e] text-[#173d33]"
-            aria-hidden="true"
-          >
-            <PackageCheck size={23} strokeWidth={2.2} />
-          </div>
-          <div>
-            <p className="text-[15px] font-bold leading-tight tracking-[0.02em]">CASA TECH</p>
-            <p className="mt-1 text-[11px] font-medium uppercase tracking-[0.16em] text-white/55">
-              Gestión comercial
-            </p>
-          </div>
-        </header>
+        <div
+          className="absolute inset-0 -z-10 bg-radial-[70%_35%_at_45%_105%] from-[#2e8f6c]/35 to-transparent to-100%"
+          aria-hidden="true"
+        />
 
-        <div className="relative z-10 mt-12 max-w-xl sm:mt-16 lg:my-auto lg:mt-0 lg:pb-14">
-          <p className="mb-4 flex animate-[rise-in_650ms_180ms_both] items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#c7e77e]">
-            <span className="h-px w-7 bg-[#c7e77e]" />
-            Todo en su lugar
-          </p>
-          <h1 className="max-w-lg animate-[rise-in_650ms_80ms_both] font-display text-[clamp(2.45rem,5vw,4.6rem)] font-semibold leading-[1.04] tracking-[-0.035em]">
-            Tu negocio, <span className="text-[#c7e77e]">en buenas manos.</span>
-          </h1>
-          <p className="mt-5 max-w-md animate-[rise-in_650ms_180ms_both] text-sm leading-6 text-white/65 sm:text-base sm:leading-7">
-            Ventas, productos y stock reunidos en un solo lugar. Una herramienta clara para el
-            trabajo de todos los días.
-          </p>
+        <Wordmark className="mx-auto w-full max-w-105 lg:mx-0 lg:max-w-none" />
 
-          <div className="mt-9 max-w-md animate-[rise-in_650ms_180ms_both] overflow-hidden rounded-2xl border border-white/10 bg-[#f8f8ef] text-[#24352f] shadow-[0_24px_60px_-32px_rgba(0,0,0,0.65)] sm:mt-12">
-            <div className="flex items-center justify-between border-b border-[#e4e8df] px-5 py-4">
-              <div>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#7c8b81]">
-                  Panel de gestión
-                </p>
-                <p className="mt-1 text-sm font-semibold">Resumen del depósito</p>
-              </div>
-              <span className="flex items-center gap-1.5 rounded-full bg-[#e9f3d6] px-2.5 py-1 text-[10px] font-semibold text-[#456b36]">
-                <span className="size-1.5 rounded-full bg-[#79a64e]" />
-                En línea
-              </span>
-            </div>
-            <div className="grid grid-cols-2 divide-x divide-[#e4e8df]">
-              <div className="px-5 py-4">
-                <p className="text-xs text-[#7c8b81]">Productos</p>
-                <p className="mt-1 font-display text-2xl font-semibold">248</p>
-              </div>
-              <div className="px-5 py-4">
-                <p className="text-xs text-[#7c8b81]">Stock bajo</p>
-                <p className="mt-1 flex items-center gap-2 font-display text-2xl font-semibold">
-                  06{" "}
-                  <span className="rounded bg-[#fbebd9] px-1.5 py-0.5 font-sans text-[10px] font-semibold text-[#a5632f]">
-                    revisar
-                  </span>
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 border-t border-[#e4e8df] px-5 py-3.5">
-              <div
-                className="grid size-8 place-items-center rounded-lg bg-[#e8eee7] text-[#507161]"
-                aria-hidden="true"
-              >
-                <PackageCheck size={16} />
-              </div>
-              <p className="text-xs font-medium text-[#64746b]">
-                Catálogo y movimientos, bajo control
-              </p>
-              <ArrowRight className="ml-auto text-[#85948a]" size={16} aria-hidden="true" />
-            </div>
-          </div>
+        <div className="hidden flex-1 place-items-center py-10 lg:grid [@media(max-height:760px)]:hidden">
+          <ReceiptPreview />
         </div>
 
-        <footer className="relative z-10 mt-10 flex items-center justify-between border-t border-white/10 pt-5 text-[11px] text-white/45 lg:mt-0">
-          <span>Casa de Tecnología · Tucumán</span>
-          <span className="hidden sm:inline">Sistema de gestión comercial</span>
-        </footer>
-        <div
-          className="pointer-events-none absolute -right-48.75 bottom-[7%] size-75 rounded-full border border-[rgba(211,235,177,0.08)] max-lg:hidden"
-          aria-hidden="true"
-        />
-        <div
-          className="pointer-events-none absolute -right-28.75 bottom-[calc(7%-80px)] size-115 rounded-full border border-[rgba(211,235,177,0.08)] max-lg:hidden"
-          aria-hidden="true"
-        />
-      </section>
+        <div className="mt-auto hidden max-w-md lg:block">
+          <p className="font-display text-[clamp(2rem,2.8vw,2.5rem)] font-semibold leading-[1.1] tracking-tight text-balance">
+            Tu negocio en un solo lugar.
+          </p>
+          <p className="mt-4 text-[17px] leading-7 text-white/65">
+            Registrá ventas, consultá precios y stock, y seguí las cuentas corrientes de los
+            clientes.
+          </p>
+        </div>
+      </header>
 
-      <section className="relative flex min-h-140 flex-col items-center justify-center bg-[#f8f9f5] bg-[radial-gradient(ellipse_at_85%_100%,rgba(216,226,203,0.25),transparent_32%)] px-6 py-12 sm:px-10 lg:min-h-screen lg:px-12">
-        <div className="w-full max-w-105 animate-enter">
-          <div className="mb-9 flex items-center gap-2 text-xs font-medium text-[#617168]">
-            <span className="size-2 rounded-full bg-[#8cb46a]" />
-            Acceso al sistema
-          </div>
-          <h2 className="font-display text-3xl font-semibold tracking-[-0.03em] text-[#1e3029] sm:text-[2.15rem]">
-            Qué bueno verte.
-          </h2>
-          <p className="mt-2 text-sm leading-6 text-[#78847d]">
-            Ingresá tus credenciales para continuar.
+      <main className="flex flex-1 flex-col items-center px-6 pt-10 pb-8 sm:px-10 sm:pt-16 lg:min-h-screen lg:px-12 lg:pt-[max(4rem,22vh)]">
+        <section className="w-full max-w-105 motion-safe:animate-enter">
+          <h1 className="font-display text-3xl font-semibold tracking-tight text-ink sm:text-[2.15rem]">
+            Iniciá sesión
+          </h1>
+          <p className="mt-3 text-[17px] leading-7 text-pretty text-muted">
+            Entrá con el usuario y la contraseña que te dio el administrador.
           </p>
 
           <LoginForm />
-        </div>
-        <p className="mt-auto w-full max-w-105 pt-12 text-center text-[10px] tracking-[0.02em] text-[#a0aaa3] lg:absolute lg:bottom-7">
-          Proyecto académico · Facultad de Ciencias Exactas · UNT
-        </p>
-      </section>
-    </main>
+        </section>
+      </main>
+    </div>
   );
 }

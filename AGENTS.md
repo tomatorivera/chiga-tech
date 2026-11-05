@@ -8,6 +8,16 @@ Punto de venta para una casa de computación. Monorepo: `backend/` (ASP.NET Core
 - Código en inglés. Los nombres de clases que representan objetos del dominio del problema llevan sus términos en español, tal como aparecen en `docs/CONTEXT.md`: `ClienteDTO`, `CuentaCorrienteController`. El resto de las clases puede ir en inglés: `UserRepository`, `DisabledUserException`. Los métodos y las variables pueden variar, pero preferentemente van en inglés: `getSessionUser`, `isLoading`, `handleSubmit`.
 - Usá los términos de `docs/CONTEXT.md` y respetá los ADR de `docs/adr/` del área que tocás. Los requisitos están en `docs/ERS.md` (RF-XX, RNF-XX).
 
+## Comentarios
+
+- El código busca explicarse solo: antes de escribir un comentario, probá con un nombre más claro o una función más chica.
+- Se comenta solo:
+  - un resumen breve de un bloque cuya intención no se lee a simple vista;
+  - código engorroso o un workaround, como una particularidad de un navegador;
+  - una regla de negocio muy contraintuitiva.
+- No van en comentarios las decisiones tomadas en el chat, el historial del cambio, las explicaciones de lo que el código ya dice ni las justificaciones largas. Eso va en el commit, en la PR o en un ADR.
+- Una o dos líneas por comentario.
+
 ## Git
 
 - Ramas `tipo/descripcion` creadas desde `dev`. Las PRs de una funcionalidad nueva van primero hacia `dev`; cuando está validada y terminada, pasa a `main` con una PR desde `dev`, la única rama de la que `main` recibe PRs.
@@ -40,6 +50,7 @@ Punto de venta para una casa de computación. Monorepo: `backend/` (ASP.NET Core
 ## Frontend
 
 - Código por funcionalidad en `src/features/<feature>/` (`components/`, `hooks/`, `models/`); las páginas que no pertenecen a ninguna feature, en `src/pages/`; lo compartido en `src/shared/`. Rutas en `src/routes.tsx`.
+- Toda pantalla o componente visual sigue `DESIGN.md`: principios, tokens, componentes y patrones de la interfaz.
 - Estilos con Tailwind CSS v4 siempre que sea posible. CSS propio solo si Tailwind no puede lograr lo buscado de ningún modo, si lo escribió el usuario o si pidió CSS explícitamente.
 - Íconos de `lucide-react`.
 - HTML5 con etiquetas semánticas siempre que se pueda y corresponda.

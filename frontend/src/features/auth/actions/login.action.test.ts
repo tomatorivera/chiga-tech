@@ -63,7 +63,6 @@ describe("loginAction", () => {
     expect(resultado).toEqual({
       status: "error",
       fieldErrors: { username: mensaje },
-      previousValues: { username },
     });
     expect(login).not.toHaveBeenCalled();
   });
@@ -95,7 +94,6 @@ describe("loginAction", () => {
     expect(resultado).toEqual({
       status: "error",
       fieldErrors: { password: "La contraseña es requerida" },
-      previousValues: { username: "vendedor" },
     });
     expect(login).not.toHaveBeenCalled();
   });
@@ -110,7 +108,6 @@ describe("loginAction", () => {
     expect(resultado).toEqual({
       status: "error",
       fieldErrors: { username: "Error del backend" },
-      previousValues: { username: "vendedor" },
     });
     expect(useSesion.getState().usuario).toBeNull();
   });
@@ -125,19 +122,19 @@ describe("loginAction", () => {
     expect(resultado).toEqual({
       status: "error",
       fieldErrors: { username: "Error del backend" },
-      previousValues: { username: "vendedor" },
     });
   });
 
   it("devuelve el detail del backend como mensaje general", async () => {
-    login.mockRejectedValue(errorConRespuesta(401, { detail: "Las credenciales son inválidas." }));
+    login.mockRejectedValue(
+      errorConRespuesta(401, { detail: "El usuario o la contraseña son incorrectos." }),
+    );
 
     const resultado = await enviar("vendedor", "incorrecta");
 
     expect(resultado).toEqual({
       status: "error",
-      message: "Las credenciales son inválidas.",
-      previousValues: { username: "vendedor" },
+      message: "El usuario o la contraseña son incorrectos.",
     });
     expect(useSesion.getState().usuario).toBeNull();
   });
@@ -150,7 +147,6 @@ describe("loginAction", () => {
     expect(resultado).toEqual({
       status: "error",
       message: NO_CONNECTION_MSG,
-      previousValues: { username: "vendedor" },
     });
   });
 });
