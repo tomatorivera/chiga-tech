@@ -56,7 +56,7 @@ export function LoginForm() {
     <form id="login-form" className="mt-8 space-y-5" onSubmit={handleSubmit} noValidate>
       {message && (
         <p
-          className="flex items-start gap-2 rounded-lg motion-safe:animate-reveal border border-danger-line bg-danger-surface px-3.5 py-3 text-xs leading-5 text-danger-ink"
+          className="flex items-start gap-2 rounded-lg motion-safe:animate-reveal border border-danger-line bg-danger-surface px-3.5 py-3 text-sm leading-5 font-medium text-danger-ink"
           role="alert"
         >
           <CircleAlert className="mt-0.5 shrink-0" size={16} aria-hidden="true" />
@@ -82,17 +82,17 @@ export function LoginForm() {
             autoFocus
             type="text"
             autoComplete="username"
+            aria-required="true"
             defaultValue={errorState?.previousValues?.username}
             aria-invalid={Boolean(fieldErrors?.username)}
             aria-describedby={fieldErrors?.username ? "username-error" : undefined}
-            className="w-full rounded-lg border border-line-control bg-surface py-3.5 pl-11 pr-4 text-ink shadow-control transition placeholder:text-faint hover:border-muted focus:border-focus focus:outline-2 focus:outline-offset-2 focus:outline-focus aria-invalid:border-danger aria-invalid:focus:outline-danger"
+            className="w-full rounded-lg border border-line-control bg-surface py-3.5 pl-11 pr-4 text-ink caret-primary shadow-control transition hover:border-muted focus:border-focus focus:outline-2 focus:outline-offset-2 focus:outline-focus aria-invalid:border-danger aria-invalid:focus:outline-danger"
           />
         </div>
         {fieldErrors?.username && (
           <p
             id="username-error"
             className="mt-1.5 text-xs text-danger-ink motion-safe:animate-reveal"
-            role="alert"
           >
             {fieldErrors.username}
           </p>
@@ -115,6 +115,7 @@ export function LoginForm() {
             name="password"
             type={showPassword ? "text" : "password"}
             autoComplete="current-password"
+            aria-required="true"
             aria-invalid={Boolean(fieldErrors?.password)}
             aria-describedby={
               [fieldErrors?.password && "password-error", capsLock && "password-caps"]
@@ -124,7 +125,7 @@ export function LoginForm() {
             onKeyDown={handlePasswordKey}
             onKeyUp={handlePasswordKey}
             onBlur={() => setCapsLock(false)}
-            className="w-full rounded-lg border border-line-control bg-surface py-3.5 pl-11 pr-12 text-ink shadow-control transition placeholder:text-faint hover:border-muted focus:border-focus focus:outline-2 focus:outline-offset-2 focus:outline-focus aria-invalid:border-danger aria-invalid:focus:outline-danger"
+            className="w-full rounded-lg border border-line-control bg-surface py-3.5 pl-11 pr-12 text-ink caret-primary shadow-control transition hover:border-muted focus:border-focus focus:outline-2 focus:outline-offset-2 focus:outline-focus aria-invalid:border-danger aria-invalid:focus:outline-danger"
           />
           <button
             className="absolute inset-y-0 right-0 grid w-11 cursor-pointer place-items-center rounded-r-lg text-muted transition hover:text-primary focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-focus"
@@ -140,16 +141,15 @@ export function LoginForm() {
           <p
             id="password-error"
             className="mt-1.5 text-xs text-danger-ink motion-safe:animate-reveal"
-            role="alert"
           >
             {fieldErrors.password}
           </p>
         )}
-        {capsLock && (
-          <p id="password-caps" className="mt-1.5 text-xs text-muted" role="status">
-            Bloq Mayús está activado.
-          </p>
-        )}
+        {/* La región viva existe siempre: un lector de pantalla anuncia el cambio de su contenido,
+            no un elemento que se inserta ya con texto */}
+        <p id="password-caps" className="mt-1.5 text-xs text-muted empty:mt-0" role="status">
+          {capsLock && "Bloq Mayús está activado."}
+        </p>
       </div>
 
       <button
@@ -175,7 +175,7 @@ export function LoginForm() {
       </button>
 
       {/* No hay recuperación por correo: las cuentas y sus contraseñas las gestiona el administrador */}
-      <p className="text-center text-[13px] leading-5 text-muted">
+      <p className="text-center text-[13px] leading-5 text-pretty text-muted">
         ¿Te olvidaste la contraseña? Pedile una nueva al administrador.
       </p>
     </form>

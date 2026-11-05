@@ -15,7 +15,7 @@ export function Login() {
     <div className="flex min-h-screen w-full flex-col bg-canvas lg:grid lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
       <a
         className="fixed top-3 left-3 z-20 translate-y-[-160%] rounded-md bg-surface px-3.5 py-2.5 text-brand focus:translate-y-0 focus:outline-2 focus:outline-offset-2 focus:outline-accent"
-        href="#login-form"
+        href="#username"
       >
         Saltar al inicio de sesión
       </a>
@@ -31,7 +31,7 @@ export function Login() {
           </div>
           <div>
             <p className="text-[15px] font-bold leading-tight tracking-[0.02em]">CHIGA TECH</p>
-            <p className="mt-1 text-xs font-medium uppercase tracking-wider text-white/55">
+            <p className="mt-1 text-xs font-medium whitespace-nowrap uppercase tracking-wider text-white/55">
               Gestión comercial
             </p>
           </div>
@@ -64,7 +64,7 @@ export function Login() {
           <h1 className="font-display text-3xl font-semibold tracking-tight text-ink sm:text-[2.15rem]">
             Iniciá sesión
           </h1>
-          <p className="mt-2 text-sm leading-6 text-muted">
+          <p className="mt-2 text-sm leading-6 text-pretty text-muted">
             Entrá con el usuario y la contraseña que te dio el administrador.
           </p>
 

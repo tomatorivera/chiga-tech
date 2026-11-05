@@ -79,6 +79,26 @@ describe("LoginForm", () => {
     expect(screen.getByRole("status")).toHaveProperty("textContent", "Bloq Mayús está activado.");
 
     fireEvent.blur(password);
-    expect(screen.queryByRole("status")).toBeNull();
+    expect(screen.getByRole("status")).toHaveProperty("textContent", "");
+  });
+
+  it("deja la región del aviso de Bloq Mayús en el DOM antes de que aparezca el aviso", () => {
+    expect(screen.getByRole("status")).toHaveProperty("textContent", "");
+  });
+
+  it("indica que el usuario y la contraseña son obligatorios sin activar la validación nativa", () => {
+    for (const label of ["Usuario", "Contraseña"]) {
+      const input = screen.getByLabelText<HTMLInputElement>(label);
+      expect(input.getAttribute("aria-required")).toBe("true");
+      expect(input.required).toBe(false);
+    }
+  });
+
+  it("anuncia los errores de campo por la descripción del campo, no como alertas", async () => {
+    completar("", "");
+
+    const error = await screen.findByText("El nombre de usuario es requerido");
+    expect(screen.queryByRole("alert")).toBeNull();
+    expect(screen.getByLabelText("Usuario").getAttribute("aria-describedby")).toBe(error.id);
   });
 });
