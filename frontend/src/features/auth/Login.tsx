@@ -41,7 +41,7 @@ export function Login() {
           <p className="font-display text-[clamp(2rem,2.8vw,2.5rem)] font-semibold leading-[1.1] tracking-tight text-balance">
             Tu negocio en un solo lugar.
           </p>
-          <p className="mt-4 text-base leading-7 text-white/65">
+          <p className="mt-4 text-[17px] leading-7 text-white/65">
             Registrá ventas, consultá precios y stock, y seguí las cuentas corrientes de los
             clientes.
           </p>
@@ -53,7 +53,7 @@ export function Login() {
           <h1 className="font-display text-3xl font-semibold tracking-tight text-ink sm:text-[2.15rem]">
             Iniciá sesión
           </h1>
-          <p className="mt-2 text-sm leading-6 text-pretty text-muted">
+          <p className="mt-3 text-[17px] leading-7 text-pretty text-muted">
             Entrá con el usuario y la contraseña que te dio el administrador.
           </p>
 
