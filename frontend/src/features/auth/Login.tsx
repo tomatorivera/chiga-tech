@@ -44,7 +44,7 @@ export function Login() {
 
         <div className="mt-auto mb-12 hidden max-w-md pt-16 lg:block">
           <p className="font-display text-[clamp(2.25rem,3.4vw,3.25rem)] font-semibold leading-[1.08] tracking-tight text-balance">
-            Lo que necesitás para atender el local.
+            Tu negocio en un solo lugar.
           </p>
           <p className="mt-4 text-base leading-7 text-white/65">
             Registrá ventas, consultá precios y stock, y seguí las cuentas corrientes de los
