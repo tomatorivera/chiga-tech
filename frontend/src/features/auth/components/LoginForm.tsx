@@ -49,8 +49,15 @@ export function LoginForm() {
     startTransition(() => formAction(formData));
   };
 
-  const handlePasswordKey = (event: KeyboardEvent<HTMLInputElement>) =>
+  const handlePasswordKey = (event: KeyboardEvent<HTMLInputElement>) => {
+    // En los eventos de la propia tecla Bloq Mayús algunos navegadores (Chrome en Linux) informan
+    // el estado anterior al cambio: ahí se invierte el aviso y solo las demás teclas leen el estado
+    if (event.key === "CapsLock") {
+      if (event.type === "keydown") setCapsLock((active) => !active);
+      return;
+    }
     setCapsLock(event.getModifierState("CapsLock"));
+  };
 
   return (
     <form id="login-form" className="mt-8 space-y-5" onSubmit={handleSubmit} noValidate>

@@ -82,6 +82,19 @@ describe("LoginForm", () => {
     expect(screen.getByRole("status")).toHaveProperty("textContent", "");
   });
 
+  it("saca el aviso apenas se desactiva Bloq Mayús, sin esperar otra tecla", () => {
+    const password = screen.getByLabelText("Contraseña");
+
+    fireEvent.keyDown(password, { key: "CapsLock", modifierCapsLock: false });
+    fireEvent.keyUp(password, { key: "CapsLock", modifierCapsLock: true });
+    expect(screen.getByRole("status")).toHaveProperty("textContent", "Bloq Mayús está activado.");
+
+    // Chrome en Linux sigue informando Bloq Mayús activo durante la tecla que lo desactiva
+    fireEvent.keyDown(password, { key: "CapsLock", modifierCapsLock: true });
+    fireEvent.keyUp(password, { key: "CapsLock", modifierCapsLock: true });
+    expect(screen.getByRole("status")).toHaveProperty("textContent", "");
+  });
+
   it("deja la región del aviso de Bloq Mayús en el DOM antes de que aparezca el aviso", () => {
     expect(screen.getByRole("status")).toHaveProperty("textContent", "");
   });
