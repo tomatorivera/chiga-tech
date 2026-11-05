@@ -63,7 +63,6 @@ describe("loginAction", () => {
     expect(resultado).toEqual({
       status: "error",
       fieldErrors: { username: mensaje },
-      previousValues: { username },
     });
     expect(login).not.toHaveBeenCalled();
   });
@@ -95,7 +94,6 @@ describe("loginAction", () => {
     expect(resultado).toEqual({
       status: "error",
       fieldErrors: { password: "La contraseña es requerida" },
-      previousValues: { username: "vendedor" },
     });
     expect(login).not.toHaveBeenCalled();
   });
@@ -110,7 +108,6 @@ describe("loginAction", () => {
     expect(resultado).toEqual({
       status: "error",
       fieldErrors: { username: "Error del backend" },
-      previousValues: { username: "vendedor" },
     });
     expect(useSesion.getState().usuario).toBeNull();
   });
@@ -125,7 +122,6 @@ describe("loginAction", () => {
     expect(resultado).toEqual({
       status: "error",
       fieldErrors: { username: "Error del backend" },
-      previousValues: { username: "vendedor" },
     });
   });
 
@@ -139,7 +135,6 @@ describe("loginAction", () => {
     expect(resultado).toEqual({
       status: "error",
       message: "El usuario o la contraseña son incorrectos.",
-      previousValues: { username: "vendedor" },
     });
     expect(useSesion.getState().usuario).toBeNull();
   });
@@ -152,7 +147,6 @@ describe("loginAction", () => {
     expect(resultado).toEqual({
       status: "error",
       message: NO_CONNECTION_MSG,
-      previousValues: { username: "vendedor" },
     });
   });
 });

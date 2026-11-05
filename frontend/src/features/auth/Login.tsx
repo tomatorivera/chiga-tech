@@ -1,4 +1,4 @@
-import { MapPin, PackageCheck } from "lucide-react";
+import { PackageCheck } from "lucide-react";
 import { Navigate, useLocation, type Location } from "react-router-dom";
 import { LoginForm } from "./components/LoginForm";
 import { useSesion } from "./hooks/useSesion";
@@ -20,7 +20,6 @@ export function Login() {
         Saltar al inicio de sesión
       </a>
 
-      {/* Debajo de lg la marca queda en una banda para que el formulario entre en la primera pantalla */}
       <header className="flex flex-col bg-brand px-6 py-5 text-white sm:px-10 lg:min-h-screen lg:px-14 lg:py-12 xl:px-20">
         <div className="mx-auto flex w-full max-w-105 items-center gap-3 lg:mx-0 lg:max-w-none">
           <div
@@ -35,11 +34,6 @@ export function Login() {
               Gestión comercial
             </p>
           </div>
-          {/* En la banda de mobile la ubicación queda a la vista junto a la marca */}
-          <p className="ml-auto flex items-center gap-1.5 text-[13px] font-medium text-white/80 lg:hidden">
-            <MapPin className="text-accent" size={15} aria-hidden="true" />
-            Tucumán
-          </p>
         </div>
 
         <div className="mt-auto mb-12 hidden max-w-md pt-16 lg:block">
@@ -51,14 +45,8 @@ export function Login() {
             clientes.
           </p>
         </div>
-
-        <p className="hidden items-center gap-2 border-t border-white/10 pt-5 text-[13px] font-medium text-white/80 lg:flex">
-          <MapPin className="text-accent" size={16} aria-hidden="true" />
-          Casa de Tecnología · Tucumán
-        </p>
       </header>
 
-      {/* Alineado arriba con un margen fijo: un error que aparece no desplaza el título */}
       <main className="flex flex-1 flex-col items-center px-6 pt-10 pb-8 sm:px-10 sm:pt-16 lg:min-h-screen lg:px-12 lg:pt-[max(4rem,22vh)]">
         <div className="w-full max-w-105 motion-safe:animate-enter">
           <h1 className="font-display text-3xl font-semibold tracking-tight text-ink sm:text-[2.15rem]">

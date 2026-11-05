@@ -10,7 +10,6 @@ type LoginStatus = ActionStatus<LoginFields>;
 export const loginAction = async (_prev: LoginStatus, formData: FormData): Promise<LoginStatus> => {
   const username = (formData.get("username") as string | null) ?? "";
   const password = (formData.get("password") as string | null) ?? "";
-  const previousValues = { username };
 
   const errors: Partial<Record<LoginFields, string>> = {};
 
@@ -19,8 +18,7 @@ export const loginAction = async (_prev: LoginStatus, formData: FormData): Promi
     errors.username = "El nombre de usuario debe tener entre 4 y 50 caracteres";
   if (!password) errors.password = "La contraseña es requerida";
 
-  if (Object.keys(errors).length > 0)
-    return { status: "error", fieldErrors: errors, previousValues };
+  if (Object.keys(errors).length > 0) return { status: "error", fieldErrors: errors };
 
   try {
     const user = await authService.login({ username: username.trim(), password });
@@ -30,8 +28,8 @@ export const loginAction = async (_prev: LoginStatus, formData: FormData): Promi
     return { status: "ok" };
   } catch (error) {
     const fieldErrors = getFieldErrors<LoginFields>(error);
-    if (fieldErrors) return { status: "error", fieldErrors, previousValues };
+    if (fieldErrors) return { status: "error", fieldErrors };
 
-    return { status: "error", message: getErrorMessage(error), previousValues };
+    return { status: "error", message: getErrorMessage(error) };
   }
 };

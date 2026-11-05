@@ -89,7 +89,6 @@ describe("LoginForm", () => {
     fireEvent.keyUp(password, { key: "CapsLock", modifierCapsLock: true });
     expect(screen.getByRole("status")).toHaveProperty("textContent", "Bloq Mayús está activado.");
 
-    // Chrome en Linux sigue informando Bloq Mayús activo durante la tecla que lo desactiva
     fireEvent.keyDown(password, { key: "CapsLock", modifierCapsLock: true });
     fireEvent.keyUp(password, { key: "CapsLock", modifierCapsLock: true });
     expect(screen.getByRole("status")).toHaveProperty("textContent", "");

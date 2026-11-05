@@ -4,7 +4,7 @@ import {
   useEffect,
   useRef,
   useState,
-  type FormEvent,
+  type SubmitEvent,
   type KeyboardEvent,
 } from "react";
 import {
@@ -20,9 +20,9 @@ import { loginAction } from "../actions/login.action";
 
 export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
-  const [state, formAction, isPending] = useActionState(loginAction, { status: "idle" });
+  const [formState, formAction, isPending] = useActionState(loginAction, { status: "idle" });
 
-  const errorState = state.status === "error" ? state : undefined;
+  const errorState = formState.status === "error" ? formState : undefined;
   const fieldErrors = isPending ? undefined : errorState?.fieldErrors;
   const message = isPending ? undefined : errorState?.message;
 
@@ -30,30 +30,27 @@ export function LoginForm() {
   const usernameRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
 
-  // Tras cada respuesta con error el foco va al campo a corregir, con su texto seleccionado.
-  // La alerta general se anuncia sola por role="alert", sin necesitar el foco
+  // Mover el foco al campo que tiene errores luego de intentar loguearse
   useEffect(() => {
-    // El estado nuevo puede llegar mientras la transición sigue pendiente y el error aún no se ve
-    if (isPending || state.status !== "error") return;
-    // Ante un error general (credenciales, conexión) lo habitual es reintentar la contraseña
-    const input = state.fieldErrors?.username ? usernameRef.current : passwordRef.current;
+    if (isPending || formState.status !== "error") return;
+
+    const input = formState.fieldErrors?.username ? usernameRef.current : passwordRef.current;
+
     input?.focus();
     input?.select();
-  }, [state, isPending]);
+  }, [formState, isPending]);
 
-  // Con `action={formAction}` React vacía el formulario al terminar; así se conserva lo escrito
-  // sin copiar la contraseña al estado ni al atributo value
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
+
     startTransition(() => formAction(formData));
   };
 
   const handlePasswordKey = (event: KeyboardEvent<HTMLInputElement>) => {
-    // En los eventos de la propia tecla Bloq Mayús algunos navegadores (Chrome en Linux) informan
-    // el estado anterior al cambio: ahí se invierte el aviso y solo las demás teclas leen el estado
     if (event.key === "CapsLock") {
       if (event.type === "keydown") setCapsLock((active) => !active);
+
       return;
     }
     setCapsLock(event.getModifierState("CapsLock"));
@@ -90,7 +87,6 @@ export function LoginForm() {
             type="text"
             autoComplete="username"
             aria-required="true"
-            defaultValue={errorState?.previousValues?.username}
             aria-invalid={Boolean(fieldErrors?.username)}
             aria-describedby={fieldErrors?.username ? "username-error" : undefined}
             className="w-full rounded-lg border border-line-control bg-surface py-3.5 pl-11 pr-4 text-ink caret-primary shadow-control transition hover:border-muted focus:border-focus focus:outline-2 focus:outline-offset-2 focus:outline-focus aria-invalid:border-danger aria-invalid:focus:outline-danger"
@@ -152,8 +148,6 @@ export function LoginForm() {
             {fieldErrors.password}
           </p>
         )}
-        {/* La región viva existe siempre: un lector de pantalla anuncia el cambio de su contenido,
-            no un elemento que se inserta ya con texto */}
         <p id="password-caps" className="mt-1.5 text-[13px] text-muted empty:mt-0" role="status">
           {capsLock && "Bloq Mayús está activado."}
         </p>
@@ -181,7 +175,6 @@ export function LoginForm() {
         )}
       </button>
 
-      {/* No hay recuperación por correo: las cuentas y sus contraseñas las gestiona el administrador */}
       <p className="text-center text-[13px] leading-5 text-pretty text-muted">
         ¿Te olvidaste la contraseña? Pedile una nueva al administrador.
       </p>
