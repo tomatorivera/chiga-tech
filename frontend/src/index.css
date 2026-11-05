@@ -1,8 +1,9 @@
 @import "tailwindcss";
 
 @theme {
-  --default-font-family: "DM Sans", sans-serif;
-  --font-display: "Manrope", sans-serif;
+  --default-font-family: "Atkinson Hyperlegible Next", sans-serif;
+  --font-display: "Schibsted Grotesk", sans-serif;
+  --font-mono: "Atkinson Hyperlegible Mono", ui-monospace, monospace;
 
   /* Marca: el verde del local y su lima de acento */
   --color-brand: #173b32;

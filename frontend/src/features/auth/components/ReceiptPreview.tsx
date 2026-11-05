@@ -16,7 +16,7 @@ export function ReceiptPreview() {
       <article className="absolute top-5 left-1.5 flex w-75 -rotate-4 flex-col gap-3.5 rounded-2xl bg-surface p-5.5 pb-5 text-ink shadow-[0_24px_48px_rgb(0_0_0/.32),0_2px_6px_rgb(0_0_0/.2)]">
         <header className="flex items-baseline justify-between">
           <p className="font-display text-[15px] font-bold">Venta</p>
-          <p className="text-[11px] text-muted tabular-nums">0001-00004217</p>
+          <p className="font-mono text-[11px] text-muted">0001-00004217</p>
         </header>
         <ul className="flex flex-col gap-2.5 border-y border-dashed border-line-strong py-3 text-[13px]">
           {ITEMS.map(({ name, price }) => (
