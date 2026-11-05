@@ -1,6 +1,7 @@
-import { PackageCheck } from "lucide-react";
 import { Navigate, useLocation, type Location } from "react-router-dom";
+import { Wordmark } from "../../shared/components/Wordmark";
 import { LoginForm } from "./components/LoginForm";
+import { ReceiptPreview } from "./components/ReceiptPreview";
 import { useSesion } from "./hooks/useSesion";
 
 export function Login() {
@@ -20,24 +21,24 @@ export function Login() {
         Saltar al inicio de sesión
       </a>
 
-      <header className="flex flex-col bg-brand px-6 py-5 text-white sm:px-10 lg:min-h-screen lg:px-14 lg:py-12 xl:px-20">
-        <div className="mx-auto flex w-full max-w-105 items-center gap-3 lg:mx-0 lg:max-w-none">
-          <div
-            className="grid size-10 place-items-center rounded-xl bg-accent text-brand lg:size-11"
-            aria-hidden="true"
-          >
-            <PackageCheck size={22} strokeWidth={2.2} />
-          </div>
-          <div>
-            <p className="text-[15px] font-bold leading-tight tracking-[0.02em]">CHIGA TECH</p>
-            <p className="mt-1 text-xs font-medium whitespace-nowrap uppercase tracking-wider text-white/55">
-              Gestión comercial
-            </p>
-          </div>
+      <header className="relative isolate m-2 flex flex-col overflow-hidden rounded-2xl bg-brand bg-linear-160 from-brand to-[#0c211b] px-4 py-5 text-white sm:px-8 lg:m-4 lg:rounded-3xl lg:px-14 lg:py-12 xl:px-20">
+        <div
+          className="absolute inset-0 -z-10 bg-radial-[80%_60%_at_95%_62%] from-[#2e8f6c]/65 via-[#2e8f6c]/30 via-40% to-transparent to-100%"
+          aria-hidden="true"
+        />
+        <div
+          className="absolute inset-0 -z-10 bg-radial-[70%_35%_at_45%_105%] from-[#2e8f6c]/35 to-transparent to-100%"
+          aria-hidden="true"
+        />
+
+        <Wordmark className="mx-auto w-full max-w-105 lg:mx-0 lg:max-w-none" />
+
+        <div className="hidden flex-1 place-items-center py-10 lg:grid [@media(max-height:760px)]:hidden">
+          <ReceiptPreview />
         </div>
 
-        <div className="mt-auto mb-12 hidden max-w-md pt-16 lg:block">
-          <p className="font-display text-[clamp(2.25rem,3.4vw,3.25rem)] font-semibold leading-[1.08] tracking-tight text-balance">
+        <div className="mt-auto hidden max-w-md lg:block">
+          <p className="font-display text-[clamp(2rem,2.8vw,2.5rem)] font-semibold leading-[1.1] tracking-tight text-balance">
             Tu negocio en un solo lugar.
           </p>
           <p className="mt-4 text-base leading-7 text-white/65">
