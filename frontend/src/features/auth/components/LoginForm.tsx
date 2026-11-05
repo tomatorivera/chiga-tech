@@ -68,7 +68,7 @@ export function LoginForm() {
         </p>
       )}
 
-      <div>
+      <section>
         <label htmlFor="username" className="mb-2 block text-[13px] font-semibold text-ink-soft">
           Usuario
         </label>
@@ -100,9 +100,9 @@ export function LoginForm() {
             {fieldErrors.username}
           </p>
         )}
-      </div>
+      </section>
 
-      <div>
+      <section>
         <label htmlFor="password" className="mb-2 block text-[13px] font-semibold text-ink-soft">
           Contraseña
         </label>
@@ -151,7 +151,7 @@ export function LoginForm() {
         <p id="password-caps" className="mt-1.5 text-[13px] text-muted empty:mt-0" role="status">
           {capsLock && "Bloq Mayús está activado."}
         </p>
-      </div>
+      </section>
 
       <button
         className="group mt-8 flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3.5 text-white shadow-action transition hover:bg-primary-hover hover:shadow-action-hover motion-safe:active:translate-y-px active:shadow-control disabled:cursor-wait disabled:bg-primary/85 disabled:shadow-none focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-focus"

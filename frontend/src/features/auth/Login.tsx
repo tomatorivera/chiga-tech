@@ -49,7 +49,7 @@ export function Login() {
       </header>
 
       <main className="flex flex-1 flex-col items-center px-6 pt-10 pb-8 sm:px-10 sm:pt-16 lg:min-h-screen lg:px-12 lg:pt-[max(4rem,22vh)]">
-        <div className="w-full max-w-105 motion-safe:animate-enter">
+        <section className="w-full max-w-105 motion-safe:animate-enter">
           <h1 className="font-display text-3xl font-semibold tracking-tight text-ink sm:text-[2.15rem]">
             Iniciá sesión
           </h1>
@@ -58,7 +58,7 @@ export function Login() {
           </p>
 
           <LoginForm />
-        </div>
+        </section>
       </main>
     </div>
   );
