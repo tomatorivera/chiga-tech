@@ -99,7 +99,7 @@ export function LoginForm() {
         {fieldErrors?.username && (
           <p
             id="username-error"
-            className="mt-1.5 text-xs text-danger-ink motion-safe:animate-reveal"
+            className="mt-1.5 text-[13px] text-danger-ink motion-safe:animate-reveal"
           >
             {fieldErrors.username}
           </p>
@@ -147,14 +147,14 @@ export function LoginForm() {
         {fieldErrors?.password && (
           <p
             id="password-error"
-            className="mt-1.5 text-xs text-danger-ink motion-safe:animate-reveal"
+            className="mt-1.5 text-[13px] text-danger-ink motion-safe:animate-reveal"
           >
             {fieldErrors.password}
           </p>
         )}
         {/* La región viva existe siempre: un lector de pantalla anuncia el cambio de su contenido,
             no un elemento que se inserta ya con texto */}
-        <p id="password-caps" className="mt-1.5 text-xs text-muted empty:mt-0" role="status">
+        <p id="password-caps" className="mt-1.5 text-[13px] text-muted empty:mt-0" role="status">
           {capsLock && "Bloq Mayús está activado."}
         </p>
       </div>
