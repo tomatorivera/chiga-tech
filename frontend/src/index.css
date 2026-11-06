@@ -27,9 +27,15 @@
 
   /* Errores */
   --color-danger: #c4604d;
-  --color-danger-ink: #a13d2d;
-  --color-danger-line: #efd6cf;
-  --color-danger-surface: #fbf2ef;
+  --color-danger-ink: #c42b1c;
+  --color-danger-line: #f7cfc4;
+  --color-danger-surface: #fde7e1;
+
+  /* Advertencias (stock bajo, deuda) y confirmaciones */
+  --color-warning-ink: #9e5c00;
+  --color-warning-surface: #fff1cf;
+  --color-success-ink: #2b6b4c;
+  --color-success-surface: #eaf5ee;
 
   --shadow-control: 0 1px 2px color-mix(in oklab, var(--color-brand) 3%, transparent);
   --shadow-action: 0 5px 12px color-mix(in oklab, var(--color-primary) 13%, transparent);

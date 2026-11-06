@@ -36,14 +36,12 @@ Los tokens viven en `@theme` de `frontend/src/index.css` y se usan como clases d
 | `line-control` | `#86918a` | Borde de campos de formulario: contrasta 3:1 para que se vea el control. |
 | `primary` / `primary-hover` | `#285644` / `#204b3a` | Botón principal y enlaces. |
 | `focus` | `#527863` | Contorno de foco. |
-| `danger`, `danger-ink`, `danger-line`, `danger-surface` | | Errores y acciones destructivas. |
+| `danger` | `#c4604d` | Borde y contorno de un campo con error. No se usa como texto. |
+| `danger-ink` / `danger-surface` / `danger-line` | `#c42b1c` / `#fde7e1` / `#f7cfc4` | Errores, acciones destructivas e inactivos. |
+| `warning-ink` / `warning-surface` | `#9e5c00` / `#fff1cf` | Stock bajo (RF-20), deuda en cuenta corriente, cuenta por vencer, autorización pendiente. |
+| `success-ink` / `success-surface` | `#2b6b4c` / `#eaf5ee` | Venta cobrada, saldo a favor, habilitado. |
 
-Colores que **faltan y se agregan cuando la primera pantalla los use**, con esta forma:
-
-| Token | Valor propuesto | Uso |
-|---|---|---|
-| `warning-ink` / `warning-surface` | `#8a5a12` / `#fdf4e3` | Stock bajo (RF-20), cuenta por vencer, autorización pendiente. |
-| `success-ink` / `success-surface` | `#2b6b4c` / `#eaf5ee` | Venta cobrada, saldo a favor, variación positiva. |
+Los textos `danger-ink` y `warning-ink` tienen contraste AA tanto sobre `surface` como sobre su propio fondo suave.
 
 Reglas de color:
 
