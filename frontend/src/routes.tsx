@@ -4,6 +4,7 @@ import { Homepage } from "./pages/Homepage";
 import { AuthGuard } from "./features/auth/components/AuthGuard";
 import { LoadingScreen } from "./shared/components/LoadingScreen";
 import { sesionLoader } from "./features/auth/loaders/sesion.loader";
+import { MainLayout } from "./shared/layouts/MainLayout";
 
 export const router = createBrowserRouter([
   {
@@ -11,6 +12,7 @@ export const router = createBrowserRouter([
     element: <Login />,
   },
   {
+    element: <MainLayout />,
     loader: sesionLoader,
     shouldRevalidate: () => false,
     HydrateFallback: LoadingScreen,
