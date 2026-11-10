@@ -260,7 +260,8 @@ Es la pantalla más usada y la que más se cuida (RF-37 a RF-42, RNF-03). Sigue 
 - Contraste AA en todo el texto; 3:1 en bordes de controles y en íconos que transmiten algo.
 - Objetivos de clic de 44px (36px en acciones dentro de filas).
 - Foco siempre visible con `outline-focus`; el orden de tabulación sigue el orden visual.
-- Enlace "Saltar al contenido" en cada pantalla, como en el login.
+- Enlace "Saltar al contenido" en cada pantalla, como en el login. En las pantallas con menú lo pone `MainLayout`, que también es dueño del `main`: las páginas no lo repiten.
+- Cada página titula la pestaña "Nombre de la página - Chiga Tech" con `useDocumentTitle`, y su `h1` lleva `tabIndex={-1}`: al navegar dentro de la app, el foco va a ese título para que el lector anuncie la página nueva.
 - Etiquetas semánticas: `nav` para el menú, `main` para el contenido, `header` para el encabezado de página, `table` para las tablas, `dialog` para los diálogos.
 - Los atajos de teclado se muestran en la interfaz (`kbd`) y no reemplazan una acción visible.
 - Íconos decorativos con `aria-hidden="true"`; íconos de `lucide-react` en 18px junto al texto y 20px en el menú.
