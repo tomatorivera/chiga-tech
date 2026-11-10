@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import type { NavbarLink } from "./Navbar";
+import type { NavbarLink } from "./navbarSections";
 
 export const NavbarItem = ({ icon: Icon, text, to }: NavbarLink) => {
   return (

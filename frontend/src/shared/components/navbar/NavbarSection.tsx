@@ -1,4 +1,4 @@
-import type { NavbarGroup } from "./Navbar";
+import type { NavbarGroup } from "./navbarSections";
 import { NavbarItem } from "./NavbarItem";
 
 export const NavbarSection = ({ id, title, items }: NavbarGroup) => {
