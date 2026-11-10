@@ -1,4 +1,4 @@
-import { ArrowLeft, Lock } from "lucide-react";
+import { ArrowLeft, House, Lock } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useSesion } from "../features/auth/hooks/useSesion";
 import { findNavbarLink } from "../shared/components/navbar/navbarSections";
@@ -21,7 +21,7 @@ export const Forbidden = () => {
   const fullName = `${usuario.nombre} ${usuario.apellido}`.trim() || usuario.nombreUsuario;
 
   // Sin historial dentro de la app, volver atrás sacaría al usuario del sistema.
-  const goBack = () => (canGoBack ? navigate(-1) : navigate("/inicio", { replace: true }));
+  const leave = () => (canGoBack ? navigate(-1) : navigate("/inicio", { replace: true }));
 
   return (
     <section className="mx-auto my-6 w-[min(35rem,calc(100%-2rem))] rounded-2xl bg-surface p-6 motion-safe:animate-enter sm:my-auto">
@@ -70,11 +70,20 @@ export const Forbidden = () => {
 
       <button
         type="button"
-        onClick={() => void goBack()}
+        onClick={() => void leave()}
         className="mt-8 inline-flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3 font-semibold text-white shadow-action transition-[background-color,box-shadow] hover:bg-primary-hover hover:shadow-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus motion-safe:active:translate-y-px"
       >
-        <ArrowLeft size={18} aria-hidden="true" />
-        Volver a la página anterior
+        {canGoBack ? (
+          <>
+            <ArrowLeft size={18} aria-hidden="true" />
+            Volver a la página anterior
+          </>
+        ) : (
+          <>
+            <House size={18} aria-hidden="true" />
+            Ir al inicio
+          </>
+        )}
       </button>
     </section>
   );

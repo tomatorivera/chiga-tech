@@ -72,10 +72,10 @@ describe("Forbidden", () => {
     expect(router.state.location.pathname).toBe("/ventas");
   });
 
-  it("va al inicio si no hay una página anterior en el sistema", () => {
+  it("ofrece ir al inicio si no hay una página anterior en el sistema", () => {
     const router = renderFrom(["/usuarios"]);
 
-    fireEvent.click(screen.getByRole("button", { name: "Volver a la página anterior" }));
+    fireEvent.click(screen.getByRole("button", { name: "Ir al inicio" }));
 
     expect(router.state.location.pathname).toBe("/inicio");
   });
