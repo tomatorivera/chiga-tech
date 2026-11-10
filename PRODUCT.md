@@ -29,7 +29,7 @@ Punto de venta y gestión comercial: vender rápido en el mostrador, controlar s
 
 - Requisitos en `docs/ERS.md`, términos en `docs/CONTEXT.md`, decisiones en `docs/adr/`.
 - La primera versión opera una sucursal y un depósito. **Multi-sucursal todavía no está contemplado, pero es un requisito probable a corto plazo**: la interfaz no debería cerrarle el paso (por ejemplo, dejando lugar para mostrar la sucursal activa).
-- Los permisos por rol son fijos (ADR-0011). Lo que un rol no puede hacer se oculta o se deshabilita.
+- Cada función exige un rol mínimo (ADR-0011). Lo que un rol no puede hacer se oculta o se deshabilita.
 - Comprobantes internos; la emisión fiscal con ARCA/AFIP queda fuera de alcance en esta versión (ADR-0010).
 - Precios en pesos argentinos, IVA único y precio neto (ADR-0001, ADR-0013).
 
@@ -40,7 +40,7 @@ Punto de venta y gestión comercial: vender rápido en el mostrador, controlar s
 ## Evidence on Hand
 
 - Login construido (`frontend/src/features/auth/`) y tokens en `frontend/src/index.css`.
-- Vistas de Productos y Clientes diseñadas en el canvas "CHIGA TECH - Vistas" (claude.ai).
+- Vistas de Productos y Clientes diseñadas en el canvas "CHIGA TECH - Vistas" (claude.ai - https://claude.ai/artifact/JQqMngKKd1QaShByUg2Vx4).
 - No hay clientes, métricas ni testimonios reales cargados: no se inventan.
 
 ## Product Principles

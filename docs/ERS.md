@@ -63,7 +63,7 @@ No forman parte de esta primera versión: comercio electrónico, pasarelas de pa
 - Importar listas de proveedores y calcular precios.
 - Generar reportes financieros y exportarlos a documentos imprimibles.
 - Registrar una auditoría de operaciones relevantes.
-- Dar de alta nuevos empleados en el sistema y ajustar sus permisos. (revisar sección “*tipos de usuarios*”)
+- Dar de alta nuevos empleados en el sistema y asignarles roles. (revisar sección “*tipos de usuarios*”)
 
 ### 2.3 Tipos de usuarios
 
@@ -76,7 +76,7 @@ No forman parte de esta primera versión: comercio electrónico, pasarelas de pa
 
 Notas importantes respecto a los roles de los usuarios:
 
-- Un empleado puede poseer uno o más roles en el sistema. Sus permisos efectivos son la unión de los permisos de sus roles; excepto el administrador que con solo ese rol obtiene acceso a todo.
+- Un empleado puede poseer uno o más roles en el sistema. Cada función exige un rol mínimo, y el empleado accede si alguno de sus roles lo cumple (ver ADR-0011).
 - Cualquier empleado puede ser dado de baja del sistema en cualquier momento. Desde ese momento no puede iniciar sesión; una sesión ya abierta no se corta de inmediato (ver ADR técnico 0005).
 - Solo puede existir UN dueño en el sistema, para garantizar la seguridad.
 - Los usuarios con rol Supervisor o superior poseen un código de supervisor único para autorizar operaciones de excepción (ver ADR-0003).
@@ -130,7 +130,7 @@ Notas importantes respecto a los roles de los usuarios:
 |---|---|
 | RF-17 | El sistema deberá registrar movimientos de stock indicando tipo de movimiento (ingreso, ajuste, venta o devolución), producto, cantidad, proveedor opcional, motivo, usuario responsable, y fecha y hora. |
 | RF-18 | El sistema deberá actualizar el stock disponible al confirmar un ingreso, una venta, una devolución con reingreso o un ajuste manual. |
-| RF-19 | El sistema deberá permitir ajustes de stock únicamente a usuarios con permiso de gestión de stock, obligando a registrar el motivo (ver ADR-0012). |
+| RF-19 | El sistema deberá permitir ajustes de stock únicamente a usuarios con rol Supervisor o superior, obligando a registrar el motivo (ver ADR-0012). |
 | RF-20 | El sistema deberá alertar visualmente los productos cuyo stock disponible sea igual o inferior al stock mínimo configurado. |
 | ~~RF-21~~ | ~~El sistema deberá permitir registrar la venta de productos sin stock disponible, conservando el stock resultante negativo.~~ |
 | RF-22 | El sistema deberá permitir registrar proveedores y asociarlos con productos a través de los movimientos de stock. |
@@ -208,7 +208,7 @@ Estas son las reglas de negocio más importantes extraídas del enunciado.
 | **Código** | **Regla** |
 |---|---|
 | RN-01 | Un producto activo debe poseer al menos un código de barras activo y único. |
-| RN-02 | El stock negativo está permitido como resultado de una venta confirmada o de un ajuste manual realizado por un usuario con permiso de gestión de stock, con motivo obligatorio (ver ADR-0012). |
+| RN-02 | El stock negativo está permitido como resultado de una venta confirmada o de un ajuste manual realizado por un usuario con rol Supervisor o superior, con motivo obligatorio (ver ADR-0012). |
 | RN-03 | El saldo de cuenta corriente se determina por la suma algebraica de sus movimientos: débitos incrementan la deuda y créditos la disminuyen. |
 | RN-04 | El saldo inicial debe conservarse como un movimiento de cuenta corriente y no puede editarse; las correcciones se realizan mediante un movimiento de ajuste con motivo. |
 | RN-05 | La venta a cuenta corriente se bloquea si el saldo proyectado supera el límite del cliente, salvo autorización registrada de un usuario con rol Supervisor o superior mediante su código (ver ADR-0003). |
@@ -252,7 +252,7 @@ Este apéndice reúne los elementos de datos identificados en el enunciado como 
 | **Campo** | **Formato** | **Validación principal** |
 |---|---|---|
 | Rol | Opción predefinida | Solo roles reconocidos por el sistema. |
-| Permisos asociados | Conjunto de permisos con formato módulo.acción | Fijos por rol; no se editan desde la interfaz (ver ADR-0011). |
+| Permisos asociados | Conjunto de permisos con formato módulo.acción | Fijos por rol; no se editan desde la interfaz (ver ADR-0011). Hoy no deciden el acceso, que se decide por rol mínimo. |
 | Descripción | Texto, hasta 250 caracteres | Debe explicar el alcance del rol. |
 
 ### A.4 Producto
@@ -329,7 +329,7 @@ Este apéndice reúne los elementos de datos identificados en el enunciado como 
 | ~~Costo unitario~~ | ~~Importe decimal~~ | ~~Mayor o igual que cero.~~ |
 | Proveedor | Selección | Si se informa, debe estar activo. |
 | Motivo | Texto, hasta 500 caracteres | Obligatorio en movimientos manuales. |
-| Usuario responsable | Usuario con permiso de gestión de stock | Siempre requerido; en devoluciones es el supervisor que autoriza (ver ADR-0012). |
+| Usuario responsable | Usuario con rol Supervisor o superior | Siempre requerido; en devoluciones es el supervisor que autoriza (ver ADR-0012). |
 | Fecha y hora | Fecha y hora del sistema | Se genera automáticamente y no se edita. |
 | Operación de origen | Referencia | Venta o nota de crédito que originó el movimiento, cuando corresponda. |
 
@@ -361,7 +361,7 @@ Este apéndice reúne los elementos de datos identificados en el enunciado como 
 | Medio de pago | Efectivo/Transferencia/Tarjeta/Otro | Obligatorio si la condición es contado; un único medio por venta. |
 | Producto | Selección o código de barras | Si está inactivo, requiere autorización con código de supervisor. |
 | Cantidad | Número entero | Mayor que cero. |
-| Precio unitario | Importe decimal | Se toma del precio sin IVA vigente al crear la venta y se conserva aunque quede pendiente; cambios requieren permiso. |
+| Precio unitario | Importe decimal | Se toma del precio sin IVA vigente al crear la venta y se conserva aunque quede pendiente; cambios requieren rol Supervisor o superior. |
 | Descuento | Porcentaje sobre el total de la venta | Hasta el 10% sin autorización; por encima requiere código de supervisor (ver ADR-0003). |
 | Subtotal | Importe calculado | Se calcula por ítem y no se ingresa manualmente. |
 | Total | Importe calculado | Debe coincidir con la suma de ítems y ajustes. |
@@ -425,7 +425,7 @@ Este apéndice reúne los elementos de datos identificados en el enunciado como 
 | Categoría | Selección | Debe existir si se informa. |
 | Producto | Selección | Debe existir si se informa. |
 | Cliente | Selección | Debe existir si se informa. |
-| Usuario | Selección | Disponible solo donde corresponda y según permisos. |
+| Usuario | Selección | Disponible solo donde corresponda y según el rol del usuario. |
 | Formato de salida | Pantalla/PDF/Excel/Impresión | Debe ser compatible con el reporte. |
 
 ### A.16 Configuración del sistema
