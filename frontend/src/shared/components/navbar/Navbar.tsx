@@ -6,6 +6,7 @@ import {
   Package,
   ReceiptText,
   Settings,
+  ShieldUser,
   ShoppingCart,
   Truck,
   UserCog,
@@ -48,6 +49,10 @@ const sections: Record<string, Omit<NavbarSectionProps, "id">> = {
       { icon: History, text: "Auditoría", to: "/auditoria" },
       { icon: Settings, text: "Configuración", to: "/configuracion" },
     ],
+  },
+  sistema: {
+    title: "Sistema",
+    items: [{ icon: ShieldUser, text: "Administradores", to: "/administradores" }],
   },
 };
 
