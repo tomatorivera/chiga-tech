@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { AxiosError, type AxiosResponse } from "axios";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { authService } from "../services/auth.service";
@@ -57,14 +57,14 @@ describe("LoginForm", () => {
     completar("vendedor", "incorrecta");
 
     await screen.findByText("El usuario o la contraseña son incorrectos.");
-    expect(document.activeElement).toBe(screen.getByLabelText("Contraseña"));
+    await waitFor(() => expect(document.activeElement).toBe(screen.getByLabelText("Contraseña")));
   });
 
   it("pone el foco en el primer campo con error", async () => {
     completar("vendedor", "");
 
     await screen.findByText("La contraseña es requerida");
-    expect(document.activeElement).toBe(screen.getByLabelText("Contraseña"));
+    await waitFor(() => expect(document.activeElement).toBe(screen.getByLabelText("Contraseña")));
     expect(login).not.toHaveBeenCalled();
   });
 
