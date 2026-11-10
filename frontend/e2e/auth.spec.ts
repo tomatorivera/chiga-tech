@@ -53,6 +53,19 @@ test("una cookie de una sesión cerrada es rechazada", async ({ page, context })
   await expect(page).toHaveURL(/\/login$/);
 });
 
+test("el rol que viene del backend habilita las secciones que le corresponden", async ({
+  page,
+}) => {
+  await login(page, "admin");
+  await expect(page).toHaveURL(/\/inicio$/);
+
+  await page.goto("/usuarios");
+  await expect(page).toHaveURL(/\/usuarios$/);
+
+  await page.goto("/administradores");
+  await expect(page).toHaveURL(/\/forbidden$/);
+});
+
 test("un usuario inactivo no puede iniciar sesión", async ({ page, context }) => {
   const response = await login(page, "inactivo");
 
