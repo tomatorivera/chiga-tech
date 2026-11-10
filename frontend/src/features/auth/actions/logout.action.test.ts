@@ -17,23 +17,27 @@ const usuario: UsuarioDTO = {
 
 describe("logoutAction", () => {
   const logout = vi.spyOn(authService, "logout");
+  const replace = vi.fn<(url: string) => void>();
 
   beforeEach(() => {
     logout.mockReset();
     logout.mockResolvedValue();
+    replace.mockReset();
+    vi.stubGlobal("location", { replace });
     useSesion.getState().login(usuario);
   });
 
   afterEach(() => {
+    vi.unstubAllGlobals();
     useSesion.getState().logout();
   });
 
-  it("cierra la sesión en el backend y olvida al usuario", async () => {
+  it("cierra la sesión en el backend y recarga la app desde el login", async () => {
     const resultado = await logoutAction({ status: "idle" });
 
     expect(resultado).toEqual({ status: "ok" });
     expect(logout).toHaveBeenCalledOnce();
-    expect(useSesion.getState().usuario).toBeNull();
+    expect(replace).toHaveBeenCalledWith("/login");
   });
 
   it("mantiene al usuario y avisa si el servidor no responde", async () => {
@@ -42,6 +46,7 @@ describe("logoutAction", () => {
     const resultado = await logoutAction({ status: "idle" });
 
     expect(resultado).toEqual({ status: "error", message: NO_CONNECTION_MSG });
+    expect(replace).not.toHaveBeenCalled();
     expect(useSesion.getState().usuario).toEqual(usuario);
   });
 });

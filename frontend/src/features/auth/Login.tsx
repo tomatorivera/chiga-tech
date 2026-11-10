@@ -11,7 +11,6 @@ export function Login() {
   const locationState = location.state as { from?: Location } | null;
   useDocumentTitle("Iniciar sesión");
 
-  // Todo: después de un "cerrar sesión" no volver al "from" cuando volves a loguear
   // Con sesión iniciada no tiene sentido mostrar el formulario: incluye el momento justo después del login
   if (usuario) return <Navigate to={locationState?.from ?? "/inicio"} replace />;
 
