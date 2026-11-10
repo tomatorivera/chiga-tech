@@ -1,13 +1,7 @@
-import type { LucideIcon } from "lucide-react";
 import { NavLink } from "react-router-dom";
+import type { NavbarLink } from "./Navbar";
 
-export type NavbarItemProps = {
-  icon: LucideIcon;
-  text: string;
-  to: string;
-};
-
-export const NavbarItem = ({ icon: Icon, text, to }: NavbarItemProps) => {
+export const NavbarItem = ({ icon: Icon, text, to }: NavbarLink) => {
   return (
     <li>
       <NavLink

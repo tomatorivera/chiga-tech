@@ -1,12 +1,7 @@
-import { NavbarItem, type NavbarItemProps } from "./NavbarItem";
+import type { NavbarGroup } from "./Navbar";
+import { NavbarItem } from "./NavbarItem";
 
-export type NavbarSectionProps = {
-  id: string;
-  title: string;
-  items: NavbarItemProps[];
-};
-
-export const NavbarSection = ({ id, title, items }: NavbarSectionProps) => {
+export const NavbarSection = ({ id, title, items }: NavbarGroup) => {
   return (
     <div>
       <h2
