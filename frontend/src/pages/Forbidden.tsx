@@ -24,11 +24,11 @@ export const Forbidden = () => {
   const goBack = () => (canGoBack ? navigate(-1) : navigate("/inicio", { replace: true }));
 
   return (
-    <section className="m-auto w-full max-w-140 rounded-2xl bg-surface p-12 motion-safe:animate-enter">
-      <div className="flex items-center gap-5">
+    <section className="mx-auto my-6 w-[min(35rem,calc(100%-2rem))] rounded-2xl bg-surface p-6 motion-safe:animate-enter sm:my-auto">
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
         <p
           aria-hidden="true"
-          className="font-display text-8xl leading-none font-extrabold tracking-[-0.04em] text-brand tabular-nums"
+          className="font-display text-6xl leading-none font-extrabold tracking-[-0.04em] text-brand tabular-nums sm:text-8xl"
         >
           403
         </p>
@@ -42,7 +42,7 @@ export const Forbidden = () => {
 
       <h1
         tabIndex={-1}
-        className="mt-6 font-display text-[28px] leading-tight font-semibold tracking-tight text-balance text-ink outline-none"
+        className="mt-6 font-display text-2xl leading-tight font-semibold tracking-tight text-balance wrap-break-word text-ink outline-none sm:text-[28px]"
       >
         No tenés permiso para entrar a {section ?? "esta sección"}
       </h1>
@@ -52,7 +52,7 @@ export const Forbidden = () => {
       </p>
 
       <div className="mt-6 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded-lg bg-canvas px-4 py-3">
-        <p>
+        <p className="min-w-0 wrap-break-word">
           <span className="block text-sm text-muted">Sesión iniciada como</span>
           <span className="mt-0.5 block font-semibold text-ink">{fullName}</span>
         </p>
