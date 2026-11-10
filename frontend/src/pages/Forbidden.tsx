@@ -2,6 +2,7 @@ import { ArrowLeft, Lock } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useSesion } from "../features/auth/hooks/useSesion";
 import { findNavbarLink } from "../shared/components/navbar/navbarSections";
+import { useDocumentTitle } from "../shared/hooks/useDocumentTitle";
 
 export type ForbiddenState = {
   from: string;
@@ -12,6 +13,7 @@ export const Forbidden = () => {
   const usuario = useSesion((state) => state.usuario!);
   const location = useLocation();
   const navigate = useNavigate();
+  useDocumentTitle("Sin acceso");
 
   const state = location.state as ForbiddenState | null;
   const section = state ? findNavbarLink(state.from)?.text : undefined;

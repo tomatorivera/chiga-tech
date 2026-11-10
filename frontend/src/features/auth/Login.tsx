@@ -1,5 +1,6 @@
 import { Navigate, useLocation, type Location } from "react-router-dom";
 import { Wordmark } from "../../shared/components/Wordmark";
+import { useDocumentTitle } from "../../shared/hooks/useDocumentTitle";
 import { LoginForm } from "./components/LoginForm";
 import { ReceiptPreview } from "./components/ReceiptPreview";
 import { useSesion } from "./hooks/useSesion";
@@ -8,6 +9,7 @@ export function Login() {
   const usuario = useSesion((state) => state.usuario);
   const location = useLocation();
   const locationState = location.state as { from?: Location } | null;
+  useDocumentTitle("Iniciar sesión");
 
   // Todo: después de un "cerrar sesión" no volver al "from" cuando volves a loguear
   // Con sesión iniciada no tiene sentido mostrar el formulario: incluye el momento justo después del login

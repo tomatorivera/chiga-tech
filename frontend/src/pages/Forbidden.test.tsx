@@ -79,4 +79,10 @@ describe("Forbidden", () => {
 
     expect(router.state.location.pathname).toBe("/inicio");
   });
+
+  it("titula la pestaña del navegador", () => {
+    renderFrom(["/usuarios"]);
+
+    expect(document.title).toBe("Sin acceso - Chiga Tech");
+  });
 });

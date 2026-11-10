@@ -1,7 +1,9 @@
 import { useSesion } from "../features/auth/hooks/useSesion";
+import { useDocumentTitle } from "../shared/hooks/useDocumentTitle";
 
 export function Homepage() {
   const usuario = useSesion((state) => state.usuario!);
+  useDocumentTitle("Inicio");
 
   return (
     <main className="px-6 py-14 sm:px-10 sm:py-20">
