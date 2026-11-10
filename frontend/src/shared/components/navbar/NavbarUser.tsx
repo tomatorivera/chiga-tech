@@ -58,7 +58,7 @@ export const NavbarUser = () => {
           ) : (
             <LogOut size={18} aria-hidden="true" />
           )}
-          {isPending ? "Saliendo..." : "Salir"}
+          {isPending ? "Cerrando..." : "Cerrar sesión"}
         </button>
       </form>
     </div>

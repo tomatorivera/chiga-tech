@@ -98,6 +98,6 @@ describe("Navbar", () => {
     renderNavbar();
 
     expect(screen.getByText("Ana Pérez")).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Salir" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Cerrar sesión" })).toBeTruthy();
   });
 });
