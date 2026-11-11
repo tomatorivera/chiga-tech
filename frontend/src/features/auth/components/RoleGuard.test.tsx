@@ -7,7 +7,7 @@ import type { UsuarioDTO } from "../models/UsuarioDTO";
 import type { Role } from "../../users/models/Role";
 import { RoleGuard } from "./RoleGuard";
 
-function loginWithRoles(roles: string[]) {
+function loginWithRoles(roles: Role[]) {
   const usuario: UsuarioDTO = {
     id: 1,
     nombreUsuario: "usuario",
@@ -91,7 +91,10 @@ describe("RoleGuard", () => {
   });
 
   it("redirige a /forbidden a un usuario con un rol desconocido", () => {
-    loginWithRoles(["Invitado"]);
+    // Aunque los roles están tipados en el frontend, pueden desincronizarse
+    // con los del backend en un descuido. Asi que este test es válido a pesar
+    // de tipar Role porque cubre ese caso particular.
+    loginWithRoles(["Invitado"] as unknown as Role[]);
     const router = renderGuard("Vendedor");
 
     expect(router.state.location.pathname).toBe("/forbidden");

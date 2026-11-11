@@ -7,7 +7,7 @@ import type { UsuarioDTO } from "../../../features/auth/models/UsuarioDTO";
 import type { Role } from "../../../features/users/models/Role";
 import { Navbar } from "./Navbar";
 
-function loginWithRoles(roles: string[]) {
+function loginWithRoles(roles: Role[]) {
   const usuario: UsuarioDTO = {
     id: 1,
     nombreUsuario: "usuario",
@@ -57,7 +57,7 @@ describe("Navbar", () => {
   });
 
   it("no muestra secciones a un usuario con un rol desconocido", () => {
-    loginWithRoles(["Invitado"]);
+    loginWithRoles(["Invitado"] as unknown as Role[]);
     renderNavbar();
 
     const nav = screen.getByRole("navigation", { name: "Principal" });
