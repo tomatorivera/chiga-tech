@@ -63,3 +63,14 @@
     }
   }
 }
+
+@utility scroll-shadows {
+  background:
+    linear-gradient(var(--color-brand) 30%, transparent) top / 100% 28px no-repeat local,
+    linear-gradient(transparent, var(--color-brand) 70%) bottom / 100% 28px no-repeat local,
+    radial-gradient(farthest-side at 50% 0, rgb(5 20 16 / 0.55), transparent) top / 100% 10px
+      no-repeat scroll,
+    radial-gradient(farthest-side at 50% 100%, rgb(5 20 16 / 0.55), transparent) bottom / 100% 10px
+      no-repeat scroll;
+  background-color: var(--color-brand);
+}

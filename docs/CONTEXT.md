@@ -79,11 +79,14 @@ _Avoid_: PIN, clave de autorización
 ## Usuarios
 
 **Usuario**:
-Datos del usuario en sesión, junto con sus roles y permisos, permite decidir qué puede hacer.
+Datos del usuario en sesión, junto con sus roles, permite decidir qué puede hacer.
 _Avoid_: Contraseña hasheada en bd
 
 **Rol**:
-Representa un rol del sistema, que contiene dentro de sí la lista de permisos asociados a dicho rol.
+Nivel de acceso predefinido de un usuario. Los roles forman una jerarquía: Vendedor, Supervisor, Administrador y Dueño.
+
+**Rol mínimo**:
+Rol más bajo de la jerarquía que exige una función. Lo cumple un usuario con ese rol o uno superior; si tiene varios roles, alcanza con que uno lo cumpla.
 
 **Permiso**:
-Representa un permiso concreto del sistema.
+Acción concreta del sistema con formato `modulo.accion`, asignada a un rol. Hoy no decide el acceso: lo decide el rol mínimo (ver ADR 0011).

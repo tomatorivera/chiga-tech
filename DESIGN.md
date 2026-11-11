@@ -24,9 +24,9 @@ Los tokens viven en `@theme` de `frontend/src/index.css` y se usan como clases d
 
 | Token | Valor | Uso |
 |---|---|---|
-| `brand` | `#173b32` | Verde de la marca. Panel del login, logo, fondo de avisos destacados. |
+| `brand` | `#173b32` | Verde de la marca. Panel del login, fondo del menú lateral, fondo de avisos destacados. |
 | `accent` | `#c7e77e` | Lima de acento. Ítem activo del menú, selección de texto, detalles de marca. Nunca como color de texto sobre blanco. |
-| `canvas` | `#f8f9f5` | Fondo de la aplicación y del menú lateral. |
+| `canvas` | `#f8f9f5` | Fondo de la zona de contenido. |
 | `surface` | `#ffffff` | Fondo de los bloques de contenido (tarjetas, tablas, paneles). |
 | `ink` | `#1e3029` | Texto principal y cifras. |
 | `ink-soft` | `#34463e` | Etiquetas de campos y texto secundario importante. |
@@ -95,7 +95,7 @@ Corto y desacelerado, para que nada demore a quien trabaja: transiciones de 160m
 
 La jerarquía se arma con **dos fondos y espacio**:
 
-- `canvas` es el piso: fondo de la aplicación y del menú lateral, que no lleva línea que lo separe del contenido.
+- `canvas` es el piso: fondo de la zona de contenido. El menú lateral va en `brand` y se separa del contenido por el cambio de fondo, sin línea.
 - `surface` (blanco) es el bloque: una tarjeta, una tabla o un panel es un rectángulo blanco `rounded-2xl` sobre `canvas`, sin borde ni sombra.
 - Adentro de un bloque, los subgrupos se separan con espacio (`gap-6`) o con un fondo `canvas` suave (por ejemplo, el resumen de totales).
 
@@ -109,17 +109,22 @@ Como no hay bordes que ordenen, el espacio no se ahorra: si un bloque se siente 
 
 ### Menú lateral
 
-- Ancho fijo de 240px, fondo `canvas`, logo (`Wordmark` en `text-brand`) arriba.
+- Ancho fijo de 240px, fondo `brand` para que se distinga del contenido a simple vista, logo (`Wordmark` en `canvas`, con su punto `accent`) arriba.
+- Sobre `brand`, los textos van en blanco translúcido: ítems al 82%, rótulos de grupo y roles al 62–72%, siempre con contraste AA. Hover con `white/8`; el foco usa `accent` en vez de `focus`, que no contrasta sobre verde.
 - Cada ítem lleva **ícono y texto, siempre**: nunca solo ícono, ni siquiera colapsado. Alto de 44px, `rounded-lg`, `text-base`.
-- Ítem activo: fondo `accent/40` (o `surface`), texto `brand`, `font-semibold`, y `aria-current="page"`.
-- Agrupado por tarea, con un rótulo `text-[13px] text-muted` por grupo ("Mostrador", "Catálogo", "Administración"). Solo aparecen los ítems que el rol permite (RNF-05).
-- "Vender" va primero y se distingue: es la tarea más frecuente.
-- Un contador junto al ítem (como ventas pendientes de autorización) es un chip con número y su `aria-label` ("3 ventas pendientes").
+- Ítem activo: fondo `accent` sólido, texto `brand`, `font-semibold`, y `aria-current="page"`.
+- Agrupado por tarea, con un rótulo por grupo en `text-sm font-bold` blanco al 94%, alineado con el borde izquierdo de los ítems: "Mostrador" (Vender), "Ventas y clientes" (Ventas, Clientes), "Catálogo" (Productos, Categorías, Stock, Proveedores, Listas de precios) y "Administración" (Reportes, Usuarios, Auditoría, Configuración). Solo aparecen los ítems que el rol permite (RNF-05); un usuario con varios roles ve la unión.
+- "Mostrador" reúne lo que usa quien atiende la caja; por ahora, solo "Vender". "Vender" va primero y se distingue con su ícono `accent` sobre un cuadro `accent/16` (`brand` cuando está activo): es la tarea más frecuente.
+- "Clientes" es un solo ítem: adentro están la gestión, la cuenta corriente, los cobros y las facturas vencidas.
+- Un contador junto al ítem es un chip con número (`warning` para ventas pendientes de autorización, `danger` para facturas vencidas) y un texto oculto para lectores ("3 pendientes de autorización").
+- El pie de la barra es un bloque `white/7` y `rounded-xl` (en una columna de 240px, `rounded-2xl` lo hace parecer una tarjeta de contenido) fijo con el usuario (iniciales en `accent`, nombre y roles) y el botón "Cerrar sesión", secundario adaptado al fondo oscuro (borde `white/24`, texto blanco). La acción peligrosa sobre `brand` usa un rojo claro (`#ffb4a6`), porque `danger-ink` no contrasta; si se repite fuera del menú, pasa a token. Si hay una venta sin cobrar, el pie pide confirmación en el lugar ("Volver a la venta" / "Cerrar sesión igual"), sin diálogo; `Esc` vuelve.
+- Los grupos hacen scroll entre el logo y el pie, con una sombra suave arriba o abajo solo cuando hay más contenido.
+- Por debajo de 1024px el menú se colapsa a 112px: ícono arriba y texto de 13px abajo, sin rótulos de grupo visibles, y los textos largos se abrevian ("Listas de precios" → "Listas", nombre completo → nombre de pila). La confirmación de salida flota al costado.
 
 ### Encabezado de página
 
 - Título de página y una bajada de una línea que dice qué se hace ahí ("Buscá un producto para ver su precio y stock").
-- A la derecha: fecha del día, avisos y el usuario con su rol. Sin barra con borde inferior: el encabezado se apoya en `canvas`.
+- A la derecha: fecha del día y avisos. El usuario y su rol van en el pie del menú lateral, no acá. Sin barra con borde inferior: el encabezado se apoya en `canvas`.
 - La acción principal de la página (por ejemplo "Agregar producto") va a la derecha del título, no escondida en otro lado.
 
 ### Zona de contenido
@@ -253,7 +258,8 @@ Es la pantalla más usada y la que más se cuida (RF-37 a RF-42, RNF-03). Sigue 
 - Contraste AA en todo el texto; 3:1 en bordes de controles y en íconos que transmiten algo.
 - Objetivos de clic de 44px (36px en acciones dentro de filas).
 - Foco siempre visible con `outline-focus`; el orden de tabulación sigue el orden visual.
-- Enlace "Saltar al contenido" en cada pantalla, como en el login.
+- Enlace "Saltar al contenido" en cada pantalla, como en el login. En las pantallas con menú lo pone `MainLayout`, que también es dueño del `main`: las páginas no lo repiten.
+- Cada página titula la pestaña "Nombre de la página - Chiga Tech" con `useDocumentTitle`, y su `h1` lleva `tabIndex={-1}`: al navegar dentro de la app, el foco va a ese título para que el lector anuncie la página nueva.
 - Etiquetas semánticas: `nav` para el menú, `main` para el contenido, `header` para el encabezado de página, `table` para las tablas, `dialog` para los diálogos.
 - Los atajos de teclado se muestran en la interfaz (`kbd`) y no reemplazan una acción visible.
 - Íconos decorativos con `aria-hidden="true"`; íconos de `lucide-react` en 18px junto al texto y 20px en el menú.
