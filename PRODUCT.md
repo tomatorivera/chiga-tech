@@ -21,7 +21,7 @@ Punto de venta y gestión comercial: vender rápido en el mostrador, controlar s
 
 ## Operating Context
 
-- Monitores de escritorio, principalmente de 1366×768. No hay versión móvil.
+- El uso principal es en monitores de escritorio, principalmente de 1366×768. No hay una experiencia móvil integral; Productos y Clientes tienen una adaptación específica desde 390px.
 - Se opera con teclado, mouse y lector de código de barras.
 - Las excepciones (crédito excedido, producto o cliente inactivo, descuento mayor al tope, devoluciones) se autorizan en el momento con el código de un supervisor, o quedan pendientes de autorización.
 

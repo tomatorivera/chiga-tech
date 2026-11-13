@@ -14,7 +14,7 @@ Quien usa el sistema atiende un mostrador: puede tener 20 o 70 años, puede usar
 
 ### Pantalla de referencia
 
-Se diseña para monitores de escritorio de **1366×768** (el caso más común en un local) y tiene que verse bien de 1280 a 1920 de ancho. No hay versión móvil (RNF-01), pero nada se rompe a 1024. A 768 de alto el espacio vertical es escaso: lo importante va arriba y no se esconde abajo del pliegue.
+Se diseña para monitores de escritorio de **1366×768** (el caso más común en un local) y tiene que verse bien de 1280 a 1920 de ancho. No hay una experiencia móvil integral (RNF-01), pero las vistas de Productos y Clientes tienen una adaptación específica desde 390px. El resto de la aplicación no se rompe a 1024. A 768 de alto el espacio vertical es escaso: lo importante va arriba y no se esconde abajo del pliegue.
 
 ## 2. Tokens
 
