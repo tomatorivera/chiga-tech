@@ -7,7 +7,7 @@ namespace Api.Repositories;
 public class ProductsRepository(NpgsqlDataSource ds) : IProductsRepository
 {
   public async Task<PagedResponse<Producto>> FindAll(
-    string? query, PageRequest page, CancellationToken ct = default
+    string? query, PageRequest page, CancellationToken ct
   )
   {
     var searchFilter = """

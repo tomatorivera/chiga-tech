@@ -33,7 +33,7 @@ Los resultados se ordenan por nombre o razón social y, a igual nombre, por id.
       "tipoDocumento": "string",
       "nroDocumento": "string",
       "condicionIva": "string",
-      "estado": "Activo" | "Inactivo",
+      "estado": "ACTIVO" | "INACTIVO",
       "motivoBaja": "string" | null,
       "esConsumidorFinal": boolean,
       "cuentaCorriente": {
