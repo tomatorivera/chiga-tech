@@ -6,5 +6,5 @@ namespace Api.Repositories;
 public interface IProductsRepository
 {
   Task<PagedResponse<Producto>> FindAll(string? query, PageRequest page, CancellationToken ct = default);
-  Task<Producto?> FindByCodigo(string codigo);
+  Task<Producto?> FindByCodigo(string codigo, CancellationToken ct = default);
 }

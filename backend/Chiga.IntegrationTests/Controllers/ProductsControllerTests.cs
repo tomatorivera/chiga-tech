@@ -14,12 +14,13 @@ public class ProductsControllerTests(WebApplicationFactory<Program> factory)
   : IClassFixture<WebApplicationFactory<Program>>, IAsyncLifetime
 {
   private const string Cleanup = """
-    DELETE FROM codigo_barra WHERE codigo LIKE 'ZZTP-%';
-    DELETE FROM producto WHERE nombre LIKE 'zztp %' OR nombre LIKE 'zzesc %';
+    DELETE FROM codigo_barra WHERE codigo LIKE 'ZZTP-%' OR codigo LIKE 'ZZBC-%';
+    DELETE FROM producto WHERE nombre LIKE 'zztp %' OR nombre LIKE 'zzesc %' OR nombre LIKE 'zzbc %';
     """;
 
   // zztp: Alfa con dos códigos, Beta inactivo y sin códigos, dos Gamma con el mismo nombre.
   // zzesc: pares en los que un comodín de LIKE sin escapar encontraría también al otro.
+  // zzbc: inactivo con código, aparte para no alterar los resultados de las búsquedas por zztp.
   private const string Setup = """
     INSERT INTO producto (nombre, id_categoria, costo_unitario, precio_unitario, stock_minimo, stock_actual, estado, motivo_baja)
     SELECT v.nombre, c.id_categoria, 0, v.precio, 1, 5, v.estado, v.motivo
@@ -33,13 +34,15 @@ public class ProductsControllerTests(WebApplicationFactory<Program> factory)
         ('zzesc a_b',   1.00,    true,  NULL),
         ('zzesc axb',   1.00,    true,  NULL),
         ('zzesc c\d',   1.00,    true,  NULL),
-        ('zzesc cd',    1.00,    true,  NULL)
+        ('zzesc cd',    1.00,    true,  NULL),
+        ('zzbc Baja',   1.00,    false, 'Sin repuestos')
     ) AS v(nombre, precio, estado, motivo)
     CROSS JOIN categoria c
     WHERE c.nombre = 'CPUs';
     INSERT INTO codigo_barra (codigo, id_producto)
     SELECT v.codigo, p.id_producto
-    FROM (VALUES ('ZZTP-1002', 'zztp Alfa'), ('ZZTP-1001', 'zztp Alfa')) AS v(codigo, producto)
+    FROM (VALUES ('ZZTP-1002', 'zztp Alfa'), ('ZZTP-1001', 'zztp Alfa'), ('ZZBC-0001', 'zzbc Baja'))
+      AS v(codigo, producto)
     JOIN producto p ON p.nombre = v.producto;
     """;
 
@@ -174,18 +177,70 @@ public class ProductsControllerTests(WebApplicationFactory<Program> factory)
     Assert.Equal(1000.50m, producto.GetProperty("precioUnitario").GetDecimal());
   }
 
+  [Theory]
+  [InlineData("ZZTP-1001")]
+  [InlineData("ZZTP-1002")]
+  public async Task GetByBarcode_AnyOfItsCodes_ReturnsProductWithAllCodes(string codigo)
+  {
+    var response = await Get($"/productos/codigo/{codigo}");
+
+    Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    var producto = await response.Content.ReadFromJsonAsync<JsonElement>();
+    Assert.Equal("zztp Alfa", producto.GetProperty("nombre").GetString());
+    Assert.Equal(["ZZTP-1001", "ZZTP-1002"], producto.GetProperty("codigosBarras").EnumerateArray().Select(c => c.GetString()));
+  }
+
+  [Fact]
+  public async Task GetByBarcode_InactiveProduct_ReturnsItWithMotivoBaja()
+  {
+    var response = await Get("/productos/codigo/ZZBC-0001");
+
+    Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    var producto = await response.Content.ReadFromJsonAsync<JsonElement>();
+    Assert.Equal("INACTIVO", producto.GetProperty("estado").GetString());
+    Assert.Equal("Sin repuestos", producto.GetProperty("motivoBaja").GetString());
+  }
+
+  [Fact]
+  public async Task GetByBarcode_CodeWithSurroundingSpaces_ReturnsProduct()
+  {
+    var response = await Get("/productos/codigo/%20ZZTP-1001%20");
+
+    Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+  }
+
+  [Theory]
+  [InlineData("ZZTP-100")]   // parte de un código existente
+  [InlineData("ZZTP-1001X")] // un código existente con algo más
+  [InlineData("zztp-1001")]  // coincidencia exacta: distingue mayúsculas
+  [InlineData("ZZTP-100_")]  // un comodín de LIKE no se interpreta
+  public async Task GetByBarcode_NoExactMatch_ReturnsNotFoundProblem(string codigo)
+  {
+    var response = await Get($"/productos/codigo/{codigo}");
+
+    Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
+    var problem = await response.Content.ReadFromJsonAsync<JsonElement>();
+    Assert.Equal(404, problem.GetProperty("status").GetInt32());
+  }
+
   private async Task<JsonElement> GetProductos(string queryString)
+  {
+    var response = await Get($"/productos?{queryString}");
+
+    Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    return await response.Content.ReadFromJsonAsync<JsonElement>();
+  }
+
+  private async Task<HttpResponseMessage> Get(string url)
   {
     var client = factory.CreateClient();
     var login = await client.PostAsJsonAsync("/auth/login", new { username = "vendedor", password = "chiga1234" });
     var cookie = login.Headers.GetValues("Set-Cookie").Single().Split(';')[0];
 
-    var request = new HttpRequestMessage(HttpMethod.Get, $"/productos?{queryString}");
+    var request = new HttpRequestMessage(HttpMethod.Get, url);
     request.Headers.Add("Cookie", cookie);
-    var response = await client.SendAsync(request);
-
-    Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-    return await response.Content.ReadFromJsonAsync<JsonElement>();
+    return await client.SendAsync(request);
   }
 
   private static List<string?> Nombres(JsonElement body) =>

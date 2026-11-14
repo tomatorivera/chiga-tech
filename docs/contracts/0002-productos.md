@@ -36,7 +36,7 @@ Los resultados se ordenan por nombre y, a igual nombre, por id.
       "precioUnitario": number,
       "stockActual": number,
       "stockMinimo": number,
-      "estado": "Activo" | "Inactivo",
+      "estado": "ACTIVO" | "INACTIVO",
       "motivoBaja": "string" | null
     }
   ],

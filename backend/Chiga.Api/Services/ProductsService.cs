@@ -17,6 +17,15 @@ public class ProductsService(IProductsRepository repository) : IProductsService
       result.Total
     );
   }
+  
+  public async Task<ProductoDTO?> GetByBarcode(string barcode, CancellationToken ct)
+  {
+    var product = await repository.FindByCodigo(barcode.Trim(), ct);
+
+    return product is not null
+      ? ProductoDTO.From(product)
+      : null;
+  }
 
   // Lo extraigo de GetAll() para hacerle tests unitarios
   // Es muy poca lógica pero si algo se cambia y se rompe, daña toda una consulta
