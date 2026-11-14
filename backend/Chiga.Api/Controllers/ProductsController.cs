@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Api.Controllers;
 
 [ApiController]
-[Route("productos")]
+[Route("api/productos")]
 [Authorize]
 public class ProductsController(IProductsService productService) : ControllerBase
 {

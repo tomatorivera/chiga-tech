@@ -74,7 +74,7 @@ public class ClientsControllerTests(WebApplicationFactory<Program> factory)
   [Fact]
   public async Task GetAll_WithoutSession_ReturnsUnauthorized()
   {
-    var response = await factory.CreateClient().GetAsync("/clientes");
+    var response = await factory.CreateClient().GetAsync("/api/clientes");
 
     Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
   }
@@ -193,7 +193,7 @@ public class ClientsControllerTests(WebApplicationFactory<Program> factory)
 
   private async Task<JsonElement> GetClientes(string queryString)
   {
-    var response = await Get($"/clientes?{queryString}");
+    var response = await Get($"/api/clientes?{queryString}");
 
     Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     return await response.Content.ReadFromJsonAsync<JsonElement>();

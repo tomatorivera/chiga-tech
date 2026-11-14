@@ -57,8 +57,8 @@ public class ProductsControllerTests(WebApplicationFactory<Program> factory)
   public async Task DisposeAsync() => await Execute(Cleanup);
 
   [Theory]
-  [InlineData("/productos")]
-  [InlineData("/productos/codigo/ZZTP-1001")]
+  [InlineData("/api/productos")]
+  [InlineData("/api/productos/codigo/ZZTP-1001")]
   public async Task Endpoints_WithoutSession_ReturnUnauthorized(string url)
   {
     var response = await factory.CreateClient().GetAsync(url);
@@ -192,7 +192,7 @@ public class ProductsControllerTests(WebApplicationFactory<Program> factory)
   [InlineData("ZZTP-1002")]
   public async Task GetByBarcode_AnyOfItsCodes_ReturnsProductWithAllCodes(string codigo)
   {
-    var response = await Get($"/productos/codigo/{codigo}");
+    var response = await Get($"/api/productos/codigo/{codigo}");
 
     Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     var producto = await response.Content.ReadFromJsonAsync<JsonElement>();
@@ -203,7 +203,7 @@ public class ProductsControllerTests(WebApplicationFactory<Program> factory)
   [Fact]
   public async Task GetByBarcode_InactiveProduct_ReturnsItWithMotivoBaja()
   {
-    var response = await Get("/productos/codigo/ZZBC-0001");
+    var response = await Get("/api/productos/codigo/ZZBC-0001");
 
     Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     var producto = await response.Content.ReadFromJsonAsync<JsonElement>();
@@ -214,7 +214,7 @@ public class ProductsControllerTests(WebApplicationFactory<Program> factory)
   [Fact]
   public async Task GetByBarcode_CodeWithSurroundingSpaces_ReturnsProduct()
   {
-    var response = await Get("/productos/codigo/%20ZZTP-1001%20");
+    var response = await Get("/api/productos/codigo/%20ZZTP-1001%20");
 
     Assert.Equal(HttpStatusCode.OK, response.StatusCode);
   }
@@ -226,7 +226,7 @@ public class ProductsControllerTests(WebApplicationFactory<Program> factory)
   [InlineData("ZZTP-100_")]  // un comodín de LIKE no se interpreta
   public async Task GetByBarcode_NoExactMatch_ReturnsNotFoundProblem(string codigo)
   {
-    var response = await Get($"/productos/codigo/{codigo}");
+    var response = await Get($"/api/productos/codigo/{codigo}");
 
     Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
@@ -236,7 +236,7 @@ public class ProductsControllerTests(WebApplicationFactory<Program> factory)
 
   private async Task<JsonElement> GetProductos(string queryString)
   {
-    var response = await Get($"/productos?{queryString}");
+    var response = await Get($"/api/productos?{queryString}");
 
     Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     return await response.Content.ReadFromJsonAsync<JsonElement>();

@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Api.Controllers;
 
 [ApiController]
-[Route("clientes")]
+[Route("api/clientes")]
 [Authorize]
 public class ClientsController(IClientsService clientsService) : ControllerBase
 {
