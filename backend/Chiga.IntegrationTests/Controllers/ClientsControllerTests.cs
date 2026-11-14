@@ -71,6 +71,14 @@ public class ClientsControllerTests(WebApplicationFactory<Program> factory)
 
   public async Task DisposeAsync() => await Execute(Cleanup);
 
+  [Fact]
+  public async Task GetAll_WithoutSession_ReturnsUnauthorized()
+  {
+    var response = await factory.CreateClient().GetAsync("/clientes");
+
+    Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+  }
+
   [Theory]
   [InlineData("")]
   [InlineData("query=%20%20%20")]

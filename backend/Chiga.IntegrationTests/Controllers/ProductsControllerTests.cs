@@ -56,6 +56,16 @@ public class ProductsControllerTests(WebApplicationFactory<Program> factory)
 
   public async Task DisposeAsync() => await Execute(Cleanup);
 
+  [Theory]
+  [InlineData("/productos")]
+  [InlineData("/productos/codigo/ZZTP-1001")]
+  public async Task Endpoints_WithoutSession_ReturnUnauthorized(string url)
+  {
+    var response = await factory.CreateClient().GetAsync(url);
+
+    Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+  }
+
   [Fact]
   public async Task GetAll_WithoutQuery_ReturnsWholeCatalogWithDefaultPagination()
   {
