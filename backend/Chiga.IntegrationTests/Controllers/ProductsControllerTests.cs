@@ -8,14 +8,14 @@ using Npgsql;
 namespace Chiga.IntegrationTests.Controllers;
 
 // Necesita la BD levantada con migraciones y seeds (npm run db:reset).
-// Inserta productos de prueba con prefijos propios (zztp, zzesc) y los borra al terminar.
+// Inserta productos de prueba con prefijos propios (zztp, zzesc, zzbc, zzpg) y los borra al terminar.
 [Collection("BD")]
 public class ProductsControllerTests(WebApplicationFactory<Program> factory)
   : IClassFixture<WebApplicationFactory<Program>>, IAsyncLifetime
 {
   private const string Cleanup = """
     DELETE FROM codigo_barra WHERE codigo LIKE 'ZZTP-%' OR codigo LIKE 'ZZBC-%';
-    DELETE FROM producto WHERE nombre LIKE 'zztp %' OR nombre LIKE 'zzesc %' OR nombre LIKE 'zzbc %';
+    DELETE FROM producto WHERE nombre LIKE 'zztp %' OR nombre LIKE 'zzesc %' OR nombre LIKE 'zzbc %' OR nombre LIKE 'zzpg %';
     """;
 
   // zztp: Alfa con dos códigos, Beta inactivo y sin códigos, dos Gamma con el mismo nombre.
@@ -146,6 +146,25 @@ public class ProductsControllerTests(WebApplicationFactory<Program> factory)
 
     Assert.Equal(0, body.GetProperty("data").GetArrayLength());
     Assert.Equal(4, body.GetProperty("total").GetInt32());
+  }
+
+  [Fact]
+  public async Task GetAll_MoreMatchesThanDefaultPageSize_SplitsThemInPagesOfTwenty()
+  {
+    await Execute("""
+      INSERT INTO producto (nombre, id_categoria, costo_unitario, precio_unitario, stock_minimo, stock_actual)
+      SELECT 'zzpg ' || lpad(n::text, 2, '0'), c.id_categoria, 0, 1, 1, 1
+      FROM generate_series(1, 25) n CROSS JOIN categoria c
+      WHERE c.nombre = 'CPUs';
+      """);
+    var expected = Enumerable.Range(1, 25).Select(n => $"zzpg {n:00}").ToList();
+
+    var first = await GetProductos("query=zzpg");
+    var second = await GetProductos("query=zzpg&page=2");
+
+    Assert.Equal(25, first.GetProperty("total").GetInt32());
+    Assert.Equal(expected.Take(20), Nombres(first));
+    Assert.Equal(expected.Skip(20), Nombres(second));
   }
 
   [Fact]

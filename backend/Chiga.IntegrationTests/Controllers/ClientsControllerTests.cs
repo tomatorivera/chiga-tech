@@ -127,6 +127,28 @@ public class ClientsControllerTests(WebApplicationFactory<Program> factory)
   }
 
   [Fact]
+  public async Task GetAll_MoreMatchesThanDefaultPageSize_SplitsThemInPagesOfTwenty()
+  {
+    await Execute("""
+      INSERT INTO cliente (id_tipo_persona, nombre_razon_social, id_tipo_documento, nro_documento, id_condicion_iva)
+      SELECT tp.id_tipo_persona, 'zzcl pag ' || lpad(n::text, 2, '0'), td.id_tipo_documento,
+             (92000000 + n)::text, ci.id_condicion_iva
+      FROM generate_series(1, 25) n
+      JOIN tipo_persona tp ON tp.nombre = 'Física'
+      JOIN tipo_documento td ON td.nombre = 'DNI'
+      JOIN condicion_iva ci ON ci.nombre = 'Consumidor Final';
+      """);
+    var expected = Enumerable.Range(1, 25).Select(n => $"zzcl pag {n:00}").ToList();
+
+    var first = await GetClientes("query=zzcl pag");
+    var second = await GetClientes("query=zzcl pag&page=2");
+
+    Assert.Equal(25, first.GetProperty("total").GetInt32());
+    Assert.Equal(expected.Take(20), Nombres(first));
+    Assert.Equal(expected.Skip(20), Nombres(second));
+  }
+
+  [Fact]
   public async Task GetAll_NoMatches_ReturnsOkWithEmptyData()
   {
     var body = await GetClientes("query=zz-no-existe-zz");
