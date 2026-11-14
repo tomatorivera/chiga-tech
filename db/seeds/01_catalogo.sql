@@ -45,6 +45,14 @@ JOIN categoria c ON c.nombre = v.categoria
 LEFT JOIN ubicacion u ON u.sector = v.sector AND u.estante = v.estante
 WHERE NOT EXISTS (SELECT 1 FROM producto p WHERE p.nombre = v.nombre);
 
+-- Producto dado de baja, para probar que la venta muestra el motivo y pide autorización (RN-14)
+INSERT INTO producto (nombre, id_categoria, id_ubicacion, costo_unitario, precio_unitario, stock_minimo, stock_actual, estado, motivo_baja)
+SELECT 'NVIDIA GeForce GTX 1050 Ti', c.id_categoria, u.id_ubicacion, 120000.00, 150000.00, 1, 2, false, 'Discontinuado por el fabricante'
+FROM categoria c
+JOIN ubicacion u ON u.sector = 'Deposito' AND u.estante = '1'
+WHERE c.nombre = 'GPUs'
+  AND NOT EXISTS (SELECT 1 FROM producto p WHERE p.nombre = 'NVIDIA GeForce GTX 1050 Ti');
+
 -- Código de barra de los productos
 INSERT INTO codigo_barra (codigo, id_producto)
 SELECT v.codigo, p.id_producto
@@ -54,7 +62,8 @@ FROM (VALUES
     ('7790000000035', 'NVIDIA GeForce RTX 5060'),
     ('7790000000042', 'Kingston Fury 16GB DDR5'),
     ('7790000000059', 'Teclado mecánico Redragon'),
-    ('7790000000066', 'Mouse Logitech G203')
+    ('7790000000066', 'Mouse Logitech G203'),
+    ('7790000000073', 'NVIDIA GeForce GTX 1050 Ti')
 ) AS v(codigo, producto)
 JOIN producto p ON p.nombre = v.producto
 ON CONFLICT (codigo) DO NOTHING;
