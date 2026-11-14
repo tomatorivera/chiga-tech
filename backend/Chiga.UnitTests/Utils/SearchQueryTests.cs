@@ -1,17 +1,17 @@
-using Api.Services;
+using Api.Utils;
 
-namespace Chiga.UnitTests.Services;
+namespace Chiga.UnitTests.Utils;
 
-public class ProductsServiceTests
+public class SearchQueryTests
 {
   [Theory]
   [InlineData(null)]
   [InlineData("")]
   [InlineData("   ")]
   [InlineData("\t\r\n")]
-  public void GetCleanQuery_NullOrWhitespace_ReturnsNull(string? query)
+  public void Clean_NullOrWhitespace_ReturnsNull(string? query)
   {
-    Assert.Null(ProductsService.GetCleanQuery(query));
+    Assert.Null(SearchQuery.Clean(query));
   }
 
   [Theory]
@@ -19,9 +19,9 @@ public class ProductsServiceTests
   [InlineData("\tryzen\n", "ryzen")]
   [InlineData(" rtx  5060 ", "rtx  5060")] // los espacios del medio se conservan
   [InlineData("Ryzen", "Ryzen")]           // no cambia mayúsculas: ILIKE ya no las distingue
-  public void GetCleanQuery_Text_TrimsEnds(string query, string expected)
+  public void Clean_Text_TrimsEnds(string query, string expected)
   {
-    Assert.Equal(expected, ProductsService.GetCleanQuery(query));
+    Assert.Equal(expected, SearchQuery.Clean(query));
   }
 
   [Theory]
@@ -32,8 +32,8 @@ public class ProductsServiceTests
   [InlineData(@"\%", @"\\\%")] // la barra se escapa antes que el comodín, si no el escape del % se duplica
   [InlineData(@"\_", @"\\\_")]
   [InlineData(" 50%_off ", @"50\%\_off")]
-  public void GetCleanQuery_LikeWildcards_EscapesThem(string query, string expected)
+  public void Clean_LikeWildcards_EscapesThem(string query, string expected)
   {
-    Assert.Equal(expected, ProductsService.GetCleanQuery(query));
+    Assert.Equal(expected, SearchQuery.Clean(query));
   }
 }
