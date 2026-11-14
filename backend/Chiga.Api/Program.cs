@@ -58,6 +58,10 @@ builder.Services.AddDataProtection().PersistKeysToFileSystem(new DirectoryInfo(k
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IProductsRepository, ProductsRepository>();
+builder.Services.AddScoped<IProductsService, ProductsService>();
+builder.Services.AddScoped<IClientsRepository, ClientsRepository>();
+builder.Services.AddScoped<IClientsService, ClientsService>();
 
 var app = builder.Build();
 

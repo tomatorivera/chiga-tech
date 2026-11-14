@@ -1,11 +1,12 @@
 -- Clientes de prueba. Se identifican por (tipo de documento, nro_documento).
-INSERT INTO cliente (id_tipo_persona, nombre_razon_social, id_tipo_documento, nro_documento, id_condicion_iva, telefono, correo)
-SELECT tp.id_tipo_persona, v.nombre_razon_social, td.id_tipo_documento, v.nro_documento, ci.id_condicion_iva, v.telefono, v.correo
+INSERT INTO cliente (id_tipo_persona, nombre_razon_social, id_tipo_documento, nro_documento, id_condicion_iva, telefono, correo, estado, motivo_baja)
+SELECT tp.id_tipo_persona, v.nombre_razon_social, td.id_tipo_documento, v.nro_documento, ci.id_condicion_iva, v.telefono, v.correo, v.estado, v.motivo_baja
 FROM (VALUES
-    ('Física',   'Juan Pérez',           'DNI',  '30111222',    'Consumidor Final',          '381-5551234',  'juan.perez@example.com'),
-    ('Física',   'María Gómez',          'CUIL', '27333444556', 'Responsable Monotributo',   '381-5559876',  NULL),
-    ('Jurídica', 'Estudio Contable Sur', 'CUIT', '30700111222', 'IVA Responsable Inscripto', '0381-4300000', 'admin@ecsur.example')
-) AS v(tipo_persona, nombre_razon_social, tipo_documento, nro_documento, condicion_iva, telefono, correo)
+    ('Física',   'Juan Pérez',           'DNI',  '30111222',    'Consumidor Final',          '381-5551234',  'juan.perez@example.com', true,  NULL),
+    ('Física',   'María Gómez',          'CUIL', '27333444556', 'Responsable Monotributo',   '381-5559876',  NULL,                     true,  NULL),
+    ('Jurídica', 'Estudio Contable Sur', 'CUIT', '30700111222', 'IVA Responsable Inscripto', '0381-4300000', 'admin@ecsur.example',    true,  NULL),
+    ('Física',   'Carlos Ruiz',          'DNI',  '25444555',    'Consumidor Final',          '381-5554321',  NULL,                     false, 'Cerró su negocio')
+) AS v(tipo_persona, nombre_razon_social, tipo_documento, nro_documento, condicion_iva, telefono, correo, estado, motivo_baja)
 JOIN tipo_persona tp ON tp.nombre = v.tipo_persona
 JOIN tipo_documento td ON td.nombre = v.tipo_documento
 JOIN condicion_iva ci ON ci.nombre = v.condicion_iva
