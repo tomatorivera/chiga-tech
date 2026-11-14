@@ -159,7 +159,7 @@ public class ProductsControllerTests(WebApplicationFactory<Program> factory)
     Assert.Equal(2000m, producto.GetProperty("precioUnitario").GetDecimal());
     Assert.Equal(5, producto.GetProperty("stockActual").GetInt32());
     Assert.Equal(1, producto.GetProperty("stockMinimo").GetInt32());
-    Assert.Equal("Inactivo", producto.GetProperty("estado").GetString());
+    Assert.Equal("INACTIVO", producto.GetProperty("estado").GetString());
     Assert.Equal("Discontinuado", producto.GetProperty("motivoBaja").GetString());
   }
 
@@ -169,7 +169,7 @@ public class ProductsControllerTests(WebApplicationFactory<Program> factory)
     var body = await GetProductos("query=zztp alfa");
 
     var producto = Assert.Single(body.GetProperty("data").EnumerateArray());
-    Assert.Equal("Activo", producto.GetProperty("estado").GetString());
+    Assert.Equal("ACTIVO", producto.GetProperty("estado").GetString());
     Assert.Equal(JsonValueKind.Null, producto.GetProperty("motivoBaja").ValueKind);
     Assert.Equal(1000.50m, producto.GetProperty("precioUnitario").GetDecimal());
   }
