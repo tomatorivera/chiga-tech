@@ -1,4 +1,3 @@
-using Api.Models.Dto;
 
 namespace Api.Models.Entities;
 
