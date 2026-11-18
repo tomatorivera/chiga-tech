@@ -14,7 +14,9 @@ Quien usa el sistema atiende un mostrador: puede tener 20 o 70 años, puede usar
 
 ### Pantalla de referencia
 
-Se diseña para monitores de escritorio de **1366×768** (el caso más común en un local) y tiene que verse bien de 1280 a 1920 de ancho. No hay versión móvil (RNF-01), pero nada se rompe a 1024. A 768 de alto el espacio vertical es escaso: lo importante va arriba y no se esconde abajo del pliegue.
+Se diseña primero para monitores de escritorio de **1366×768** (el caso más común en un local) y tiene que verse bien de 1280 a 1920 de ancho. A 768 de alto el espacio vertical es escaso: lo importante va arriba y no se esconde abajo del pliegue.
+
+También hay versión para celular, con 390px de ancho como referencia: es una adaptación de la de escritorio, no otra pantalla. Sus reglas están en la sección 4.
 
 ## 2. Tokens
 
@@ -31,7 +33,11 @@ Los tokens viven en `@theme` de `frontend/src/index.css` y se usan como clases d
 | `ink` | `#1e3029` | Texto principal y cifras. |
 | `ink-soft` | `#34463e` | Etiquetas de campos y texto secundario importante. |
 | `muted` | `#636f68` | Descripciones, encabezados de tabla, metadatos. Contraste AA sobre `canvas` y `surface`. |
-| `line` | `#dfe5de` | Separadores entre filas de tabla. Es el único borde decorativo permitido. |
+| `surface-sunken` | `#eef1ea` | Fondo de las tarjetas de indicador, del control segmentado y del hover de los botones fantasma. |
+| `band` | `#e3e8e0` | Banda del encabezado de tabla. |
+| `selected` | `rgb(82 120 99 / .09)` | Fila seleccionada y opción elegida en las tarjetas de selección. |
+| `accent-soft` | `rgb(199 231 126 / .5)` | Chip de filtro aplicado ("Mostrando 6 productos filtrados"), con texto `brand`. |
+| `line` | `#dfe5de` | Separadores entre filas en las tablas que los usan y borde de los botones secundarios. Es el único borde decorativo permitido. |
 | `line-strong` | `#c6d2c8` | Separadores punteados de comprobantes. |
 | `line-control` | `#86918a` | Borde de campos de formulario: contrasta 3:1 para que se vea el control. |
 | `primary` / `primary-hover` | `#285644` / `#204b3a` | Botón principal y enlaces. |
@@ -58,9 +64,13 @@ Reglas de color:
 
 | Rol | Clases | Ejemplo |
 |---|---|---|
-| Título de página | `font-display text-[28px] font-semibold tracking-tight text-ink` | "Ventas" |
-| Título de bloque | `font-display text-lg font-semibold text-ink` | "Venta en curso" |
-| Cifra destacada (KPI, total) | `font-display text-[32px] font-semibold tabular-nums text-ink` | "$ 172.400" |
+| Título de página | `font-display text-[38px] font-bold tracking-[-0.03em] text-ink` | "Productos" |
+| Título de grupo | `font-display text-[30px] font-bold tracking-[-0.025em] text-ink` | Una familia: "Hardware" |
+| Título de subgrupo | `font-display text-[21px] font-semibold tracking-[-0.015em] text-ink` | Una categoría: "CPUs" |
+| Título de panel de detalle | `font-display text-2xl font-semibold text-ink` | El nombre del producto elegido |
+| Título de bloque o diálogo | `font-display text-lg font-semibold text-ink` (22px en diálogos) | "Venta en curso", "Ajustar stock" |
+| Cifra de indicador (KPI) | `font-display text-[40px] font-bold tracking-[-0.03em] tabular-nums text-ink` | "24" |
+| Cifra destacada (total) | `font-display text-[32px] font-semibold tabular-nums text-ink` | "$ 172.400" |
 | Texto base | `text-base text-ink` (16px) | Celdas de tabla, valores de campos |
 | Etiqueta | `text-sm font-semibold text-ink-soft` (14px) | "Cliente", "Medio de pago" |
 | Secundario | `text-sm text-muted` | Descripciones, encabezados de tabla |
@@ -79,7 +89,8 @@ Escala de Tailwind (múltiplos de 4px). Valores fijos para que todas las pantall
 | Relleno interior de un bloque | `p-6` |
 | Entre etiqueta y campo | `mb-2` |
 | Entre campos de un formulario | `space-y-5` |
-| Alto de fila de tabla | 56px (`h-14`) |
+| Alto de fila de tabla | 56px (`h-14`) con línea entre filas; 64px (`h-16`) sin línea |
+| Separación entre grupos de una lista (familias) | 56px |
 
 ### Forma y profundidad
 
@@ -89,7 +100,24 @@ Escala de Tailwind (múltiplos de 4px). Valores fijos para que todas las pantall
 
 ### Movimiento
 
-Corto y desacelerado, para que nada demore a quien trabaja: transiciones de 160ms con `ease-out-quart` (por defecto en el tema), `animate-enter` para la entrada de una pantalla y `animate-reveal` para mensajes que aparecen. Siempre con `motion-safe:`. Nada se mueve por hacer scroll y nada parpadea.
+Con resortes, al estilo de la librería Motion: lo que entra o se desplaza se pasa apenas de su lugar y se asienta, y lo que cambia de tamaño empuja al resto suavemente en vez de hacerlo saltar. Todo se mueve con el mismo carácter.
+
+| Curva | Valor | Para qué |
+|---|---|---|
+| Resorte | En Motion, `{ type: "spring", bounce: 0.15, visualDuration: 0.45 }`; en CSS, una curva `linear()` que se pasa un 4% y vuelve | Lo que entra o se desplaza: filas, el panel de detalle, el fondo del control segmentado, la flecha que gira, los resultados al filtrar. |
+| Asentado | `cubic-bezier(.22, 1, .36, 1)` | Lo que cambia de tamaño: la altura de una sección que se pliega, el ancho del panel. Un rebote ahí hace temblar el resto de la página. |
+| Corta | 160ms con `ease-out-quart` (por defecto en el tema) | Hover, foco y cambios de color. |
+
+Duraciones de 420 a 620ms: las entradas un poco más largas que las salidas. Las filas que aparecen juntas entran escalonadas, 35ms una de otra, hasta la octava.
+
+Patrones:
+
+- **Plegar y desplegar:** la sección anima su altura y lo de abajo se desliza; el contenido no se desmonta al cerrar, se desvanece y deja de ser alcanzable con `Tab`. Al abrir, las filas caen escalonadas.
+- **Panel de detalle:** su lugar crece y la lista se angosta deslizándose, mientras el panel entra desde la derecha. Al cerrar hace lo mismo al revés, mostrando el último elemento mientras sale. Al pasar de un elemento a otro, el contenido se renueva subiendo 10px.
+- **Hoja desde abajo (celular):** sube con resorte y el fondo oscuro aparece de a poco. Debajo de la hoja hay blanco de sobra para que el rebote no deje un hueco.
+- **Resultados al filtrar:** entran subiendo 14px; los contadores no se animan.
+
+Siempre con `motion-safe:` (en Motion, `MotionConfig reducedMotion="user"`): con movimiento reducido, todo cambia directo. Nada se mueve por hacer scroll y nada parpadea.
 
 ## 3. Sin bordes
 
@@ -103,9 +131,11 @@ Los bordes quedan para lo que tiene que verse como control:
 
 - Campos de texto, selects y casillas (`border-line-control`), porque una persona tiene que reconocer dónde escribir.
 - Botones secundarios (`border-line`), para que se lean como botón y no como texto.
-- Una línea `border-line` entre filas de tabla. Sin líneas verticales ni recuadro externo.
+- Las tablas que la necesitan llevan una línea `border-line` entre filas (sección 5, Tablas). Sin líneas verticales ni recuadro externo.
 
-Como no hay bordes que ordenen, el espacio no se ahorra: si un bloque se siente apretado, se saca contenido; no se le pone un borde.   
+Como no hay bordes que ordenen, el espacio no se ahorra: si un bloque se siente apretado, se saca contenido; no se le pone un borde.
+
+## 4. Estructura de la pantalla
 
 ### Menú lateral
 
@@ -124,13 +154,26 @@ Como no hay bordes que ordenen, el espacio no se ahorra: si un bloque se siente 
 ### Encabezado de página
 
 - Título de página y una bajada de una línea que dice qué se hace ahí ("Buscá un producto para ver su precio y stock").
-- A la derecha: fecha del día y avisos. El usuario y su rol van en el pie del menú lateral, no acá. Sin barra con borde inferior: el encabezado se apoya en `canvas`.
-- La acción principal de la página (por ejemplo "Agregar producto") va a la derecha del título, no escondida en otro lado.
+- A la derecha, las acciones de la página: la principal (por ejemplo "Agregar producto") y, si hace falta, una secundaria a su izquierda ("Exportar"). Ninguna queda escondida en otro lado.
+- El usuario y su rol van en el pie del menú lateral, no acá. Sin barra con borde inferior: el encabezado se apoya en `canvas`.
 
 ### Zona de contenido
 
-- Máximo cuatro tarjetas de indicadores (KPI) por fila y solo en pantallas de resumen o reportes. Las pantallas de trabajo (vender, cargar un producto) no llevan KPI.
-- Diseño de dos columnas cuando hay un elemento en curso (una venta, un cliente seleccionado): la lista a la izquierda (flexible) y el detalle a la derecha (`w-96` aprox.). El detalle muestra todo lo necesario sin otra pantalla.
+- Arriba, a todo el ancho, los indicadores (KPI) si los hay y la búsqueda con sus filtros. Máximo cuatro indicadores por fila, en cualquier pantalla donde aporten un dato que sirva tener a mano para la tarea de esa vista; si solo decoran, no van.
+- Diseño de dos columnas cuando hay un elemento en curso (una venta, un producto o un cliente seleccionado): la lista a la izquierda (flexible) y el panel de detalle a la derecha, de 400px. El detalle muestra todo lo necesario sin otra pantalla.
+- El panel de detalle arranca a la altura del primer grupo de la lista, no de los indicadores ni de la búsqueda, y queda fijo a 16px del borde superior al hacer scroll. Abrirlo angosta la lista, no los indicadores ni la búsqueda.
+
+### Celular
+
+Por debajo de 1100px el panel de detalle pasa a ser una hoja que sube desde abajo, con fondo oscuro detrás; por debajo de 640px la pantalla se adapta a celular. Se sacrifican detalles para ganar espacio, nunca datos: lo que se saca de la lista sigue en el detalle.
+
+- Márgenes de 16px y separación entre bloques de 32px. El título de página baja a 30px y las acciones del encabezado se reparten el ancho.
+- Los indicadores van de a dos por fila, más compactos.
+- Las tablas pasan a lista: cada fila muestra solo lo necesario para reconocer el elemento y decidir (en productos, nombre y stock con su mínimo), sin encabezado ni flecha. El nombre ocupa hasta dos líneas. Toda la fila abre el detalle.
+- En los grupos plegables, el ícono del grupo baja a 40px, la tarjeta ocupa todo el ancho y la alerta de cada subgrupo pasa a la línea de abajo.
+- El control segmentado ocupa todo el ancho, sin íconos ni cantidades.
+- En los diálogos, las opciones y los campos van en una columna y los botones del pie se reparten el ancho.
+- Los avisos emergentes ocupan el ancho con 16px de margen.
 
 ## 5. Componentes
 
@@ -140,7 +183,7 @@ Como no hay bordes que ordenen, el espacio no se ahorra: si un bloque se siente 
 |---|---|---|
 | Primario | La acción principal: una por pantalla | `rounded-lg bg-primary px-5 py-3 text-white shadow-action hover:bg-primary-hover hover:shadow-action-hover motion-safe:active:translate-y-px` |
 | Secundario | Acciones de apoyo | `rounded-lg border border-line bg-surface px-4 py-2.5 text-ink-soft hover:border-line-strong hover:bg-canvas` |
-| Fantasma | Acciones dentro de una fila, filtros | `rounded-lg px-3 py-2 text-ink-soft hover:bg-canvas` |
+| Fantasma | Acciones dentro de una fila, filtros, encabezados que se pliegan | `rounded-lg px-3 py-2 text-ink-soft hover:bg-surface-sunken` |
 | Peligro | Dar de baja, rechazar, anular | Como el secundario, con `text-danger-ink hover:bg-danger-surface` |
 
 - Todos: alto mínimo de 44px (36px solo en acciones dentro de filas de tabla), `cursor-pointer`, foco visible `focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus`.
@@ -167,25 +210,40 @@ Siguen el patrón ya construido en `LoginForm.tsx`:
 
 ### Tablas
 
-- Bloque `surface rounded-2xl` sin recuadro; filas de 56px separadas por `border-b border-line`; la última sin línea.
-- Encabezados en `text-sm font-medium text-muted`, sin mayúsculas sostenidas.
+- Bloque `surface rounded-2xl` sin recuadro.
+- Las filas se separan con espacio o con línea, según la tabla:
+  - **Sin línea** (por defecto): filas de 64px. El hover y la selección pintan la fila con esquinas redondeadas (`rounded-lg` en la primera y la última celda), así cada fila se lee como una unidad.
+  - **Con línea:** filas de 56px separadas por `border-b border-line`, la última sin línea. Para tablas densas o con muchas filas parecidas, donde el ojo necesita una guía para seguir la fila (movimientos, comprobantes).
+- Encabezado sobre una banda `bg-band` de 44px con esquinas `rounded-lg`, en `text-sm font-medium text-ink-soft`, sin mayúsculas sostenidas, separado 8px de la primera fila para que no choque con el hover.
 - Importes y cantidades alineados a la derecha con `tabular-nums`; texto a la izquierda.
-- Fila al pasar el mouse: `hover:bg-canvas`. Si la fila abre un detalle, toda la fila es clickeable y alcanzable con teclado.
+- Fila al pasar el mouse: `bg-canvas`; fila elegida: `bg-selected`. Si la fila abre un detalle, toda la fila es clickeable y alcanzable con teclado, y lleva al final una flecha (`CircleArrowRight` en `line-control`, `brand` si está elegida).
 - Pocas columnas: las que se necesitan para reconocer y decidir. Lo demás va en el detalle. Si una tabla pasa de seis columnas, sobra alguna.
-- Paginación o "Cargar más" abajo, con el total en palabras ("Mostrando 25 de 312 productos").
+- Las listas largas se paginan, con el total en palabras ("Mostrando 25 de 312 productos"); el control de paginación todavía no está diseñado. El catálogo de productos no se pagina (ADR-0007): con un filtro aplicado, cada grupo dice cuántos muestra con el chip de filtro aplicado.
 - Sin casillas de selección múltiple salvo que exista una acción en lote real.
+
+### Lista agrupada que se pliega
+
+Para listas que tienen dos niveles naturales, como familias y categorías de productos:
+
+- Cada grupo lleva un ícono de 56px sobre `accent` (`rounded-2xl`, ícono `brand`), el título de grupo y un resumen que no cambia con los filtros ("7 productos en 3 categorías"). Con un filtro aplicado, al lado aparece el chip de filtro aplicado.
+- Los subgrupos van en una tarjeta `surface` de todo el ancho, con relleno de 12px. Cada subgrupo es un botón fantasma de todo el ancho y 56px de alto, con `aria-expanded`: flecha `ChevronRight` que gira 90° al abrir, título de subgrupo, la cantidad ("3 productos") y, si corresponde, la alerta ("1 con stock bajo", en `warning-ink` con su ícono).
+- Plegados por defecto. Se abren solos el que contiene el elemento seleccionado y, al buscar o filtrar, todos los que tienen resultados, aunque se hayan cerrado a mano.
+- Adentro, la tabla del subgrupo sin línea entre filas.
 
 ### Tarjeta de indicador (KPI)
 
 ```
 ┌─────────────────────────────┐
-│ [ícono]  Vendido hoy        │   ícono en cuadro canvas de 40px
-│          $ 1.250.000        │   cifra font-display 32px
-│          ▲ 12% que ayer     │   variación con texto, no solo flecha
+│ Total de productos  [ícono] │   etiqueta muted; ícono en cuadro surface de 36px
+│                             │
+│ 24                          │   cifra de indicador, 40px
+│ 18 activos y 6 inactivos    │   contexto: lo destacado en negrita y en el color de su estado
 └─────────────────────────────┘
 ```
 
-Bloque `surface rounded-2xl p-6`. La variación dice contra qué se compara.
+- **Normal:** bloque `bg-surface-sunken rounded-2xl`, de hasta 300px de ancho, con relleno de 20 a 24px. La etiqueta en `text-[15px] text-muted`; el ícono de 19px en un cuadro `surface rounded-[10px]`, del color del estado que mide (`primary` para un total, `warning-ink` para alertas). La línea de contexto en `text-sm text-muted`, con su primera parte en `font-bold` y en el color del estado ("**11%** de los productos activos").
+- **Destacado:** para el indicador que tiene que tomar más fuerza que el resto, el mismo bloque sobre `brand`: cifra blanca, etiqueta y contexto en blanco al 72–82%, ícono `accent` en un cuadro blanco al 10%.
+- La línea de contexto dice contra qué se compara o de qué se compone el número; nunca una cifra sola.
 
 ### Chips de estado
 
@@ -197,6 +255,27 @@ Bloque `surface rounded-2xl p-6`. La variación dice contra qué se compara.
 | Pendiente de autorización, Stock bajo | `warning-surface` / `warning-ink` |
 | Rechazada, Deshabilitado, Vencida | `danger-surface` / `danger-ink` |
 | Neutro (Contado, Cuenta corriente) | `canvas` / `ink-soft` |
+| Filtro aplicado ("Mostrando 6 productos filtrados") | `accent-soft` / `brand`, `text-sm` |
+
+En una lista donde cada fila tiene estado, como activo o inactivo, el estado va como texto de 13px semibold bajo el nombre, sin chip ni ícono: "Activo" en `success-ink` e "Inactivo" en `danger-ink`. En celular solo se muestra el que se sale de lo normal ("Inactivo").
+
+### Control segmentado
+
+Para elegir una opción entre pocas que filtran una vista ("Todos · Activos · Bajo stock · Inactivos"):
+
+- Fondo `surface-sunken` `rounded-[10px]` con 4px de relleno; opciones del mismo ancho, de 40px de alto, en texto regular, con la cantidad entre paréntesis.
+- La opción elegida se marca con un fondo `surface` y sombra suave que se desliza hasta ella con resorte. El texto no cambia de grosor, para que nada salte.
+- Si una opción es un estado, lleva su ícono en el color del estado.
+- Cada opción es un botón con `aria-pressed`, dentro de un `role="group"` con etiqueta visible.
+
+### Tarjetas de selección
+
+Para elegir entre opciones que necesitan explicarse ("Ingreso / Ajuste", "PDF / CSV", "Todo el catálogo / Una familia / Una categoría"):
+
+- Cada opción es un botón con `aria-pressed`, `rounded-xl`, borde `line` de 1px y relleno de 14px, con título semibold y una descripción breve en `text-sm text-ink-soft`.
+- La elegida lleva borde `focus` de 2px (con 1px menos de relleno, para que no salte) y fondo `selected`; el hover oscurece el borde a `line-control`.
+- Cuando las opciones son excluyentes y van una debajo de la otra, llevan a la izquierda un círculo de selección.
+- Si una opción necesita un dato más (qué familia), el campo aparece debajo al elegirla.
 
 ### Avisos
 
@@ -206,7 +285,9 @@ Bloque `surface rounded-2xl p-6`. La variación dice contra qué se compara.
 ### Diálogos
 
 - Para confirmar algo que no se puede deshacer (dar de baja, rechazar una venta) y para la **autorización con código de supervisor** (ADR-0003).
-- `<dialog>` nativo, `rounded-2xl p-6`, ancho `max-w-md`, título que nombra la operación y texto que explica qué va a pasar con datos concretos ("La venta de $ 172.400 a Gómez supera su límite de crédito por $ 22.400").
+- También para tareas cortas que no justifican una pantalla, como ajustar stock o exportar.
+- `<dialog>` nativo, `rounded-2xl p-6`, título que nombra la operación y texto que explica qué va a pasar con datos concretos ("La venta de $ 172.400 a Gómez supera su límite de crédito por $ 22.400"). Las confirmaciones miden `max-w-md`; los diálogos con formulario, de 520 a 560px.
+- Los diálogos con formulario llevan arriba un ícono de 44px sobre `brand` y, antes de confirmar, un resumen sobre `canvas` que dice qué va a pasar ("Se exportan 7 productos de Hardware en «productos-hardware.pdf»"). El pie va sobre `canvas`, con el botón principal a la derecha.
 - Foco al primer campo; `Esc` cierra; el botón que confirma dice la acción ("Autorizar venta", "Dar de baja").
 - La autorización nunca saca a la persona de la venta: el diálogo se abre encima y al cerrarse la venta sigue donde estaba.
 
@@ -288,6 +369,8 @@ Es la pantalla más usada y la que más se cuida (RF-37 a RF-42, RNF-03). Sigue 
 - [ ] Hay un solo botón primario y dice verbo y objeto.
 - [ ] Los bloques se separan con fondo y espacio, sin bordes ni sombras.
 - [ ] Se ve completa en 1366×768 y no se rompe en 1280 ni en 1920.
+- [ ] En un celular de 390px de ancho se lee y se usa sin scroll horizontal.
+- [ ] Con movimiento reducido no se anima nada.
 - [ ] Se puede completar con teclado, con foco visible y en orden.
 - [ ] Usa solo tokens del tema; las cifras con `tabular-nums` y formato es-AR.
 - [ ] Ningún estado depende solo del color.
