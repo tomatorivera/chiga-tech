@@ -32,3 +32,13 @@ GET /api/productos?query=ryzen&page=2&pageSize=50
 - `total` sale de un `COUNT(*)` con el mismo filtro que la página.
 - El orden tiene que ser estable: si el criterio de orden no es único, como el nombre, se desempata por id. Sin ese desempate, un registro puede repetirse o saltearse entre páginas.
 - La respuesta tiene la misma forma en todos los listados, así que el backend la define una sola vez como tipo genérico y el frontend la replica a mano.
+
+## Excepción: el catálogo de productos
+
+La pantalla de Productos agrupa el catálogo por familia y categoría, con las categorías colapsadas, y filtra por familia, por estado y por texto. Con páginas, un grupo queda repartido entre varias y los totales y los filtros solo ven la página cargada. Por eso la pantalla trae el catálogo completo con un endpoint propio sin paginar y resuelve en el cliente la agrupación, los totales y los filtros.
+
+- Solo se dibujan las filas de las categorías abiertas, así que el costo de la pantalla está en la descarga y no en el render.
+- El volumen está acotado por RNF-02: una casa de computación grande ronda los 4.000 productos activos y, con los inactivos que se acumulan con los años, llega a unos 10.000. La respuesta viaja comprimida.
+- `GET /api/productos` sigue paginado: la venta busca un producto entre muchos y no necesita el catálogo entero.
+- Se descartó subir el tope de `pageSize`: la pantalla dependería de un límite que alguien puede volver a bajar sin saber que la rompe.
+- Si las mediciones muestran que la descarga no cumple RNF-02, el catálogo puede traer los inactivos aparte, solo cuando se elige ese filtro.
