@@ -185,7 +185,7 @@ Notas importantes respecto a los roles de los usuarios:
 
 | **Código** | **Requisito** |
 |---|---|
-| RNF-01 | La aplicación deberá ser accesible desde navegadores modernos de escritorio sin requerir instalación local, y desde múltiples computadoras en simultáneo. |
+| RNF-01 | La aplicación deberá ser accesible desde navegadores modernos de escritorio y de celular sin requerir instalación local, y desde múltiples dispositivos en simultáneo. |
 | RNF-02 | Las pantallas de consulta de productos y clientes deberán responder en un máximo de 3 segundos en condiciones normales de operación para búsquedas de hasta 10.000 registros. |
 | RNF-03 | El flujo de venta deberá poder completarse usando teclado, lector de código de barras o mouse, sin pasos innecesarios de confirmación. |
 | RNF-04 | La interfaz deberá presentar mensajes claros en español y validaciones junto al campo afectado. |
