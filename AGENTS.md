@@ -81,6 +81,10 @@ Si el cambio afecta algo documentado en un README, un ADR o `docs/GIT.md`, actua
 
 Issues y specs en GitHub Issues, vía `gh`. Ver `docs/agents/issue-tracker.md`.
 
+### Tablero de Trello
+
+El docente sigue el avance en Trello. Usá la skill `sync-trello` (`.claude/skills/sync-trello/`) después de publicar tickets con `to-tickets`, después de editar un ticket, cuando alguien empieza o está trabajando en un ticket cuya tarjeta no está en DOING, y cuando te piden sincronizar un ticket. Sin MCP de Trello, sugerí los cambios en vez de hacerlos.
+
 ### Domain docs
 
 Contexto único: `docs/CONTEXT.md` y ADR en `docs/adr/negocio/` y `docs/adr/tecnico/`. Ver `docs/agents/domain.md`.

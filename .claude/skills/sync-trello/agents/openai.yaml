@@ -1,0 +1,5 @@
+interface:
+  display_name: "Sync Trello"
+  short_description: "Mirror GitHub tickets on the Trello board"
+policy:
+  allow_implicit_invocation: true
